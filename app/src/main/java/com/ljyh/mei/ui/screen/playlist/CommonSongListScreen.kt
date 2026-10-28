@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import com.kyant.backdrop.backdrops.rememberCanvasBackdrop
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.constants.DetailPageHorizontalPadding
 import com.ljyh.mei.constants.PlaylistTrackTableHeaderKey
 import com.ljyh.mei.constants.PlaylistCoverStyle
@@ -222,7 +222,7 @@ fun CommonSongListScreen(
                                 modifier = Modifier
                                     .width(animatedWidth.coerceIn(buttonSize, maxWidth.coerceAtLeast(buttonSize)))
                                     .height(buttonSize),
-                                shape = Capsule(),
+                                shape = GlassCapsule,
                                 onClick = if (isPlaylistSearchActive) null else {
                                     { onPlaylistSearchActiveChange(true) }
                                 },
@@ -230,7 +230,7 @@ fun CommonSongListScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(Capsule()),
+                                        .clip(GlassCapsule),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Box(

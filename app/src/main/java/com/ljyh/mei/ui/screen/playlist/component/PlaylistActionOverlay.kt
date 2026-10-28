@@ -31,7 +31,7 @@ fun PlaylistActionOverlay(
     val context = LocalContext.current
 
     when (overlay) {
-        is OverlayState.Share -> com.ljyh.mei.ui.screen.social.NeteaseShareSheet(
+        is OverlayState.Share -> com.ljyh.mei.ui.component.TrackShareSheet(
             metadata = overlay.metadata,
             onDismiss = onDismiss,
         )

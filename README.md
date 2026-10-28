@@ -4,7 +4,7 @@
 
 <img src="./screenshot/logo.png" width="120px" style="border-radius:12px"/>
 
-### 一个基于 Mei 改造的高仿 Apple Music 风格网易云音乐 Android 客户端
+### 一个基于 Mei / MeiloX 改造的高仿 Apple Music 风格哔哩哔哩音乐播放器 Android 客户端
 
 ![Android](https://img.shields.io/badge/Platform-Android-green?logo=android)
 ![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue)
@@ -12,6 +12,16 @@
 ![Status](https://img.shields.io/badge/Development-In%20Progress-yellow)
 
 </div>
+
+---
+
+> **B 站播放器改造说明**：本仓库已由第三方网易云音乐客户端改造为 **哔哩哔哩音乐播放器**：
+> - 首页读取 B 站音乐区（rid=3）排行榜与最新投稿；
+> - 支持哔哩哔哩扫码登录（网页版 Cookie 会话）；
+> - 「我的账号」页可浏览并**同步个人收藏夹合集**到本地歌单（离线可浏览、可播放）；
+> - 搜索为 B 站视频搜索，结果可直接播放其音频流；
+> - 播放器内的歌词页面已移除（状态栏/桌面歌词等系统歌词能力保留）；
+> - 网易云音乐相关界面与入口已全部移除，播放内容为 B 站视频的 DASH 音频流。
 
 ---
 

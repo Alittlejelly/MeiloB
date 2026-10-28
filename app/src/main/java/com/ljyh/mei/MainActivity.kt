@@ -123,7 +123,6 @@ import androidx.navigation3.ui.defaultTransitionSpec
 import com.ljyh.mei.constants.AppBarHeight
 import com.ljyh.mei.constants.AppAppearance
 import com.ljyh.mei.constants.AppAppearanceKey
-import com.ljyh.mei.constants.BetaUpdatesEnabledKey
 import com.ljyh.mei.constants.DeviceIdKey
 import com.ljyh.mei.constants.DynamicThemeKey
 import com.ljyh.mei.constants.AccentColorKey
@@ -155,17 +154,10 @@ import com.ljyh.mei.constants.NavigationBarHeight
 import com.ljyh.mei.constants.NavigationBarSurfaceHeight
 import com.ljyh.mei.constants.NavigationBarBottomMargin
 import com.ljyh.mei.data.model.UserData
-import com.ljyh.mei.data.model.api.GetSongDetails
-import com.ljyh.mei.data.model.melox.NeteaseMusicLink
-import com.ljyh.mei.data.model.melox.NeteaseMusicLinkParser
-import com.ljyh.mei.data.model.toMediaItem
-import com.ljyh.mei.data.network.api.ApiService
 import com.ljyh.mei.di.AppDatabase
 import com.ljyh.mei.di.repository.ColorRepository
 import com.ljyh.mei.playback.MusicService
 import com.ljyh.mei.playback.PlayerConnection
-import com.ljyh.mei.playback.queue.ListQueue
-import com.ljyh.mei.ui.component.ClipboardLinkPrompt
 import com.ljyh.mei.ui.component.IconButton
 import com.ljyh.mei.ui.component.VersionUpdateAlert
 import com.ljyh.mei.ui.component.player.BottomSheetPlayer
@@ -208,9 +200,7 @@ import com.ljyh.mei.ui.glass.rememberSharedGlassBackdrop
 import com.ljyh.mei.ui.glass.trackBackdropPosition
 import com.ljyh.mei.ui.screen.Index
 import com.ljyh.mei.ui.screen.Screen
-import com.ljyh.mei.ui.screen.account.NeteaseLegacyWebSessionNotice
 import com.ljyh.mei.ui.screen.navigationEntry
-import com.ljyh.mei.ui.screen.search.SearchScreen
 import com.ljyh.mei.ui.navigation.MeiNavEntryViewModelStoreOwner
 import com.ljyh.mei.ui.navigation.MeiNavigator
 import com.ljyh.mei.ui.navigation.MeiRoute
@@ -222,7 +212,6 @@ import com.ljyh.mei.playback.nextPlaybackMediaItemIndex
 import com.ljyh.mei.utils.dataStore
 import com.ljyh.mei.utils.get
 import com.ljyh.mei.utils.log.FileLoggingTree
-import com.ljyh.mei.utils.netease.NeteaseUtils.getAndroidId
 import com.ljyh.mei.utils.rememberPreference
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.utils.VersionUpdateChecker
@@ -251,7 +240,8 @@ class MainActivity : ComponentActivity() {
     lateinit var colorRepository: ColorRepository
 
     @Inject
-    lateinit var apiService: ApiService
+    lateinit var biliRepository: com.ljyh.mei.data.repository.BiliRepository
+
     private var userData by mutableStateOf(UserData.VISITOR)
     private var pictureInPictureMode by mutableStateOf(false)
     private var floatingLyricsRequest: Boolean? = null
@@ -297,11 +287,11 @@ class MainActivity : ComponentActivity() {
             // Search chrome belongs to the search destination, including back navigation.
             val active = navController.currentRoute == Screen.Search.route
             var focusSearchOnEntry by remember { mutableStateOf(false) }
+            val bottomSearchState = remember { com.ljyh.mei.ui.local.BottomSearchState() }
             val dynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = false)
             val accentColorArgb by rememberPreference(AccentColorKey, DefaultAccentColorArgb)
             val appAppearance by rememberEnumPreference(AppAppearanceKey, AppAppearance.System)
             val (lastSelectedTab, setLastSelectedTab) = rememberPreference(LastSelectedTabKey, Index.Home.name)
-            val recognizeClipboardLinks by rememberPreference(RecognizeClipboardLinksKey, false)
             val navigationPreferences by context.dataStore.data
                 .collectAsState<Preferences, Preferences?>(initial = null)
             val colorfulPageBackgrounds = navigationPreferences?.let {
@@ -318,34 +308,20 @@ class MainActivity : ComponentActivity() {
                 navigationPreferences?.get(PredictiveBackAnimationEnabledKey) ?: true
             val podcastsEnabled = navigationPreferences?.get(PodcastsEnabledKey) ?: true
             val downloadsEnabled = navigationPreferences?.get(DownloadsEnabledKey) ?: true
-            val cloudMusicEnabled = navigationPreferences?.get(CloudMusicEnabledKey) ?: true
             val listeningHistoryEnabled = navigationPreferences?.get(ListeningHistoryEnabledKey) ?: true
-            val findMusicTabEnabled = navigationPreferences?.get(FindMusicTabEnabledKey) ?: true
             val libraryTabEnabled = navigationPreferences?.get(LibraryTabEnabledKey) ?: true
-            val podcastsTabEnabled = navigationPreferences?.get(PodcastsTabEnabledKey) ?: false
             val downloadsTabEnabled = navigationPreferences?.get(DownloadsTabEnabledKey) ?: false
-            val cloudMusicTabEnabled = navigationPreferences?.get(CloudMusicTabEnabledKey) ?: false
             val listeningHistoryTabEnabled = navigationPreferences?.get(ListeningHistoryTabEnabledKey) ?: false
             val keepScreenOnInPlayer by rememberPreference(PlayerKeepScreenOnKey, false)
             val navigationTabOrder = navigationPreferences?.get(NavigationTabOrderKey)
                 ?: Index.DefaultOrder.joinToString(",", transform = Index::name)
             var playerConnection by remember { mutableStateOf<PlayerConnection?>(null) }
-            var clipboardLink by remember { mutableStateOf<NeteaseMusicLink?>(null) }
-            var clipboardInspected by rememberSaveable { mutableStateOf(false) }
             var startupUpdateResult by remember { mutableStateOf<VersionUpdateResult?>(null) }
 
             LaunchedEffect(Unit) {
                 try {
-                    val betaUpdatesEnabled = context.dataStore.data.first()[BetaUpdatesEnabledKey] ?: false
-                    val result = VersionUpdateChecker.check(
-                        BuildConfig.VERSION_NAME,
-                        betaUpdatesEnabled = betaUpdatesEnabled,
-                    )
-                    val currentBetaUpdatesEnabled = context.dataStore.data.first()[BetaUpdatesEnabledKey] ?: false
-                    if (result is VersionUpdateResult.UpdateAvailable &&
-                        result.comparisonKnown &&
-                        currentBetaUpdatesEnabled == betaUpdatesEnabled
-                    ) {
+                    val result = VersionUpdateChecker.check(BuildConfig.VERSION_NAME)
+                    if (result is VersionUpdateResult.UpdateAvailable) {
                         startupUpdateResult = result
                     }
                 } catch (cancellation: CancellationException) {
@@ -576,9 +552,7 @@ class MainActivity : ComponentActivity() {
                     val windowsInsets = WindowInsets.systemBars
                     val navigationInsets = WindowInsets.navigationBars
                     val currentRoute = navController.currentRoute
-                    val handlesKeyboardInsets = active || currentRoute == Screen.Search.route ||
-                        currentRoute?.startsWith("${Screen.PrivateConversation.route}/") == true ||
-                        currentRoute?.startsWith("${Screen.Comment.route}/") == true
+                    val handlesKeyboardInsets = active || currentRoute == Screen.Search.route
                     DisposableEffect(handlesKeyboardInsets) {
                         val previousMode = window.attributes.softInputMode
                         if (handlesKeyboardInsets) {
@@ -626,25 +600,17 @@ class MainActivity : ComponentActivity() {
                     }
 
                     val navigationItems = remember(
-                        podcastsEnabled,
                         downloadsEnabled,
-                        cloudMusicEnabled,
                         listeningHistoryEnabled,
-                        findMusicTabEnabled,
                         libraryTabEnabled,
-                        podcastsTabEnabled,
                         downloadsTabEnabled,
-                        cloudMusicTabEnabled,
                         listeningHistoryTabEnabled,
                         navigationTabOrder,
                     ) {
                         val available = buildList {
                             add(Index.Home)
-                            if (findMusicTabEnabled) add(Index.FindMusic)
-                            if (podcastsEnabled && podcastsTabEnabled) add(Index.Podcasts)
                             if (libraryTabEnabled) add(Index.Library)
                             if (downloadsEnabled && downloadsTabEnabled) add(Index.Downloads)
-                            if (cloudMusicEnabled && cloudMusicTabEnabled) add(Index.Cloud)
                             if (listeningHistoryEnabled && listeningHistoryTabEnabled) add(Index.History)
                             add(Index.Settings)
                         }
@@ -687,7 +653,6 @@ class MainActivity : ComponentActivity() {
                     // Keep the anchor stable while the navigation morphs. The mini player
                     // moves inside the collapsed host with the same continuous spring.
                     val collapsedBottomReservation = when {
-                        active -> navigationBottomMargin + 56.dp + NavigationBarBottomMargin
                         shouldAllowNavigationBar ->
                             navigationBottomMargin + NavigationBarHeight - NavigationBarBottomMargin
                         else -> navigationBottomMargin
@@ -827,22 +792,20 @@ class MainActivity : ComponentActivity() {
 
                     val onSearch: (String) -> Unit = {
                         if (it.isNotEmpty()) {
+                            // 结果就地展示在搜索页，交给页面注册的处理器发起全站搜索。
+                            bottomSearchState.submit?.invoke(it)
                             clearSearchInput()
-                            Screen.SearchResult.navigate(navController){
-                                addPath(Uri.encode(it))
-                                addPath("1") // 默认所搜单曲
-                            }
                         }
                     }
-
                     LaunchedEffect(Unit) {
                         lifecycleScope.launch {
-                            getAndroidId(this@MainActivity)
                             if (dataStore.get(DeviceIdKey, "").isEmpty()) {
                                 dataStore.edit { settings ->
                                     settings[DeviceIdKey] = com.ljyh.mei.utils.getDeviceId()
                                 }
                             }
+                            // 校验本地 B 站会话，坏凭证自动清除回未登录状态。
+                            biliRepository.validateSession()
                         }
                     }
                     DisposableEffect(playerConnection, playerBottomSheetState, isMeasured) {
@@ -949,6 +912,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 CompositionLocalProvider(
                                     LocalGlassBackdrop provides glassBackdrop,
+                                    com.ljyh.mei.ui.local.LocalBottomSearchState provides bottomSearchState,
                                 ) {
                                     val entryViewModelOwners = remember {
                                         mutableMapOf<String, MeiNavEntryViewModelStoreOwner>()
@@ -1116,25 +1080,7 @@ class MainActivity : ComponentActivity() {
                                                     if (query.text.isEmpty()) Color.Transparent
                                                     else MaterialTheme.colorScheme.background,
                                                 ),
-                                        ) {
-                                            if (query.text.isNotEmpty()) {
-                                                SearchScreen(
-                                                    query = query.text,
-                                                    onQueryChange = onQueryChange,
-                                                    onSearch = { query, type ->
-                                                        Screen.SearchResult.navigate(navController){
-                                                            addPath(Uri.encode(query))
-                                                            addPath(type.toString())
-                                                        }
-                                                    },
-                                                    onDismiss = clearSearchInput,
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .padding(top = windowsInsets.asPaddingValues().calculateTopPadding())
-                                                        .padding(searchResultsBottomPadding),
-                                                )
-                                            }
-                                        }
+                                        )
                                     }
                                 }
                             }
@@ -1146,6 +1092,7 @@ class MainActivity : ComponentActivity() {
                             pageDarkAppearance = pageDarkAppearance,
                             onBackgroundReadyChanged = onPlayerBackgroundReadyChanged,
                         )
+                        // 全站搜索工具栏：占据底栏导航位置（导航栏在搜索页隐藏后露出的同一空间）。
                         AnimatedVisibility(
                             visible = active,
                             enter = fadeIn(),
@@ -1229,61 +1176,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        LaunchedEffect(recognizeClipboardLinks) {
-                            if (recognizeClipboardLinks && !clipboardInspected) {
-                                clipboardInspected = true
-                                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val text = clipboard.primaryClip
-                                    ?.takeIf { it.itemCount > 0 }
-                                    ?.getItemAt(0)
-                                    ?.coerceToText(this@MainActivity)
-                                    ?.toString()
-                                clipboardLink = text?.let(NeteaseMusicLinkParser::parse)
-                            }
-                        }
-                        clipboardLink?.let { detectedLink ->
-                            ClipboardLinkPrompt(
-                                link = detectedLink,
-                                onDismiss = { clipboardLink = null },
-                                onOpen = {
-                                    clipboardLink = null
-                                    when (detectedLink) {
-                                        is NeteaseMusicLink.ListenTogether -> {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                "listen_invitation",
-                                                detectedLink.invitationText,
-                                            )
-                                            Screen.ListenTogether.navigate(navController)
-                                        }
-                                        is NeteaseMusicLink.Song -> {
-                                            lifecycleScope.launch {
-                                                runCatching {
-                                                    apiService.getSongDetail(GetSongDetails(detectedLink.id.toString()))
-                                                        .songs
-                                                        .firstOrNull()
-                                                        ?: error(getString(R.string.clipboard_song_not_found))
-                                                }.onSuccess { song ->
-                                                    playerConnection?.playQueue(
-                                                        ListQueue(
-                                                            id = "clipboard-${song.id}",
-                                                            title = song.name,
-                                                            items = listOf(song.id.toString() to song.toMediaItem()),
-                                                        ),
-                                                    )
-                                                }.onFailure { error ->
-                                                    Toast.makeText(
-                                                        this@MainActivity,
-                                                        getString(R.string.clipboard_open_failed, error.message.orEmpty()),
-                                                        Toast.LENGTH_LONG,
-                                                    ).show()
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                            )
-                        }
-                        if (!pictureInPictureMode) NeteaseLegacyWebSessionNotice()
                         VersionUpdateAlert(
                             result = startupUpdateResult,
                             onDismiss = { startupUpdateResult = null },

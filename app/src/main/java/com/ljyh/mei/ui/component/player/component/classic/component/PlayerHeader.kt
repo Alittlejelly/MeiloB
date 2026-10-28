@@ -53,7 +53,7 @@ fun PlayerHeader(
     onTextPositioned: (LayoutCoordinates) -> Unit = {},
     onRowPositioned: (LayoutCoordinates) -> Unit = {},
 ) {
-    val showLikeButton = !mediaMetadata.isLocal && !mediaMetadata.isPodcast
+    val showLikeButton = !mediaMetadata.isLocal && !mediaMetadata.isPodcast && !mediaMetadata.isBili
     val marqueeEnabled = LocalPlayerSheet.current?.state?.isExpanded != false
     val metadataClick = if (appleMusicStyle) {
         Modifier.clickable(

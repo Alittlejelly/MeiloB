@@ -112,13 +112,6 @@ class PlayerOverlayHandler(
     }
 
     /**
-     * 显示QQ音乐选择弹窗
-     */
-    fun showQQMusicSelection(mediaMetadata: MediaMetadata) {
-        _currentOverlay.value = OverlayState.QQMusicSelection(mediaMetadata)
-    }
-
-    /**
      * 显示音质选择弹窗
      */
     fun showMusicQualitySelection(current: Int) {
@@ -167,12 +160,8 @@ class PlayerOverlayHandler(
                 mediaMetadata?.let {
                     dismiss()
                     requestNotificationPermission()
-                    stateContainer.playerViewModel.downloadSong(it, context)
-                }
-            }
-            MoreAction.DELETE -> {
-                mediaMetadata?.let {
-                    stateContainer.playerViewModel.deleteSongById(it.id.toString())
+                    val mediaId = stateContainer.playerConnection.player.currentMediaItem?.mediaId
+                    stateContainer.playerViewModel.downloadSong(it, context, biliMediaId = mediaId)
                 }
             }
             MoreAction.VIEW_PLAYLIST -> {

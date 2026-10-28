@@ -45,7 +45,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SongInfoSheet(
     metadata: MediaMetadata,
-    qqSongId: String?,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -128,19 +127,6 @@ fun SongInfoSheet(
                     label = "译名",
                     value = tns,
                     onCopy = { setClipboard(context, tns, "译名") }
-                )
-            }
-
-            // QQ 音乐
-            if (qqSongId != null) {
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                Spacer(Modifier.height(8.dp))
-                SectionLabel("QQ 音乐")
-                InfoItem(
-                    label = "QQ 歌曲 ID",
-                    value = qqSongId,
-                    onCopy = { setClipboard(context, qqSongId, "QQ 歌曲 ID") }
                 )
             }
 

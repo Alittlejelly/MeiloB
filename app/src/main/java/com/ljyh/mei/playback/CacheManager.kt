@@ -74,11 +74,17 @@ object CacheManager {
         // 1. 先配置你的 OkHttp (负责处理网络流)
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
-                chain.proceed(
-                    chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgent)
-                        .build()
-                )
+                val host = chain.request().url.host
+                val builder = chain.request().newBuilder()
+                    .addHeader("User-Agent", UserAgent)
+                // B 站音视频 CDN 强制校验 Referer，缺失会返回 403。
+                if (host.endsWith("bilivideo.com") || host.endsWith("bilivideo.cn") ||
+                    host.endsWith("acgvideo.com") || host.endsWith("hdslb.com")
+                ) {
+                    builder.header("Referer", "https://www.bilibili.com/")
+                        .header("Origin", "https://www.bilibili.com")
+                }
+                chain.proceed(builder.build())
             }
             .build()
         val okHttpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)

@@ -115,21 +115,16 @@ fun AppearanceSettings(
     val (reduceTransparency, setReduceTransparency) = rememberPreference(ReduceTransparencyKey, false)
     val (predictiveBackAnimation, setPredictiveBackAnimation) =
         rememberPreference(PredictiveBackAnimationEnabledKey, true)
-    val podcastsEnabled by rememberPreference(PodcastsEnabledKey, true)
     val downloadsEnabled by rememberPreference(DownloadsEnabledKey, true)
-    val cloudMusicEnabled by rememberPreference(CloudMusicEnabledKey, true)
     val historyEnabled by rememberPreference(ListeningHistoryEnabledKey, true)
     val libraryDefaultPages = LibraryPage.entries.filter { page ->
         when (page.requiredFeature) {
-            ContentFeature.Podcasts -> podcastsEnabled && libraryStyle == LibraryStyle.AppleMusic
             ContentFeature.Downloads -> downloadsEnabled
-            ContentFeature.CloudMusic -> cloudMusicEnabled
             ContentFeature.ListeningHistory -> historyEnabled
             null -> true
         }
     }.map(LibraryPage::name)
     val displayedLibraryDefaultPage = when {
-        libraryStyle == LibraryStyle.Default && libraryDefaultPage == LibraryPage.Podcasts.name && podcastsEnabled -> LibraryPage.Albums.name
         libraryDefaultPage in libraryDefaultPages -> libraryDefaultPage
         else -> ""
     }

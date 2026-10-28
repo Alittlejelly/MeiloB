@@ -20,7 +20,6 @@ import androidx.media3.common.Player.STATE_READY
 import androidx.media3.common.util.UnstableApi
 import com.ljyh.mei.data.model.MediaMetadata
 import com.ljyh.mei.data.model.metadata
-import com.ljyh.mei.data.model.qq.u.SearchResult
 import com.ljyh.mei.data.model.room.Playlist
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.playback.PlayerConnection
@@ -67,9 +66,6 @@ class PlayerStateContainer(
         internal set
 
     lateinit var lyricResult: State<LyricData>
-        internal set
-
-    lateinit var qqLyricSearch: State<Resource<SearchResult>>
         internal set
 
     lateinit var checkSongLike: State<Resource<Boolean>>
@@ -149,7 +145,6 @@ fun rememberPlayerStateContainer(
     container.isFMMode = playerConnection.isFMMode.collectAsStateWithLifecycle()
 
     container.lyricResult = playerViewModel.lyric.collectAsStateWithLifecycle()
-    container.qqLyricSearch = playerViewModel.searchResult.collectAsStateWithLifecycle()
     container.checkSongLike = playerViewModel.like.collectAsStateWithLifecycle()
     container.allPlaylist = playerViewModel.localPlaylists.collectAsStateWithLifecycle()
     container.myPlaylist = playerViewModel.myPlaylists.collectAsStateWithLifecycle()

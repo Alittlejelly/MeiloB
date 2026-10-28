@@ -120,8 +120,8 @@
     <string name="pip_pause">Pause</string>
     <string name="pip_next">Next</string>
     <string name="lyrics_waiting">Waiting for lyrics</string>
-    <string name="app_name">MeiloX</string>
-    <string name="app_name_en">MeiloX</string>
+    <string name="app_name">MeiloB</string>
+    <string name="app_name_en">MeiloB</string>
     <string name="music_player">Music Player</string>
     <string name="error_no_internet">No network connection</string>
     <string name="error_timeout">Timeout</string>
@@ -289,20 +289,17 @@
     <string name="about_feedback">Report an Issue</string>
     <string name="about_logs">Diagnostic Logs</string>
     <string name="about_check_updates">Check for Updates</string>
-    <string name="about_check_beta_updates">Check for beta updates</string>
     <string name="about_checking_updates">Checking for Updates…</string>
     <string name="about_check_updates_description">Compare this version with the latest GitHub tag.</string>
     <string name="about_update_available_title">New Version Available</string>
     <string name="about_update_available_message">Version %1$s is available. You are using %2$s.</string>
     <string name="about_open_update">View Update</string>
-    <string name="about_beta_download_login_required">Sign in to your GitHub account to download nightly builds</string>
     <string name="about_update_up_to_date_title">You’re Up to Date</string>
     <string name="about_update_up_to_date_message">You are using the latest version, %1$s.</string>
     <string name="about_update_failed_title">Couldn’t Check for Updates</string>
     <string name="about_update_failed_message">Please check your network connection and try again.</string>
-    <string name="about_beta_latest_build_title">Latest Nightly Build</string>
-    <string name="about_beta_comparison_unavailable_message">Nightly %1$s is available to download. Your current build is %2$s. Their update order could not be determined; you can view the nightly build on GitHub.</string>
     <string name="about_acknowledgements">Open Source Acknowledgements</string>
+    <string name="about_fork_source_description">Fork source of this project (Android)</string>
     <string name="about_upstream_description">Mei upstream repository</string>
     <string name="about_melox_description">iOS reference implementation</string>
     <string name="about_amll_description">High-quality word-synced lyrics</string>
@@ -387,7 +384,7 @@
     <string name="notification_enable_floating_lyrics">Enable floating lyrics</string>
     <string name="notification_disable_floating_lyrics">Disable floating lyrics</string>
     <string name="notification_floating_lyrics_open_hint">Tap this notification to open floating lyrics</string>
-    <string name="notification_floating_lyrics_open_app">Open MeiloX to enable floating lyrics</string>
+    <string name="notification_floating_lyrics_open_app">Open MeiloB to enable floating lyrics</string>
     <string name="notification_floating_lyrics_background_permission">Background floating lyrics</string>
     <string name="notification_floating_lyrics_background_permission_description">Allow “Display over other apps” in system settings to open floating lyrics directly from notifications.</string>
     <string name="notification_floating_lyrics_background_permission_description_xiaomi">Allow “Display over other apps”, then “Background pop-up windows” in system settings to open floating lyrics directly from notifications.</string>
@@ -417,7 +414,7 @@
     <string name="app_tab_music">Music</string>
     <string name="app_tab_podcasts">Podcasts</string>
     <string name="app_tab_explore">Explore</string>
-    <string name="app_tab_library">Library</string>
+    <string name="app_tab_library">收藏</string>
     <string name="app_tab_library_songs">Favorite Songs</string>
     <string name="app_tab_library_playlists">Favorite Playlists</string>
     <string name="app_tab_library_podcasts">Subscribed Podcasts</string>
@@ -489,7 +486,7 @@
     <string name="search_category_relax">Relax</string>
     <string name="search_category_night">Night</string>
     <string name="settings_account">Account</string>
-    <string name="netease_login">Sign in to NetEase Cloud Music</string>
+    <string name="netease_login">登录哔哩哔哩</string>
     <string name="netease_login_detected">Signed in successfully</string>
     <string name="netease_login_waiting">Complete sign-in on the webpage</string>
     <string name="netease_cookie_login">Use Cookie Login</string>
@@ -554,7 +551,7 @@
     <string name="netease_web_login">Web Cookie Sign-In</string>
     <string name="pc_qr_login_mobile_only">Requires mobile sign-in</string>
     <string name="netease_web_session_notice_title">Mobile Sign-In Is Now Available</string>
-    <string name="netease_web_session_notice_message">Your existing web session may not support all features. MeiloX now supports official NetEase mobile account sessions, including Web / PC QR authorization. Sign in with your phone to switch. Your current session stays signed in until the new sign-in succeeds.</string>
+    <string name="netease_web_session_notice_message">Your existing web session may not support all features. MeiloB now supports official NetEase mobile account sessions, including Web / PC QR authorization. Sign in with your phone to switch. Your current session stays signed in until the new sign-in succeeds.</string>
     <string name="netease_web_session_do_not_remind">Do Not Remind Again</string>
     <string name="netease_web_session_sign_in_again">Sign In Again</string>
     <string name="done">Done</string>
@@ -817,4 +814,7 @@
 
 <string name="flyme_status_bar_lyrics">Flyme status bar lyrics</string>
 <string name="flyme_status_bar_lyrics_warning">检测到当前系统非Flyme，可能无法正确显示状态栏歌词。</string>
+    <string name="library_page_fav_folders">我的收藏</string>
+    <string name="library_page_fav_collections">收藏合集</string>
+    <string name="queue_reverse">倒序播放</string>
 </resources>

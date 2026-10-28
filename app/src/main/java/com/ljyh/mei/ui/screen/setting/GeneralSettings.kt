@@ -26,8 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.AppAppearance
 import com.ljyh.mei.constants.AppAppearanceKey
-import com.ljyh.mei.constants.CookieKey
-import com.ljyh.mei.constants.RecognizeClipboardLinksKey
+import com.ljyh.mei.constants.BiliSessdataKey
 import com.ljyh.mei.ui.glass.GlassCard
 import com.ljyh.mei.ui.glass.GlassIconButton
 import com.ljyh.mei.ui.glass.GlassToggle
@@ -44,10 +43,7 @@ import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.utils.rememberPreference
-import com.ljyh.mei.utils.setClipboard
-import com.ljyh.mei.data.network.NeteaseSessionType
-import com.ljyh.mei.ui.screen.account.logoutNetease
-import com.ljyh.mei.ui.screen.account.rememberNeteaseSessionType
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,15 +52,10 @@ fun GeneralSettings() {
     val context = LocalContext.current
     val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     val (appearance, setAppearance) = rememberEnumPreference(AppAppearanceKey, AppAppearance.System)
-    val (recognizeClipboard, setRecognizeClipboard) = rememberPreference(RecognizeClipboardLinksKey, false)
-    val (cookie) = rememberPreference(CookieKey, "")
-    val sessionType = rememberNeteaseSessionType()
+    val (biliSessdata) = rememberPreference(BiliSessdataKey, "")
+    val biliAccountViewModel: com.ljyh.mei.ui.screen.account.BiliAccountViewModel = hiltViewModel()
     var showLogoutConfirmation by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val logoutTitle = stringResource(
-        if (sessionType == NeteaseSessionType.Mobile) R.string.netease_logout
-        else R.string.netease_logout_web,
-    )
+    val logoutTitle = stringResource(R.string.netease_logout)
 
     IosPinnedListPage(
         title = stringResource(R.string.general_settings),
@@ -94,42 +85,8 @@ fun GeneralSettings() {
             }
         }
         item {
-            SettingsGroup(stringResource(R.string.general_clipboard)) {
-                GeneralToggle(R.string.general_recognize_clipboard, R.string.general_recognize_clipboard_description, "document.on.clipboard", recognizeClipboard, setRecognizeClipboard)
-            }
-        }
-        item {
             SettingsGroup(stringResource(R.string.settings_account)) {
-                GlassCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(if (cookie.isNotBlank()) 1f else 0.38f),
-                    onClick = if (cookie.isNotBlank()) {
-                        { setClipboard(context, cookie, "MUSIC_U") }
-                    } else {
-                        null
-                    },
-                ) {
-                    Row(
-                        Modifier.fillMaxWidth().padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SfIcon("document.on.clipboard", null, size = 21.dp)
-                        Column(
-                            Modifier.weight(1f).padding(horizontal = 13.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                        ) {
-                            Text(stringResource(R.string.general_export_music_u))
-                            Text(
-                                stringResource(R.string.general_export_music_u_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        SfIcon("chevron.forward", null, size = 15.dp, tint = LocalGlassColors.current.separator)
-                    }
-                }
-                if (sessionType != NeteaseSessionType.None) {
+                if (biliSessdata.isNotBlank()) {
                     IosListRow(
                         title = logoutTitle,
                         systemName = "rectangle.portrait.and.arrow.forward",
@@ -139,13 +96,13 @@ fun GeneralSettings() {
             }
         }
     }
-    if (showLogoutConfirmation && sessionType != NeteaseSessionType.None) {
+    if (showLogoutConfirmation && biliSessdata.isNotBlank()) {
         NeteaseLogoutConfirmation(
             title = logoutTitle,
             onDismiss = { showLogoutConfirmation = false },
             onConfirm = {
                 showLogoutConfirmation = false
-                scope.launch { logoutNetease(context) }
+                biliAccountViewModel.logout()
             },
         )
     }

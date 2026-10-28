@@ -93,8 +93,8 @@ android {
             .get()
         minSdk = 33
         targetSdk = 37
-        versionCode = 16
-        versionName = "1.55.1"
+        versionCode = 100
+        versionName = "1.0.0"
         buildConfigField("long", "BUILD_NUMBER", "${buildNumber}L")
         buildConfigField("String", "BUILD_COMMIT_SHA", "\"$buildCommitSha\"")
         buildConfigField("boolean", "BUILD_SOURCE_DIRTY", buildSourceDirty.toString())
@@ -118,6 +118,12 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            // Temporary perf A/B experiment: with -Pmei.strictAot set, produce a
+            // NON-debuggable debug build so ART honors `pm compile -m speed`
+            // (debuggable packages are pinned to verify/interpreter execution).
+            isDebuggable = !providers.gradleProperty("mei.strictAot").isPresent
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -180,6 +186,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.zxing.core)
     implementation(libs.miuix.navigation3.ui.android)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.media3)

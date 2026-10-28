@@ -93,13 +93,12 @@ import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.constants.MiniPlayerHeight
 import com.ljyh.mei.constants.PlayerHorizontalPadding
 import com.ljyh.mei.constants.ThumbnailCornerRadius
 import com.ljyh.mei.ui.component.player.MiniPlayer
 import com.ljyh.mei.ui.component.player.component.FluidBackground
-import com.ljyh.mei.ui.component.player.component.LyricScreen
 import com.ljyh.mei.ui.component.player.component.PlayerControlsSection
 import com.ljyh.mei.ui.component.player.overlay.PlayerOverlayHandler
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
@@ -112,7 +111,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private enum class AppleMusicPlayerPage { Artwork, Lyrics, Queue }
+private enum class AppleMusicPlayerPage { Artwork, Queue }
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -133,10 +132,9 @@ fun AppleMusicPlayer(
 
     // --- Apple Music 特定状态 ---
     var page by remember { mutableStateOf(AppleMusicPlayerPage.Artwork) }
-    val showLyrics = page == AppleMusicPlayerPage.Lyrics
     val showQueue = page == AppleMusicPlayerPage.Queue
     val showDetail = page != AppleMusicPlayerPage.Artwork
-    var lastDetailPage by remember { mutableStateOf(AppleMusicPlayerPage.Lyrics) }
+    var lastDetailPage by remember { mutableStateOf(AppleMusicPlayerPage.Queue) }
     var playerBoundsInRoot by remember { mutableStateOf<Rect?>(null) }
     var albumTextCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     var headerTextCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
@@ -254,7 +252,7 @@ fun AppleMusicPlayer(
             maxHeightPx, measuredControlsHeight, albumInformationHeight,
             with(density) { AppleMusicDimensions.albumInfoBottomGap.toPx() }, topSafeArea,
         )
-        val controlsShown = !showLyrics || stateContainer.controlsVisible
+        val controlsShown = true
         val controlsFadeShift = animateFloatAsState(
             targetValue = if (controlsShown) 0f else 0.6f,
             animationSpec = appleMusicControlsFadeSpring(controlsShown),
@@ -411,7 +409,7 @@ fun AppleMusicPlayer(
                         .playerAdditiveBlend()
                         .background(
                             Color.White.copy(alpha = 0.3f),
-                            Capsule(),
+                            GlassCapsule,
                         ),
                 )
 
@@ -495,7 +493,7 @@ fun AppleMusicPlayer(
                                                                 title = metadata.title,
                                                                 subTitle = metadata.artists.joinToString { it.name },
                                                                 isLiked = isLiked,
-                                                                showLikeButton = !metadata.isLocal && !metadata.isPodcast,
+                                                                showLikeButton = !metadata.isLocal && !metadata.isPodcast && !metadata.isBili,
                                                                 onLikeClick = { stateContainer.playerViewModel.like(metadata.id.toString()) },
                                                                 onMoreClick = { overlayHandler.showMoreAction() },
                                                                 onTitleClick = {
@@ -541,36 +539,7 @@ fun AppleMusicPlayer(
                                     )
                                 }
                             },
-                            lyrics = { active ->
-                                LyricScreen(
-                                    lyricData = lyricLine,
-                                    active = active,
-                                    showSourceBadge = false,
-                                    topFadeHeight = AppleMusicDimensions.lyricTopFade,
-                                    bottomFadeHeight = AppleMusicDimensions.lyricBottomFade,
-                                    rendererVerticalPadding = 0.dp,
-                                    synchronizeEntryWithParent = true,
-                                    lyricContentModifier = Modifier.graphicsLayer {
-                                        translationY = lyricEntryTranslationY()
-                                    },
-                                    controlsFadeRange = { viewportHeight ->
-                                        appleMusicLyricsControlsFadeRange(
-                                            viewportHeight, controlsFadeShift.value, lyricEntryTranslationY(),
-                                            controlsTop = (progressTrackTopInRoot?.minus(playerBoundsInRoot?.top ?: 0f)
-                                                ?: (maxHeightPx - controlsHeightPx)) - lyricViewportTop,
-                                        )
-                                    },
-                                    playerConnection = stateContainer.playerConnection,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(top = with(density) { lyricViewportTop.toDp() })
-                                        // Both upstream lyric text renderers add 16.dp internally.
-                                        .padding(horizontal = AppleMusicDimensions.lyricTextInset - AppleMusicDimensions.lyricRendererInset),
-                                    onClick = {},
-                                    onLongClick = {},
-                                    controlsVisible = stateContainer.controlsVisible,
-                                    onToggleControls = { stateContainer.controlsVisible = it },
-                                )
+                            lyrics = { _ ->
                             },
                         )
                     }
@@ -607,7 +576,7 @@ fun AppleMusicPlayer(
                                 title = metadata.title,
                                 subTitle = metadata.artists.joinToString { it.name },
                                 isLiked = isLiked,
-                                showLikeButton = !metadata.isLocal && !metadata.isPodcast,
+                                showLikeButton = !metadata.isLocal && !metadata.isPodcast && !metadata.isBili,
                                 onLikeClick = { stateContainer.playerViewModel.like(metadata.id.toString()) },
                                 onMoreClick = { overlayHandler.showMoreAction() },
                                 onTitleClick = {
@@ -654,7 +623,7 @@ fun AppleMusicPlayer(
                             title = metadata.title,
                             subTitle = metadata.artists.joinToString { it.name },
                             isLiked = isLiked,
-                            showLikeButton = !metadata.isLocal && !metadata.isPodcast,
+                            showLikeButton = !metadata.isLocal && !metadata.isPodcast && !metadata.isBili,
                             onLikeClick = { stateContainer.playerViewModel.like(metadata.id.toString()) },
                             onMoreClick = { overlayHandler.showMoreAction() },
                             onTitleClick = {
@@ -725,11 +694,7 @@ fun AppleMusicPlayer(
                                 isPlaying = isPlaying,
                                 playbackState = playbackState,
                                 playerConnection = stateContainer.playerConnection,
-                                lyricsVisible = showLyrics,
                                 queueVisible = showQueue,
-                                onLyricClick = {
-                                    page = if (showLyrics) AppleMusicPlayerPage.Artwork else AppleMusicPlayerPage.Lyrics
-                                },
                                 onPlaylistClick = {
                                     if (showQueue) page = AppleMusicPlayerPage.Artwork
                                     else overlayHandler.showPlaylist()
@@ -799,7 +764,7 @@ fun AppleMusicPlayer(
                         .playerArtworkAppearance(artworkFrame, artworkOpacity)
                         .then(
                             if (sheetExpanded && !inlineHeaderVisible) Modifier.clickable {
-                                page = if (showDetail) AppleMusicPlayerPage.Artwork else AppleMusicPlayerPage.Lyrics
+                                page = if (showDetail) AppleMusicPlayerPage.Artwork else AppleMusicPlayerPage.Queue
                             }
                             else Modifier.clearAndSetSemantics { },
                         )

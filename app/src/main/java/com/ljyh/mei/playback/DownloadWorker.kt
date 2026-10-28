@@ -49,6 +49,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.jaudiotagger.audio.AudioFileIO
 import timber.log.Timber
 import java.io.File
@@ -200,7 +201,9 @@ class DownloadWorker(
                     val tags = SongMate.checkTags(existingPath)
                     if (tags != null && (!tags.isBasicComplete || !tags.hasLyric)) {
                         try {
-                            val lyric = if (!tags.hasLyric) LyricFetcher.fetchBestLyric(songId) else null
+                            val lyric = if (!tags.hasLyric && !songId.startsWith("bili_")) {
+                                LyricFetcher.fetchBestLyric(songId)
+                            } else null
                             currentCoroutineContext().ensureActive()
                             SongMate.writeTags(task.songTitle, task.songArtist, task.songAlbum,
                                 task.songCover, existingPath, lyric)
@@ -232,11 +235,13 @@ class DownloadWorker(
                 "Unsupported or malformed downloaded audio"
             }
             val fileName = "${DownloadFileNames.songBaseName(task.songTitle, task.songArtist)}.${format.extension}"
-            val lyric = async { LyricFetcher.fetchBestLyric(songId) }
+            // B 站稿件没有对应的网易云/AMLL 曲库条目，歌词按 ID 查只会落空，跳过。
+            val isBili = songId.startsWith("bili_")
+            val lyric = if (isBili) null else async { LyricFetcher.fetchBestLyric(songId) }
             val cover = async { if (task.songCover.isNotBlank()) ImageUtils.downloadImageBytes(task.songCover) else null }
             try {
                 SongMate.writeTagsWithCoverBytes(task.songTitle, task.songArtist, task.songAlbum,
-                    cover.await(), tempFile.absolutePath, lyric.await())
+                    cover.await(), tempFile.absolutePath, lyric?.await())
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
@@ -437,8 +442,19 @@ internal suspend fun downloadAudioFile(
     onProgress: (Int) -> Unit,
 ) = withContext(Dispatchers.IO) {
     val owner = currentCoroutineContext()
+    val host = runCatching { url.toHttpUrl().host }.getOrNull().orEmpty()
+    val request = okhttp3.Request.Builder().url(url).apply {
+        // B 站音视频 CDN 强制校验 Referer/UA，缺失会返回 403。
+        if (host.endsWith("bilivideo.com") || host.endsWith("bilivideo.cn") ||
+            host.endsWith("acgvideo.com") || host.endsWith("hdslb.com")
+        ) {
+            header("Referer", "https://www.bilibili.com/")
+            header("Origin", "https://www.bilibili.com")
+            header("User-Agent", com.ljyh.mei.constants.UserAgent)
+        }
+    }.build()
     try {
-        readDownloadResponse(client, Request.Builder().url(url).build()) { response ->
+        readDownloadResponse(client, request) { response ->
             check(response.isSuccessful) { "Audio download failed (${response.code})" }
             val body = response.body
             val total = body.contentLength()

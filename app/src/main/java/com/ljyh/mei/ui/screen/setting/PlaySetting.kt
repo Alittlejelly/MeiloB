@@ -86,7 +86,7 @@ fun PlaySetting(
     val (cloudShuffle, onCloudShuffleChange) = rememberPreference(CloudShuffleEnabledKey, true)
     val (previousPlayback, onPreviousPlaybackChange) = rememberPreference(PreviousPlaybackKey, true)
     val (restorePlaybackPosition, onRestorePlaybackPositionChange) = rememberPreference(RestorePlaybackPositionKey, true)
-    val (restorePlaybackState, onRestorePlaybackStateChange) = rememberPreference(RestorePlaybackStateKey, true)
+    val (restorePlaybackState, onRestorePlaybackStateChange) = rememberPreference(RestorePlaybackStateKey, false)
     val (notificationLeftAction, onNotificationLeftActionChange) = rememberEnumPreference(NotificationLeftActionKey, NotificationAction.PlayMode)
     val (notificationRightAction, onNotificationRightActionChange) = rememberEnumPreference(NotificationRightActionKey, NotificationAction.Like)
     val (noAudioSource, onNoAudioSourceChange) = rememberPreference(NoAudioSourceKey, false)

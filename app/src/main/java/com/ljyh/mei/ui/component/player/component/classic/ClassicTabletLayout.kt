@@ -60,7 +60,6 @@ import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.ui.component.player.OverlayState
 import com.ljyh.mei.ui.component.player.component.FluidProgressSlider
 import com.ljyh.mei.ui.component.player.component.PlayerControls
-import com.ljyh.mei.ui.component.player.component.LyricScreen
 import com.ljyh.mei.ui.component.player.component.PlayerActionToolbar
 import com.ljyh.mei.ui.component.player.component.PlayerProgressSlider
 import com.ljyh.mei.ui.component.player.component.PlayerTableControls
@@ -85,7 +84,6 @@ fun ClassicTabletLayout(
     val playbackState by stateContainer.playbackState
     val sliderPosition by remember { derivedStateOf { stateContainer.sliderPosition } }
     val duration by remember { derivedStateOf { stateContainer.duration } }
-    val lyricLine by remember { derivedStateOf { stateContainer.lyricLine } }
     val isLiked by stateContainer.isLiked
     val playerStyle by rememberEnumPreference(PlayerStyleKey, PlayerStyle.AppleMusic)
 
@@ -210,170 +208,22 @@ fun ClassicTabletLayout(
                     isPlaying = isPlaying,
                     playbackState = playbackState,
                     modifier = Modifier.fillMaxWidth(0.7f),
-                    onPlaylistClick = {
-                        isShowingPlaylist = !isShowingPlaylist
-                    }
+                    onPlaylistClick = { }
                 )
 
             }
 
             Spacer(Modifier.width(32.dp))
 
-            val tabletAnimStyle by rememberEnumPreference(
-                key = TabletAnimationStyleKey,
-                defaultValue = TabletAnimationStyle.FLIP_3D
-            )
-
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                val lyricContent = @Composable {
-                    LyricScreen(
-                        lyricData = lyricLine,
-                        showSourceBadge = playerStyle != PlayerStyle.AppleMusic,
-                        topFadeHeight = if (playerStyle == PlayerStyle.AppleMusic) AppleMusicDimensions.lyricTopFade else 20.dp,
-                        bottomFadeHeight = if (playerStyle == PlayerStyle.AppleMusic) AppleMusicDimensions.lyricBottomFade else 100.dp,
-                        rendererVerticalPadding = if (playerStyle == PlayerStyle.AppleMusic) 0.dp else 8.dp,
-                        playerConnection = stateContainer.playerConnection,
-                        contentPadding = PaddingValues(
-                            start = PlayerHorizontalPadding + if (playerStyle == PlayerStyle.AppleMusic) 1.dp else 0.dp,
-                            end = PlayerHorizontalPadding + 32.dp + if (playerStyle == PlayerStyle.AppleMusic) 1.dp else 0.dp,
-                            top = if (playerStyle == PlayerStyle.AppleMusic) 0.dp else lyricVerticalPadding,
-                            bottom = if (playerStyle == PlayerStyle.AppleMusic) 0.dp else lyricVerticalPadding,
-                        ),
-                        sourceBadgeEndOffset = -badgeEndPadding,
-                        sourceBadgeBottomPadding = badgeBottomPadding,
-                        modifier = Modifier.fillMaxSize(),
-                        onClick = {
-                            mediaMetadata?.let {
-                                if (overlayHandler.currentOverlayValue is OverlayState.None) {
-                                    stateContainer.playerViewModel.searchQQSong(it.title)
-                                    overlayHandler.showQQMusicSelection(
-                                        mediaMetadata = it
-                                    )
-                                }
-                            }
-                        },
-                        onLongClick = { source ->
-                            if (source == LyricSource.QQMusic && mediaMetadata != null) {
-                                stateContainer.playerViewModel.deleteSongById(id = mediaMetadata!!.id.toString())
-                                Toast.makeText(context, "已删除QQ音乐歌词", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        },
-                        controlsVisible = stateContainer.controlsVisible,
-                        onToggleControls = {},
-                    )
-                }
-
-                val playlistContent = @Composable {
-                    PlaylistContent(
-                        onDismiss = { isShowingPlaylist = false },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = PlayerHorizontalPadding)
-                    )
-                }
-
-                val playlistModifier = Modifier
-                    .width(paneWidth)
-                    .fillMaxHeight(0.95f)
-                    .align(Alignment.CenterStart)
-
-                when (tabletAnimStyle) {
-                    TabletAnimationStyle.FLIP_3D -> {
-                        val rotation by animateFloatAsState(
-                            targetValue = if (isShowingPlaylist) 180f else 0f,
-                            animationSpec = tween(600, easing = FastOutSlowInEasing)
-                        )
-                        val density = LocalDensity.current
-
-                        if (rotation < 90f) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .graphicsLayer {
-                                        rotationY = rotation
-                                        transformOrigin = lyricTransformOrigin
-                                        cameraDistance = 12f * density.density
-                                    }
-                            ) {
-                                lyricContent()
-                            }
-                        }
-
-                        if (rotation > 90f) {
-                            Box(
-                                modifier = playlistModifier
-                                    .graphicsLayer {
-                                        rotationY = rotation - 180f
-                                        cameraDistance = 12f * density.density
-                                    }
-                            ) {
-                                playlistContent()
-                            }
-                        }
-                    }
-
-                    TabletAnimationStyle.SLIDE -> {
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = !isShowingPlaylist,
-                            enter = slideInHorizontally { -paneWidthPx } + fadeIn(),
-                            exit = slideOutHorizontally { -paneWidthPx } + fadeOut(),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            lyricContent()
-                        }
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = isShowingPlaylist,
-                            enter = slideInHorizontally { it } + fadeIn(),
-                            exit = slideOutHorizontally { it } + fadeOut(),
-                            modifier = playlistModifier
-                        ) {
-                            playlistContent()
-                        }
-                    }
-
-                    TabletAnimationStyle.CROSSFADE -> {
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = !isShowingPlaylist,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            lyricContent()
-                        }
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = isShowingPlaylist,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                            modifier = playlistModifier
-                        ) {
-                            playlistContent()
-                        }
-                    }
-
-                    TabletAnimationStyle.ZOOM -> {
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = !isShowingPlaylist,
-                            enter = scaleIn(initialScale = 0.92f, transformOrigin = lyricTransformOrigin) + fadeIn(),
-                            exit = scaleOut(targetScale = 0.92f, transformOrigin = lyricTransformOrigin) + fadeOut(),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            lyricContent()
-                        }
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = isShowingPlaylist,
-                            enter = scaleIn(initialScale = 0.92f) + fadeIn(),
-                            exit = scaleOut(targetScale = 0.92f) + fadeOut(),
-                            modifier = playlistModifier
-                        ) {
-                            playlistContent()
-                        }
-                    }
-                }
+                PlaylistContent(
+                    onDismiss = { },
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }

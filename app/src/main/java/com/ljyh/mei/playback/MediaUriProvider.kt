@@ -11,9 +11,13 @@ import com.ljyh.mei.data.model.SongUrl
 import com.ljyh.mei.data.model.api.GetSongDetails
 import com.ljyh.mei.data.model.api.GetSongUrlV1
 import com.ljyh.mei.data.model.availableMusicQualities
+import com.ljyh.mei.data.model.bili.BILI_AUDIO_ID_EXHIGH
+import com.ljyh.mei.data.model.bili.BILI_AUDIO_ID_HIRES
+import com.ljyh.mei.data.model.bili.BiliMediaId
 import com.ljyh.mei.data.model.room.Song
 import com.ljyh.mei.data.model.room.SourceType
 import com.ljyh.mei.data.network.api.ApiService
+import com.ljyh.mei.data.repository.BiliRepository
 import com.ljyh.mei.di.repository.SongRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
@@ -54,6 +58,7 @@ internal data class ResolvedMediaSource(
 class MediaUriProvider @Inject constructor(
     private val apiService: ApiService,
     private val songRepository: SongRepository,
+    private val biliRepository: BiliRepository,
     @ApplicationContext private val context: Context,
 ) {
     private data class CachedUrl(
@@ -152,6 +157,9 @@ class MediaUriProvider @Inject constructor(
         val stateVersion = synchronized(qualityStateLock) { qualityStateVersion.get() }
         val requestedQuality = normalizePlaybackQuality(quality)
         resolveLocalSource(mediaId)?.let { return it }
+        if (BiliMediaId.isBili(mediaId)) {
+            return resolveBiliSource(mediaId, stateVersion)
+        }
         if (!canResolveOnline(mediaId)) {
             throw SourceNotFoundException("No local source for $mediaId")
         }
@@ -216,6 +224,72 @@ class MediaUriProvider @Inject constructor(
 
         val message = "No playable full source for $mediaId at quality $requestedQuality"
         throw SourceNotFoundException(message)
+    }
+
+    /** aid → bvid 缓存：wbi playurl 只认 bvid，archiveStat 换取的结果按会话缓存。 */
+    private val biliBvidCache = ConcurrentHashMap<Long, String>()
+
+    /**
+     * B 站视频音频流（DASH）解析。mediaId 形如 `bili_{aid}_{cid}`，
+     * URL 会周期性刷新，但同一 (aid, cid) 的音频内容不变，磁盘缓存可跨会话复用。
+     */
+    private suspend fun resolveBiliSource(mediaId: String, stateVersion: Long): ResolvedMediaSource {
+        val parts = BiliMediaId.parse(mediaId)?.takeIf { it.aid > 0 }
+            ?: throw SourceNotFoundException("Invalid Bilibili media id $mediaId")
+        var aid = parts.aid
+        var cid = parts.cid
+        if (cid <= 0L) {
+            // 缺少 cid（例如旧快照里的搜索结果条目）：先补齐视频详情。
+            val video = biliRepository.resolveVideoByAid(aid)
+                ?: throw SourceNotFoundException("Unable to resolve Bilibili video $mediaId")
+            aid = video.aid
+            cid = video.cid
+            video.bvid?.let { biliBvidCache[aid] = it }
+        }
+        val bvid = biliBvidCache[aid]
+            ?: biliRepository.resolveBvidByAid(aid)?.also { biliBvidCache[aid] = it }
+            ?: throw SourceNotFoundException("Unable to resolve Bilibili bvid for $mediaId")
+        val now = System.currentTimeMillis()
+        urlCache.values.firstOrNull {
+            it.cacheKey.startsWith(playbackCacheKeyPrefix(mediaId)) && it.expiresAtMs > now
+        }?.let { cached ->
+            if (!sourceIsRejected(mediaId, cached.sourceIdentity)) {
+                return synchronized(qualityStateLock) {
+                    ensureCurrentState(stateVersion)
+                    rememberResolvedSource(mediaId, cached.toResolvedSource())
+                }
+            }
+        }
+        val stream = try {
+            biliRepository.resolveAudioStream(aid = aid, bvid = bvid, cid = cid)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // 把 B 站返回的原始错误（如 -412 风控、-404 稿件不可见）带到播放器错误提示里。
+            throw IOException("B站音频解析失败: ${e.message}", e)
+        }
+        val actualQuality = when (stream.audioId) {
+            BILI_AUDIO_ID_HIRES -> MusicQuality.HIRES.text
+            BILI_AUDIO_ID_EXHIGH -> MusicQuality.EXHIGH.text
+            else -> MusicQuality.STANDARD.text
+        }
+        val identity = "bili-$aid-$cid-${stream.audioId}"
+        val cacheEntry = CachedUrl(
+            url = stream.url,
+            expiresAtMs = now + BILI_URL_CACHE_TTL_MS,
+            actualQuality = actualQuality,
+            cacheKey = playbackCacheKey(mediaId, actualQuality, identity, stream.bandwidth.takeIf { it > 0 }),
+            sourceIdentity = playbackSourceIdentity(identity, stream.bandwidth.takeIf { it > 0 }),
+            contentLength = null,
+        )
+        return synchronized(qualityStateLock) {
+            ensureCurrentState(stateVersion)
+            if (sourceIsRejected(mediaId, cacheEntry.sourceIdentity)) {
+                throw IOException("Playback source was rejected while resolving $mediaId")
+            }
+            urlCache[cacheEntry.cacheKey] = cacheEntry
+            rememberResolvedSource(mediaId, cacheEntry.toResolvedSource())
+        }
     }
 
     /** Verifies catalog hints against full URLs for this account and device. */
@@ -516,5 +590,6 @@ class MediaUriProvider @Inject constructor(
         const val MIN_URL_CACHE_TTL_MS = 1_000L
         const val AVAILABLE_QUALITY_CACHE_TTL_MS = 60 * 1_000L
         const val QUALITY_PROBE_CONCURRENCY = 3
+        const val BILI_URL_CACHE_TTL_MS = 60 * 60 * 1_000L
     }
 }

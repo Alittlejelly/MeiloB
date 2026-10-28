@@ -10,9 +10,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ljyh.mei.R
-import com.ljyh.mei.constants.CookieKey
-import com.ljyh.mei.constants.UserAvatarUrlKey
-import com.ljyh.mei.constants.UserNicknameKey
+import com.ljyh.mei.constants.BiliAvatarKey
+import com.ljyh.mei.constants.BiliNicknameKey
+import com.ljyh.mei.constants.BiliSessdataKey
 import com.ljyh.mei.ui.glass.GlassIconButton
 import com.ljyh.mei.ui.glass.SfIcon
 import com.ljyh.mei.ui.local.LocalNavController
@@ -23,22 +23,22 @@ import com.ljyh.mei.utils.rememberPreference
 @Composable
 fun GlobalProfileAvatarButton(modifier: Modifier = Modifier) {
     val navController = LocalNavController.current
-    val (cookie) = rememberPreference(CookieKey, "")
-    val (avatarUrl) = rememberPreference(UserAvatarUrlKey, "")
-    val (nickname) = rememberPreference(UserNicknameKey, "")
+    val (sessdata) = rememberPreference(BiliSessdataKey, "")
+    val (avatarUrl) = rememberPreference(BiliAvatarKey, "")
+    val (nickname) = rememberPreference(BiliNicknameKey, "")
     val accountDescription = stringResource(R.string.account_home)
 
     GlassIconButton(
         onClick = {
-            if (cookie.isBlank()) {
-                Screen.NeteaseLogin.navigate(navController)
+            if (sessdata.isBlank()) {
+                Screen.BiliLogin.navigate(navController)
             } else {
-                Screen.AccountHome.navigate(navController)
+                Screen.BiliAccount.navigate(navController)
             }
         },
         modifier = modifier,
     ) {
-        if (avatarUrl.isBlank() || cookie.isBlank()) {
+        if (avatarUrl.isBlank() || sessdata.isBlank()) {
             SfIcon(
                 systemName = "person.crop.circle",
                 contentDescription = accountDescription,

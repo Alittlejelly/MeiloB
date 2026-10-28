@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.PlaylistCoverStyle
 import com.ljyh.mei.constants.PlaylistCoverStyleKey
@@ -156,7 +156,7 @@ fun PlaylistHeader(
                             compositingStrategy = CompositingStrategy.Offscreen
                             alpha = if (count > 0) 1f else 0.38f
                         }
-                        .clip(Capsule())
+                        .clip(GlassCapsule)
                         .background(colors.content)
                         .clickable(
                             enabled = count > 0,
@@ -271,7 +271,7 @@ private fun FlatDetailIconButton(
                 compositingStrategy = CompositingStrategy.Offscreen
                 alpha = if (enabled || pending) 1f else 0.38f
             }
-            .clip(Capsule())
+            .clip(GlassCapsule)
             .background(colors.content.copy(alpha = 0.12f))
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,

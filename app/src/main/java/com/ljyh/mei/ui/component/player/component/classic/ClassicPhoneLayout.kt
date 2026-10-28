@@ -46,7 +46,6 @@ import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.ui.component.player.OverlayState
 import com.ljyh.mei.ui.component.player.component.PlayerControls
 import com.ljyh.mei.ui.component.player.component.FluidProgressSlider
-import com.ljyh.mei.ui.component.player.component.LyricScreen
 import com.ljyh.mei.ui.component.player.component.PlayerActionToolbar
 import com.ljyh.mei.ui.component.player.component.PlayerProgressSlider
 import com.ljyh.mei.ui.component.player.component.applemusic.PlayerQueuePage
@@ -56,7 +55,6 @@ import com.ljyh.mei.ui.component.player.component.classic.component.PlayerHeader
 import com.ljyh.mei.ui.component.player.overlay.PlayerOverlayHandler
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
 import com.ljyh.mei.ui.component.sheet.LocalPlayerSheet
-import com.ljyh.mei.ui.model.LyricSource
 import com.ljyh.mei.utils.rememberEnumPreference
 import kotlinx.coroutines.launch
 
@@ -73,14 +71,14 @@ fun ClassicPhoneLayout(
     val scope = rememberCoroutineScope()
     var headerTextCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     var headerRowCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 2 })
     val sheet = LocalPlayerSheet.current
     val sheetExpanded by remember(sheet) { derivedStateOf { sheet?.state?.isExpanded == true } }
 
     DisposableEffect(overlayHandler, pagerState, scope) {
         val openPlaylist: () -> Unit = {
             scope.launch {
-                pagerState.animateScrollToPage(2, animationSpec = spring(stiffness = Spring.StiffnessLow))
+                pagerState.animateScrollToPage(1, animationSpec = spring(stiffness = Spring.StiffnessLow))
             }
         }
         overlayHandler.onShowPlaylist = openPlaylist
@@ -100,7 +98,6 @@ fun ClassicPhoneLayout(
     val playbackState by stateContainer.playbackState
     val sliderPosition by remember { derivedStateOf { stateContainer.sliderPosition } }
     val duration by remember { derivedStateOf { stateContainer.duration } }
-    val lyricLine by remember { derivedStateOf { stateContainer.lyricLine } }
     val isLiked by stateContainer.isLiked
 
     val progressBarStyle = rememberEnumPreference(
@@ -170,37 +167,6 @@ fun ClassicPhoneLayout(
                 }
 
                 1 -> {
-                    LyricScreen(
-                        lyricData = lyricLine,
-                        // Account for the pager inset while matching the progress track.
-                        sourceBadgeEndOffset = PlayerHorizontalPadding - 8.dp,
-                        playerConnection = stateContainer.playerConnection,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = PlayerHorizontalPadding),
-                        onClick = {
-                            mediaMetadata?.let {
-                                if (overlayHandler.currentOverlayValue is OverlayState.None) {
-                                    stateContainer.playerViewModel.searchQQSong(it.title)
-                                    overlayHandler.showQQMusicSelection(
-                                        mediaMetadata = it
-                                    )
-                                }
-                            }
-                        },
-                        onLongClick = { source ->
-                            if (source == LyricSource.QQMusic && mediaMetadata != null) {
-                                stateContainer.playerViewModel.deleteSongById(id = mediaMetadata!!.id.toString())
-                                Toast.makeText(context, "已删除QQ音乐歌词", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        },
-                        controlsVisible = stateContainer.controlsVisible,
-                        onToggleControls = {},
-                    )
-                }
-
-                2 -> {
                     PlayerQueuePage(
                         playerConnection = stateContainer.playerConnection,
                         modifier = Modifier.fillMaxSize(),
@@ -258,19 +224,11 @@ fun ClassicPhoneLayout(
         // Action Toolbar (Queue, Like, Sleep, etc.)
         PlayerActionToolbar(
             modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
-            lyricsVisible = pagerState.currentPage == 1,
-            queueVisible = pagerState.currentPage == 2,
-            onLyricClick = {
-                scope.launch {
-                    pagerState.animateScrollToPage(if (pagerState.currentPage == 1) 0 else 1,
-                        animationSpec = spring(stiffness = Spring.StiffnessLow)
-                    )
-                }
-            },
+            queueVisible = pagerState.currentPage == 1,
             onPlaylistClick = {
                 scope.launch {
                     pagerState.animateScrollToPage(
-                        if (pagerState.currentPage == 2) 0 else 2,
+                        if (pagerState.currentPage == 1) 0 else 1,
                         animationSpec = spring(stiffness = Spring.StiffnessLow),
                     )
                 }

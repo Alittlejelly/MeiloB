@@ -58,9 +58,7 @@ import timber.log.Timber
 @Composable
 fun PlayerActionToolbar(
     modifier: Modifier = Modifier,
-    lyricsVisible: Boolean,
     queueVisible: Boolean = false,
-    onLyricClick: () -> Unit,
     onPlaylistClick: () -> Unit,
     onSleepTimerClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
@@ -134,16 +132,6 @@ fun PlayerActionToolbar(
                         iconWeight = FontWeight.SemiBold,
                         pressedAlpha = pressedAlpha,
                         onClick = onPlaylistClick
-                    )
-                }
-
-                PlayerAction.LYRICS -> {
-                    PlayerPageActionButton(
-                        systemName = if (lyricsVisible) "quote.bubble.fill" else action.systemName,
-                        contentDescription = stringResource(action.labelRes),
-                        isSelected = lyricsVisible,
-                        pressedAlpha = pressedAlpha,
-                        onClick = onLyricClick
                     )
                 }
 

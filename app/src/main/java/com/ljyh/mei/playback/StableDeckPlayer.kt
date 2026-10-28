@@ -80,6 +80,7 @@ class StableDeckPlayer(
     private var activeDeckIndex = 0
     private var released = false
     private var internalQueueUpdateDepth = 0
+    private var queueMemberIdDepth = 0
     internal var onQueueEdited: ((replaced: Boolean) -> Unit)? = null
     internal var onSeekRequested: (() -> Unit)? = null
     internal var isExternalMediaRequest: (() -> Boolean)? = null
@@ -92,6 +93,25 @@ class StableDeckPlayer(
             internalQueueUpdateDepth--
         }
     }
+
+    /**
+     * For in-place queue reshuffles only: items already carrying a queue entry ID keep their
+     * identity through the enclosed add/replace calls, so visible rows retain their lazy keys
+     * and can slide instead of fading. Reusing live queue members transiently duplicates an
+     * entry ID inside the block; callers must leave the timeline with unique IDs by the time
+     * the block returns (invalidation and recomposition only observe the final state).
+     */
+    internal fun <T> withQueueMemberIds(block: () -> T): T {
+        queueMemberIdDepth++
+        return try {
+            block()
+        } finally {
+            queueMemberIdDepth--
+        }
+    }
+
+    private fun MediaItem.keepingQueueEntryId(): MediaItem =
+        if (queueMemberIdDepth > 0 && queueEntryId != null) this else withQueueEntryId()
 
     private fun notifyQueueEdit(replaced: Boolean = false) {
         if (internalQueueUpdateDepth == 0) onQueueEdited?.invoke(replaced)
@@ -140,7 +160,7 @@ class StableDeckPlayer(
 
     override fun handleAddMediaItems(index: Int, mediaItems: List<MediaItem>): ListenableFuture<*> {
         notifyQueueEdit()
-        return super.handleAddMediaItems(index, mediaItems.map { it.withQueueEntryId() })
+        return super.handleAddMediaItems(index, mediaItems.map { it.keepingQueueEntryId() })
     }
 
     override fun handleRemoveMediaItems(fromIndex: Int, toIndex: Int): ListenableFuture<*> {

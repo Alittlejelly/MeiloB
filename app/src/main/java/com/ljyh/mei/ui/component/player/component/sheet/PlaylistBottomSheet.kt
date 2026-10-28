@@ -56,7 +56,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.R
 import com.ljyh.mei.data.model.MediaMetadata
 import com.ljyh.mei.data.model.metadata
@@ -299,7 +299,7 @@ fun PlaylistBottomSheet(onDismiss: () -> Unit) {
                         Modifier
                             .padding(top = 5.dp)
                             .size(width = 58.dp, height = 4.dp)
-                            .background(LocalGlassColors.current.tertiaryContent.copy(alpha = 0.55f), Capsule()),
+                            .background(LocalGlassColors.current.tertiaryContent.copy(alpha = 0.55f), GlassCapsule),
                     )
                 }
                 PlaylistContent(

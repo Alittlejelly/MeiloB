@@ -149,9 +149,12 @@ class PlaybackShuffleSnapshotTest {
     }
 
     @Test
-    fun missingRestorePreferencesKeepExistingBehaviorAndNeverStartAPausedSnapshot() {
+    fun missingRestorePreferencesKeepTheQueuePausedAndNeverStartAPausedSnapshot() {
         val playing = PlaybackSnapshot(positionMs = 7000L, playWhenReady = true)
-        assertEquals(playing, playing.withRestorePreferences(emptyPreferences()))
+        // Cold starts stay paused unless the user explicitly enabled state restoration.
+        assertEquals(false, playing.withRestorePreferences(emptyPreferences()).playWhenReady)
+        assertEquals(playing.positionMs, playing.withRestorePreferences(emptyPreferences()).positionMs)
+        assertEquals(playing, playing.withRestorePreferences(preferencesOf(RestorePlaybackStateKey to true)))
         val paused = playing.copy(playWhenReady = false)
         assertEquals(paused, paused.withRestorePreferences(emptyPreferences()))
         assertEquals(paused, paused.withRestorePreferences(preferencesOf(RestorePlaybackStateKey to true)))

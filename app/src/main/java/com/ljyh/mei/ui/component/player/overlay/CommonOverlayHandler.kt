@@ -5,7 +5,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -21,7 +20,6 @@ import com.ljyh.mei.ui.component.player.component.sheet.AlbumArtistBottomSheet
 import com.ljyh.mei.ui.component.player.component.sheet.MoreActionsSheet
 import com.ljyh.mei.ui.component.player.component.sheet.PlayerActionSettingsSheet
 import com.ljyh.mei.ui.component.player.component.sheet.PlaylistBottomSheet
-import com.ljyh.mei.ui.component.player.component.sheet.QQMusicSelectSheet
 import com.ljyh.mei.ui.component.player.component.sheet.SleepTimerSheet
 import com.ljyh.mei.ui.component.player.component.sheet.SongInfoSheet
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
@@ -31,10 +29,6 @@ import com.ljyh.mei.ui.component.playlist.TrackActionMenu
 import com.ljyh.mei.ui.component.sheet.BottomSheetState
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.model.MoreAction
-import com.ljyh.mei.ui.model.LyricSource
-import com.ljyh.mei.constants.PlayerStyle
-import com.ljyh.mei.constants.PlayerStyleKey
-import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.R
 import com.ljyh.mei.ui.glass.IosAlertDialog
@@ -43,7 +37,7 @@ import com.ljyh.mei.ui.glass.IosListRow
 import com.ljyh.mei.ui.glass.LocalGlassColors
 import com.ljyh.mei.ui.glass.SfIcon
 import com.ljyh.mei.ui.local.LocalPlayerConnection
-import com.ljyh.mei.ui.screen.social.NeteaseShareSheet
+import com.ljyh.mei.ui.component.TrackShareSheet
 import com.ljyh.mei.utils.setClipboard
 import timber.log.Timber
 
@@ -62,7 +56,6 @@ fun CommonOverlayHandler(
     val context = LocalContext.current
     val navController = LocalNavController.current
     val playerViewModel = stateContainer.playerViewModel
-    val playerStyle by rememberEnumPreference(PlayerStyleKey, PlayerStyle.AppleMusic)
 
     when (val overlay = overlayHandler.currentOverlayValue) {
         OverlayState.None -> {}
@@ -74,14 +67,8 @@ fun CommonOverlayHandler(
         }
 
         is OverlayState.AlbumArtist -> {
-            val onAlbumClick: (Long) -> Unit = { id ->
-                Screen.Album.navigate(navController) { addPath(id.toString()) }
-                sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
-            }
-            val onArtistClick: (Long) -> Unit = { id ->
-                Screen.Artist.navigate(navController) { addPath(id.toString()) }
-                sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
-            }
+            val onAlbumClick: (Long) -> Unit = { }
+            val onArtistClick: (Long) -> Unit = { }
             val anchor = overlay.anchorBounds
             if (anchor != null) {
                 PlayerNavigationMenu(
@@ -115,21 +102,9 @@ fun CommonOverlayHandler(
         }
 
         is OverlayState.SongInfo -> {
-            val qqSongId by produceState<String?>(null, overlay.metadata.id) {
-                value = stateContainer.playerViewModel.getQQSongId(overlay.metadata.id)
-            }
             SongInfoSheet(
                 metadata = overlay.metadata,
-                qqSongId = qqSongId,
                 onDismissRequest = { overlayHandler.dismiss() }
-            )
-        }
-
-        is OverlayState.QQMusicSelection -> {
-            QQMusicSelectSheet(
-                viewmodel = playerViewModel,
-                mediaMetadata = overlay.mediaMetadata,
-                onDismiss = { overlayHandler.dismiss() }
             )
         }
 
@@ -172,43 +147,14 @@ fun CommonOverlayHandler(
                     overlayHandler.dismiss()
                 },
                 onActionClick = { action ->
-                    if (action == MoreAction.COMMENT || action == MoreAction.SONG_WIKI) {
-                        stateContainer.mediaMetadata.value?.let { v->
-                            val destination = if (action == MoreAction.COMMENT) Screen.Comment else Screen.SongWiki
-                            destination.navigate(navController) {
-                                addPath(v.id.toString())
-                            }
-                            overlayHandler.dismiss()
-                            sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
-                        }
-
-                    }else{
-                        overlayHandler.handleMoreAction(action)
-                    }
-
+                    overlayHandler.handleMoreAction(action)
                 },
                 viewModel = playerViewModel,
-                onFindLyrics = if (playerStyle == PlayerStyle.AppleMusic && stateContainer.mediaMetadata.value != null) {
-                    {
-                        stateContainer.mediaMetadata.value?.let { metadata ->
-                            playerViewModel.searchQQSong(metadata.title)
-                            overlayHandler.showQQMusicSelection(metadata)
-                        }
-                    }
-                } else null,
-                onFindLyricsLongClick = if (stateContainer.lyricLine.source == LyricSource.QQMusic) {
-                    {
-                        stateContainer.mediaMetadata.value?.let { metadata ->
-                            playerViewModel.deleteSongById(metadata.id.toString())
-                            android.widget.Toast.makeText(context, "已删除QQ音乐歌词", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else null,
             )
         }
 
         is OverlayState.Share -> {
-            NeteaseShareSheet(
+            TrackShareSheet(
                 metadata = overlay.metadata,
                 onDismiss = overlayHandler::dismiss,
             )

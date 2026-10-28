@@ -181,6 +181,16 @@
 # 奇怪的问题，ArtistDetail需要免去r8混淆，但是其他类正常s com.google.common.reflect.** { *; }
 -keep class com.ljyh.mei.data.model.api.** { *; }
 
+# Bilibili wire models are Kotlin data classes whose @SerializedName annotations land on
+# constructor parameters, not fields, so the field-based keep rules above never match them.
+# Without this, R8 renames the members and Gson deserializes every B API response as null.
+-keep class com.ljyh.mei.data.model.bili.** { *; }
+# The QR/sms login state machine results are matched by sealed-subclass identity after
+# Gson construction; keep their members too.
+-keepclassmembers class com.ljyh.mei.data.repository.BiliQrLoginState { *; }
+-keepclassmembers class com.ljyh.mei.data.repository.BiliFavFolder { *; }
+-keepclassmembers class com.ljyh.mei.data.repository.BiliFavFolderPage { *; }
+
 # ONNX Runtime's JNI and reflective Java API are required by minimized builds.
 -keep class ai.onnxruntime.** { *; }
 -keep class com.aegis.sdk.AegisNative { *; }

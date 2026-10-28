@@ -19,9 +19,7 @@ import com.ljyh.mei.data.model.Tracks
 import com.ljyh.mei.data.model.UserPlaylist
 import com.ljyh.mei.data.model.api.CreatePlaylistResult
 import com.ljyh.mei.data.model.api.Intelligence
-import com.ljyh.mei.data.model.qq.u.SearchResult
 import com.ljyh.mei.data.model.room.Playlist
-import com.ljyh.mei.data.model.room.QQSong
 import com.ljyh.mei.data.model.weapi.Radio
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.network.neteaseSessionFingerprint
@@ -34,9 +32,7 @@ import com.ljyh.mei.di.repository.observeOwnedPlaylists
 import com.ljyh.mei.di.repository.toLocalPlaylist
 import com.ljyh.mei.di.repository.ColorRepository
 import com.ljyh.mei.di.repository.LikeRepository
-import com.ljyh.mei.di.repository.QQSongRepository
 import com.ljyh.mei.playback.MediaUriProvider
-import com.ljyh.mei.ui.model.LyricCandidate
 import com.ljyh.mei.ui.model.LyricData
 import com.ljyh.mei.ui.model.MoreAction
 import com.ljyh.mei.ui.model.SortOrder
@@ -69,7 +65,6 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val repository: PlayerRepository,
-    private val qqSongRepository: QQSongRepository,
     private val userRepository: UserRepository,
     private val localPlaylistRepository: LocalPlaylistRepository,
     private val playlistRepository: PlaylistRepository,
@@ -79,10 +74,7 @@ class PlayerViewModel @Inject constructor(
     private val mediaUriProvider: MediaUriProvider,
     private val collections: LibraryCollectionsRepository,
 ) : ViewModel() {
-    val searchResult: StateFlow<Resource<SearchResult>> = lyricManager.qqSearchResult
     val lyric: StateFlow<LyricData> = lyricManager.lyricData
-    val lyricCandidates: StateFlow<List<LyricCandidate>> = lyricManager.lyricCandidates
-    val lyricOffsetMs: StateFlow<Int> = lyricManager.lyricOffsetMs
     val songLikes = repository.songLikes
     val songLikeGeneration = repository.songLikeGeneration
     val songLikeAccount = collections.accounts.stateIn(
@@ -173,52 +165,14 @@ class PlayerViewModel @Inject constructor(
     }
 
 
-    private val _qqSong = MutableStateFlow<QQSong?>(null)
-    val qqSong: StateFlow<QQSong?> = _qqSong
-
-    fun searchQQSong(keyword: String) {
-        lyricManager.searchQQSong(keyword)
-    }
-
-    fun selectQQSong(
-        metadata: MediaMetadata,
-        song: SearchResult.Request.Data.Body.ItemSong,
-    ) {
-        lyricManager.selectQQSongForLyric(metadata, song)
-    }
-
-    fun selectLyricCandidate(metadata: MediaMetadata, candidate: LyricCandidate) {
-        lyricManager.selectLyricCandidate(metadata, candidate)
-    }
-
-    fun adjustLyricOffset(metadata: MediaMetadata, deltaMs: Int) {
-        lyricManager.adjustLyricOffset(metadata, deltaMs)
-    }
-
-    fun resetLyricOffset(metadata: MediaMetadata) {
-        lyricManager.resetLyricOffset(metadata)
-    }
-
     fun resetLyricSource(metadata: MediaMetadata) {
         lyricManager.resetLyricSource(metadata)
-    }
-
-    fun insertSong(song: QQSong) {
-        viewModelScope.launch {
-            qqSongRepository.insertSong(song)
-        }
     }
 
     fun deleteSongById(id: String) {
         val metadata = mediaMetadata ?: return
         if (metadata.id.toString() == id) lyricManager.resetLyricSource(metadata)
     }
-
-    suspend fun getQQSongId(metadataId: Long): String? {
-        return qqSongRepository.getQQSong(metadataId.toString()).firstOrNull()?.qid
-    }
-
-
 
     fun refreshPlaylistChoices() {
         playlistChoicesJob?.cancel()
@@ -287,8 +241,17 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun downloadSong(metadata: MediaMetadata, context: android.content.Context, requestedQuality: MusicQuality? = null) {
+    fun downloadSong(
+        metadata: MediaMetadata,
+        context: android.content.Context,
+        requestedQuality: MusicQuality? = null,
+        biliMediaId: String? = null,
+    ) {
         viewModelScope.launch {
+            if (metadata.isBili || biliMediaId?.startsWith("bili_") == true) {
+                downloadBiliSong(metadata, context, biliMediaId)
+                return@launch
+            }
             val quality = requestedQuality ?: try {
                 val saved = AppContext.instance.dataStore[DownloadQualityKey]
                 if (saved != null) com.ljyh.mei.constants.DownloadQuality.valueOf(saved).toMusicQuality()
@@ -334,6 +297,49 @@ class PlayerViewModel @Inject constructor(
             } else {
                 android.widget.Toast.makeText(context, "获取链接失败", android.widget.Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    /**
+     * B 站稿件下载：解析当前音源（DASH m4a/mp4，最高可用码率），复用通用下载管线。
+     * biliMediaId 形如 bili_{aid}_{cid}；缺失 cid 时由解析层自动补齐。
+     */
+    private suspend fun downloadBiliSong(
+        metadata: MediaMetadata,
+        context: android.content.Context,
+        biliMediaId: String?,
+    ) {
+        val mediaId = biliMediaId?.takeIf { it.startsWith("bili_") }
+            ?: com.ljyh.mei.data.model.bili.BiliMediaId.create(metadata.id, 0)
+        try {
+            val source = mediaUriProvider.resolveMediaSource(mediaId, com.ljyh.mei.constants.MusicQuality.EXHIGH.text)
+            val downloadPath = AppContext.instance.dataStore[DownloadPathKey]
+                ?: com.ljyh.mei.utils.DownloadManager.getDefaultDownloadPath()
+            com.ljyh.mei.utils.DownloadManager.enqueue(
+                context = context,
+                songs = listOf(
+                    com.ljyh.mei.playback.SongDownloadInfo(
+                        songId = mediaId,
+                        url = source.uri.toString(),
+                        songTitle = metadata.title,
+                        songArtist = metadata.artists.map { it.name },
+                        songAlbum = metadata.album.title,
+                        songCover = metadata.coverUrl,
+                        duration = metadata.duration,
+                        fileType = "m4a",
+                        quality = source.actualQuality,
+                    )
+                ),
+                playlistName = "单曲下载",
+                downloadPath = downloadPath
+            )
+            android.widget.Toast.makeText(context, "已添加到下载队列", android.widget.Toast.LENGTH_SHORT).show()
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            android.widget.Toast.makeText(
+                context, "获取B站音频失败：${error.message}", android.widget.Toast.LENGTH_SHORT,
+            ).show()
         }
     }
 

@@ -27,6 +27,7 @@ data class MediaMetadata(
     val tns:String?=null,
     val isPodcast: Boolean = false,
     val isLocal: Boolean = false,
+    val isBili: Boolean = false,
 ) {
     data class Artist(
         val id: Long,

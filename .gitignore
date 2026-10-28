@@ -26,3 +26,6 @@ temp/
 /app/release
 /ncm_workspace
 /accounts
+# local agent scratch (perf captures, unpacked caches)
+.dsh-tmp/
+.perf/

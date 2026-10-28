@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.ui.component.shimmer.ButtonPlaceholder
 import com.ljyh.mei.ui.component.shimmer.ShimmerHost
 import com.ljyh.mei.ui.component.shimmer.TextPlaceholder
@@ -82,7 +82,7 @@ private fun MobileShimmerContent(flatDetailStyle: Boolean = false) {
                 modifier = Modifier
                     .height(48.dp)
                     .width(140.dp)
-                    .clip(Capsule()),
+                    .clip(GlassCapsule),
                 verticalPadding = 0.dp,
             )
             ButtonPlaceholder(modifier = Modifier.size(48.dp))
@@ -132,7 +132,7 @@ private fun TabletShimmerContent() {
                     modifier = Modifier
                         .height(48.dp)
                         .width(140.dp)
-                        .clip(Capsule()),
+                        .clip(GlassCapsule),
                     verticalPadding = 0.dp,
                 )
                 Spacer(modifier = Modifier.width(16.dp))

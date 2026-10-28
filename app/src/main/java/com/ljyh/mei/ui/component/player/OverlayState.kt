@@ -11,9 +11,6 @@ sealed interface OverlayState {
     data object CreatePlaylist: OverlayState
     data class AddToPlaylist(val mediaId: Long) : OverlayState
     data class MusicQualitySelection(val current: Int) : OverlayState
-    data class QQMusicSelection(
-        val mediaMetadata: MediaMetadata
-    ): OverlayState
 
     data class AlbumArtist(
         val album: MediaMetadata.Album,

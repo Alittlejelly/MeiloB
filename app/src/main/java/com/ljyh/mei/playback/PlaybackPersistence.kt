@@ -67,7 +67,8 @@ internal fun PlaybackSnapshot.withCheckpoint(checkpoint: PlaybackCheckpoint?): P
 
 internal fun PlaybackSnapshot.withRestorePreferences(preferences: Preferences): PlaybackSnapshot = copy(
     positionMs = if (preferences[RestorePlaybackPositionKey] != false) positionMs.coerceAtLeast(0L) else 0L,
-    playWhenReady = playWhenReady && preferences[RestorePlaybackStateKey] != false,
+    // 默认冷启动保持暂停：只有用户显式开启「恢复上次播放状态」才自动续播。
+    playWhenReady = playWhenReady && preferences[RestorePlaybackStateKey] == true,
 )
 
 data class PlaybackSnapshot(

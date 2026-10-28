@@ -17,8 +17,6 @@ enum class MoreAction(
 
     DOWNLOAD("download", R.string.more_action_download, "arrow.down.circle", 6, 4),
 
-    DELETE("delete", R.string.more_action_delete, "trash", 1, 9),
-
     // --- 播放列表操作 ---
     VIEW_PLAYLIST("view_playlist", R.string.more_action_view_playlist, "list.bullet", 7, 1),
 
@@ -29,12 +27,7 @@ enum class MoreAction(
     BOTTOM_ACTION("bottom_action", R.string.more_action_bottom_actions, "switch.2", 4, 4),
 
     // --- 信息 ---
-    SONG_INFO("song_info", R.string.more_action_song_info, "info.circle", 4, 1),
-
-    SONG_WIKI("song_wiki", R.string.song_wiki, "book.pages", 5, 1),
-
-    // --- 评论 ---
-    COMMENT("comment", R.string.more_action_comments, "bubble.left.and.bubble.right", 7, 1);
+    SONG_INFO("song_info", R.string.more_action_song_info, "info.circle", 4, 1);
 
     companion object {
         // 简单工厂方法

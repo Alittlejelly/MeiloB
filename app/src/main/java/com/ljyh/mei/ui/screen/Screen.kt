@@ -8,24 +8,16 @@ import com.ljyh.mei.ui.navigation.ContentFeature
 
 sealed class Screen(val route:String) {
     data object Home:Screen("home")
+    data object BiliLogin:Screen("bili/login")
+    data object BiliAccount:Screen("bili/account")
+    data object BiliFavFolder:Screen("bili_fav")
     data object Library:Screen("library")
     data object LibraryCategory:Screen("library_category")
-    data object FindMusic: Screen("find_music")
-    data object PlaylistCategory: Screen("playlist_category")
-    data object SearchResult:Screen("search_result")
     data object PlayList:Screen("playlist")
     data object Setting:Screen("setting")
     data object ContentSettings:Screen(("setting/content"))
-    data object NeteaseLogin:Screen("account/login")
-    data object NeteaseWebLogin:Screen("account/web_login")
-    data object PcQrLogin:Screen("account/pc_qr_login")
-    data object AccountHome:Screen("account/home")
-    data object AccountConnections:Screen("account/connections")
-    data object AccountListeningRank:Screen("account/listening_rank")
-    data object ListeningStats:Screen("account/listening_stats")
     data object AppearanceSettings:Screen("setting/appearance")
     data object GeneralSettings:Screen("setting/general")
-    data object LyricsSettings:Screen("setting/lyrics")
     data object PlaySettings:Screen("setting/play")
     data object EqualizerSettings:Screen("setting/equalizer")
     data object DownloadSettings:Screen("setting/download")
@@ -33,24 +25,8 @@ sealed class Screen(val route:String) {
     data object DownloadManage:Screen("download_manage")
     data object LocalMusic:Screen("local_music")
     data object LocalSongList:Screen("local_songs")
-    data object EveryDay:Screen("everyday")
-    data object Album: Screen("album")
-    data object Artist: Screen("artist")
-    data object ArtistInfo: Screen("artist-info")
-    data object ArtistSongs: Screen("artist-songs")
-    data object ArtistAlbums: Screen("artist-albums")
     data object History: Screen("history")
-    data object Podcasts: Screen("podcasts")
-    data object PodcastDetail: Screen("podcast")
-    data object CloudMusic: Screen("cloud_music")
     data object Search: Screen("search")
-    data object PrivateMessages: Screen("private_messages")
-    data object PrivateConversation: Screen("private_message")
-    data object MessageContacts: Screen("message_contacts")
-    data object ListenTogether: Screen("listen_together")
-    data object SongRecognition: Screen("song_recognition")
-    data object Comment: Screen("comment")
-    data object SongWiki: Screen("song_wiki")
     data object Test:Screen("test")
     data object About: Screen("about")
     data object Log: Screen("log")
@@ -64,7 +40,7 @@ sealed class Screen(val route:String) {
 
     companion object {
         val MainScreens: List<Screen>
-            get() = listOf(Home, FindMusic, Podcasts, Library, DownloadManage, CloudMusic, History, Search, Setting)
+            get() = listOf(Home, Library, DownloadManage, History, Search, Setting)
     }
 }
 
@@ -75,19 +51,15 @@ enum class Index(
     val requiredFeature: ContentFeature? = null,
 ) {
     Home(Screen.Home.route, R.string.app_tab_home, SfSymbol.HouseFilled),
-    FindMusic(Screen.FindMusic.route, R.string.app_tab_explore, SfSymbol.SafariFilled),
-    Podcasts(Screen.Podcasts.route, R.string.app_tab_podcasts, SfSymbol.RadioFilled, ContentFeature.Podcasts),
     Library(Screen.Library.route, R.string.app_tab_library, SfSymbol.MusicNoteSquareStackFilled),
     Downloads(Screen.DownloadManage.route, R.string.app_tab_library_downloads, SfSymbol.DownloadFilled, ContentFeature.Downloads),
-    Cloud(Screen.CloudMusic.route, R.string.app_tab_library_cloud, SfSymbol.CloudFilled, ContentFeature.CloudMusic),
     History(Screen.History.route, R.string.app_tab_library_history, SfSymbol.ClockFilled, ContentFeature.ListeningHistory),
     Settings(Screen.Setting.route, R.string.settings, SfSymbol.Settings),
-    Search(Screen.Search.route, R.string.app_tab_search, SfSymbol.Search),
 
     ;
 
     companion object {
-        val DefaultOrder = listOf(Home, FindMusic, Library, Settings)
+        val DefaultOrder = listOf(Home, Library, Settings)
     }
 }
 

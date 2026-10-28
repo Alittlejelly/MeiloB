@@ -3,11 +3,15 @@ package com.ljyh.mei.di
 import com.ljyh.mei.AppContext
 import com.ljyh.mei.constants.CookieKey
 import com.ljyh.mei.data.network.api.ApiService
+import com.ljyh.mei.data.network.bili.BiliApiService
+import com.ljyh.mei.data.network.bili.BiliCookieStore
 import com.ljyh.mei.data.network.QQMusicUApiService
 import com.ljyh.mei.data.network.NeteaseLoginSecurity
 import com.ljyh.mei.data.network.api.EApiService
 import com.ljyh.mei.data.network.api.MeloXDirectService
 import com.ljyh.mei.data.network.api.WeApiService
+import com.ljyh.mei.data.repository.BiliRepository
+import com.ljyh.mei.data.repository.BiliFavoritesSync
 import com.ljyh.mei.data.repository.HomeRepository
 import com.ljyh.mei.data.repository.PlayerRepository
 import com.ljyh.mei.data.repository.PlaylistRepository
@@ -17,6 +21,7 @@ import com.ljyh.mei.data.repository.UserRepository
 import com.ljyh.mei.data.repository.ArtistRepository
 import com.ljyh.mei.data.repository.CommentRepository
 import com.ljyh.mei.di.repository.LocalPlaylistRepository
+import com.ljyh.mei.di.repository.PlaylistSongCrossRefRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -102,5 +107,25 @@ object RepositoryModule {
         @Named("MeloXWeapi") directWeapi: MeloXDirectService,
     ): CommentRepository {
         return CommentRepository(apiService, weApiService, directEapi, directWeapi)
+    }
+
+    @Singleton
+    @Provides
+    fun provideBiliRepository(
+        biliApiService: BiliApiService,
+        biliCookieStore: BiliCookieStore,
+    ): BiliRepository {
+        return BiliRepository(biliApiService, biliCookieStore)
+    }
+
+    @Singleton
+    @Provides
+    fun provideBiliFavoritesSync(
+        biliRepository: BiliRepository,
+        localPlaylistRepository: LocalPlaylistRepository,
+        songRepository: com.ljyh.mei.di.repository.SongRepository,
+        crossRefRepository: PlaylistSongCrossRefRepository,
+    ): BiliFavoritesSync {
+        return BiliFavoritesSync(biliRepository, localPlaylistRepository, songRepository, crossRefRepository)
     }
 }

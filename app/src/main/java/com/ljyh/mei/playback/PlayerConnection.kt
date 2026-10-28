@@ -265,6 +265,44 @@ class PlayerConnection(
 
     fun switchPlayMode() = service.switchPlayMode()
 
+    /**
+     * 列表倒序：只重排当前曲目两侧的历史段与待播段，当前曲目及其播放窗口原封不动——ExoPlayer
+     * 不重建正在播放的媒体源，音频与进度无缝继续。条目沿用各自的 queueEntryId，
+     * 队列页的行按现有动画整体滑到新位置。
+     */
+    fun reverseQueue() {
+        val count = player.mediaItemCount
+        if (count < 2) return
+        val currentIndex = player.currentMediaItemIndex
+        if (currentIndex !in 0 until count) return
+        // 私人 FM / 相似 FM 的队列是动态生成的，倒序没有意义。
+        if (service.isFmMode()) return
+        val stablePlayer = player as? StableDeckPlayer ?: return
+        if (player.shuffleModeEnabled) {
+            // 随机模式下不动队列本身，只反转播放顺序，同样零重缓冲。
+            val order = player.playbackOrderIndices()
+            if (order.size == count) stablePlayer.setPlaybackOrder(order.reversed())
+            return
+        }
+        val items = (0 until count).map { player.getMediaItemAt(it) }
+        val history = items.subList(0, currentIndex).reversed()
+        val upcoming = items.subList(currentIndex + 1, count).reversed()
+        // 每次移除/插回都避开当前曲目所在的播放窗口：正在播放的媒体源不被重建，音频无缝。
+        // 两次变更同步在主线程完成，监听回调合并后列表只重排一次。
+        stablePlayer.withInternalQueueUpdate {
+            stablePlayer.withQueueMemberIds {
+                if (upcoming.isNotEmpty()) {
+                    player.removeMediaItems(currentIndex + 1, count)
+                    player.addMediaItems(0, upcoming)
+                }
+                if (history.isNotEmpty()) {
+                    player.removeMediaItems(upcoming.size, upcoming.size + history.size)
+                    player.addMediaItems(upcoming.size + 1, history)
+                }
+            }
+        }
+    }
+
 
     // --- Listeners ---
 

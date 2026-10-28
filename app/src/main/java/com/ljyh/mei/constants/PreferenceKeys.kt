@@ -23,14 +23,8 @@ val UserIdKey = stringPreferencesKey("userId")
 val UserNicknameKey = stringPreferencesKey("userNickname")
 val UserAvatarUrlKey = stringPreferencesKey("userAvatarUrl")
 val UserPhotoKey = stringPreferencesKey("userPhoto")
-val ShowLyricsKey = booleanPreferencesKey("showLyrics")
-val LyricVisualStyleKey = stringPreferencesKey("lyrics.visualStyle")
 val LyricTranslationEnabledKey = booleanPreferencesKey("lyrics.translationEnabled")
 val LyricRomanizationEnabledKey = booleanPreferencesKey("lyrics.romanizationEnabled")
-val LyricGlowEnabledKey = booleanPreferencesKey("lyrics.glowEnabled")
-val LyricLiftEnabledKey = booleanPreferencesKey("lyrics.liftEnabled")
-val LyricLongToneEnabledKey = booleanPreferencesKey("lyrics.longToneEnabled")
-val LyricAutoFollowEnabledKey = booleanPreferencesKey("lyrics.autoFollowEnabled")
 val SystemLyricsEnabledKey = booleanPreferencesKey("lyrics.systemEnabled")
 val BluetoothLyricsEnabledKey = booleanPreferencesKey("lyrics.bluetoothEnabled")
 val FloatingLyricsTranslationKey = booleanPreferencesKey("floatingLyrics.showsTranslation")
@@ -152,7 +146,6 @@ val NavigationTabOrderKey = stringPreferencesKey("navigation.tabOrder")
 val AppAppearanceKey = stringPreferencesKey("application.appearance")
 val LastSelectedTabKey = stringPreferencesKey("navigation.lastSelectedTab")
 val RecognizeClipboardLinksKey = booleanPreferencesKey("application.recognizeClipboardLinks")
-val BetaUpdatesEnabledKey = booleanPreferencesKey("application.betaUpdatesEnabled")
 val QqTimeoutKey = stringPreferencesKey("qq_timeout")
 
 enum class QqTimeout(val seconds: Int, val label: String) {
@@ -194,8 +187,6 @@ enum class LyricTextAlignment {
     Center,
     Right
 }
-
-enum class LyricVisualStyle { AppleMusic, EVA, TextPV, Skyline }
 
 
 enum class MusicQuality(val text: String, val explanation: String, val labelRes: Int) {
@@ -250,3 +241,22 @@ enum class TabletAnimationStyle(val label: String) {
 }
 
 val FlymeStatusBarLyricsEnabledKey = booleanPreferencesKey("lyrics.flymeStatusBarEnabled")
+
+// ---- Bilibili 会话 ----
+val BiliSessdataKey = stringPreferencesKey("bili_sessdata")
+val BiliJctKey = stringPreferencesKey("bili_jct")
+val BiliDedeUserIdKey = stringPreferencesKey("bili_dede_user_id")
+val BiliDedeUserIdCkMd5Key = stringPreferencesKey("bili_dede_user_id_ckmd5")
+val BiliBuvid3Key = stringPreferencesKey("bili_buvid3")
+val BiliNicknameKey = stringPreferencesKey("bili_nickname")
+val BiliAvatarKey = stringPreferencesKey("bili_avatar")
+val BiliLevelKey = stringPreferencesKey("bili_level")
+val BiliCoinKey = longPreferencesKey("bili_coin")
+val BiliVipKey = longPreferencesKey("bili_vip")
+val BiliWbiImgKeyKey = stringPreferencesKey("bili_wbi_img_key")
+val BiliWbiSubKeyKey = stringPreferencesKey("bili_wbi_sub_key")
+val BiliWbiKeyAtKey = longPreferencesKey("bili_wbi_key_at")
+
+// ---- 首页分区 ----
+/** 首页当前展示的 B 站一级分区 rid；未设置时默认音乐区（3）。 */
+val BiliHomeRegionKey = intPreferencesKey("bili.homeRegionRid")

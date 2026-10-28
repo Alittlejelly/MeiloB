@@ -60,7 +60,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import com.kyant.backdrop.Backdrop
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.BottomBarHorizontalPadding
 import com.ljyh.mei.constants.MiniPlayerHeight
@@ -183,7 +183,7 @@ private fun MiniPlayerContent(
                 sheet?.miniBounds = Rect(it.localToRoot(Offset.Zero), Size(it.size.width.toFloat(), it.size.height.toFloat()))
             },
         backdrop = backdrop,
-        shape = Capsule(),
+        shape = GlassCapsule,
         onVisualBoundsChanged = { bounds, light -> sheet?.updateMiniPressHighlight(bounds, light) },
         cancelPressFeedback = sheetTransitioning,
         pressHighlight = remember(sheet) { { sheet?.collapsedPressHighlight } },

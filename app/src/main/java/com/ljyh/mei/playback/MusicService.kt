@@ -1429,7 +1429,14 @@ class MusicService : MediaLibraryService(),
             val limitReached = playbackFailures.recordFailure()
             Timber.tag("MusicService").e("Play failure detected. Count: %s", playbackFailures.consecutiveFailures)
             if (limitReached) {
-                Toast.makeText(context, "播放失败，已连续跳过多首歌曲", Toast.LENGTH_LONG).show()
+                val detail = generateSequence(error.cause) { it.cause }
+                    .mapNotNull { it.message }
+                    .firstOrNull { it.isNotBlank() }
+                Toast.makeText(
+                    context,
+                    "播放失败，已连续跳过多首歌曲" + (detail?.let { "：${it.take(80)}" } ?: ""),
+                    Toast.LENGTH_LONG,
+                ).show()
                 player.pause()
                 player.stop()
                 return

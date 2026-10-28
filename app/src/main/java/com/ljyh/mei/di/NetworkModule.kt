@@ -13,6 +13,9 @@ import com.ljyh.mei.data.network.api.EApiService
 import com.ljyh.mei.data.network.api.WeApiService
 import com.ljyh.mei.data.network.api.MeloXDirectService
 import com.ljyh.mei.data.network.api.AudioMatchService
+import com.ljyh.mei.data.network.bili.BiliApiService
+import com.ljyh.mei.data.network.bili.BiliCookieStore
+import com.ljyh.mei.data.network.bili.BiliInterceptor
 import com.ljyh.mei.data.network.netease.DataStoreNcblSessionContextProvider
 import com.ljyh.mei.data.network.netease.NcblSessionContextProvider
 import com.ljyh.mei.utils.log.NetworkLogInterceptor
@@ -253,6 +256,39 @@ object RetrofitModule {
     @Provides
     fun provideQQMusicApiServiceU(@Named("qqMusicRetrofitU") retrofit: Retrofit): QQMusicUApiService {
         return retrofit.create(QQMusicUApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    @Named("biliOkHttp")
+    fun provideBiliOkHttpClient(cookieStore: BiliCookieStore): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            .addInterceptor(BiliInterceptor(cookieStore))
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                redactHeader("Cookie")
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            })
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("biliRetrofit")
+    fun provideBiliRetrofit(@Named("biliOkHttp") okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.bilibili.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideBiliApiService(@Named("biliRetrofit") retrofit: Retrofit): BiliApiService {
+        return retrofit.create(BiliApiService::class.java)
     }
 
     private fun determineCryptoMethod(url: String): String {

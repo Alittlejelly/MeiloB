@@ -59,7 +59,7 @@ import com.ljyh.mei.ui.navigation.LibraryPage
 import com.ljyh.mei.ui.screen.local.LocalLibraryViewModel
 import com.ljyh.mei.ui.screen.playlist.PlaylistViewModel
 import com.ljyh.mei.ui.screen.playlist.component.StandaloneTrackActionOverlay
-import com.ljyh.mei.ui.screen.social.NeteaseShareSheet
+import com.ljyh.mei.ui.component.TrackShareSheet
 import com.ljyh.mei.utils.DownloadManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -179,7 +179,7 @@ internal fun LibraryDownloadsPage(
         if (!isCategoryPage) item("library-pages") {
             GlassSegmentedControl(
                 items = pages.map { it to stringResource(it.titleRes) },
-                selected = LibraryPage.Downloads,
+                selected = pages.firstOrNull() ?: LibraryPage.Favorites,
                 onSelected = onPageSelect,
                 positionAnimation = tabPosition,
                 modifier = Modifier.fillMaxWidth(),
@@ -293,11 +293,11 @@ internal fun LibraryDownloadsPage(
             onAddToPlaylist = metadata?.let { { playlistViewModel.getAllMePlaylist(); overlay = OverlayState.AddToPlaylist(it.id) } },
             onPause = task?.let { { DownloadManager.pauseSong(context, it.songId) } },
             onResume = task?.let { { scope.launch { DownloadManager.resumeSong(context, it.songId, queueTitle) }; Unit } },
-            onRetry = retryMetadata?.let { { playerViewModel.downloadSong(it, context, retryQuality) } },
+            onRetry = retryMetadata?.let { { playerViewModel.downloadSong(it, context, retryQuality, biliMediaId = task?.songId) } },
         )
     }
     StandaloneTrackActionOverlay(overlay, { overlay = OverlayState.None }, { overlay = it }, playlistViewModel = playlistViewModel)
-    share?.let { NeteaseShareSheet(it, onDismiss = { share = null }) }
+    share?.let { TrackShareSheet(it, onDismiss = { share = null }) }
     info?.let { song -> LocalFileInfo(song) { info = null } }
     LocalMatchSheet(viewModel)
     deleteEntry?.let { entry ->

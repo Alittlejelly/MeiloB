@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.ljyh.mei.constants.PlayerHorizontalPadding
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.ui.component.player.OverlayState
-import com.ljyh.mei.ui.component.player.component.LyricScreen
 import com.ljyh.mei.ui.component.player.component.classic.component.Cover
 import com.ljyh.mei.ui.component.player.overlay.PlayerOverlayHandler
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
@@ -46,7 +45,6 @@ fun ClassicImmersiveLayout(
     val context = LocalContext.current
     val mediaMetadata by stateContainer.mediaMetadata
     val isPlaying by stateContainer.isPlaying
-    val lyricLine by remember { derivedStateOf { stateContainer.lyricLine } }
 
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -108,42 +106,6 @@ fun ClassicImmersiveLayout(
 
             }
 
-            Spacer(Modifier.width(32.dp))
-
-
-
-            LyricScreen(
-                lyricData = lyricLine,
-                playerConnection = stateContainer.playerConnection,
-                contentPadding = PaddingValues(
-                    start = PlayerHorizontalPadding,
-                    end = PlayerHorizontalPadding + 32.dp,
-                ),
-                sourceBadgeEndOffset = -badgeEndPadding,
-                sourceBadgeBottomPadding = badgeBottomPadding,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                onClick = {
-                    mediaMetadata?.let {
-                        if (overlayHandler.currentOverlayValue is OverlayState.None) {
-                            stateContainer.playerViewModel.searchQQSong(it.title)
-                            overlayHandler.showQQMusicSelection(
-                                mediaMetadata = it
-                            )
-                        }
-                    }
-                },
-                onLongClick = { source ->
-                    if (source == LyricSource.QQMusic && mediaMetadata != null) {
-                        stateContainer.playerViewModel.deleteSongById(id = mediaMetadata!!.id.toString())
-                        Toast.makeText(context, "已删除QQ音乐歌词", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                },
-                controlsVisible = stateContainer.controlsVisible,
-                onToggleControls = {},
-            )
         }
     }
 }

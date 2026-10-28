@@ -33,17 +33,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kyant.capsule.ContinuousRoundedRectangle
 import com.ljyh.mei.BuildConfig
 import com.ljyh.mei.R
-import com.ljyh.mei.constants.BetaUpdatesEnabledKey
 import com.ljyh.mei.constants.DevModeKey
 import com.ljyh.mei.constants.Github
 import com.ljyh.mei.ui.glass.GlassCard
-import com.ljyh.mei.ui.glass.GlassIconButton
-import com.ljyh.mei.ui.glass.GlassToggle
 import com.ljyh.mei.ui.glass.IosGroupedList
 import com.ljyh.mei.ui.glass.IosPinnedListPage
 import com.ljyh.mei.ui.glass.LocalGlassColors
@@ -54,11 +50,9 @@ import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.ui.component.VersionUpdateAlert
 import com.ljyh.mei.utils.rememberPreference
-import com.ljyh.mei.utils.dataStore
 import com.ljyh.mei.utils.VersionUpdateChecker
 import com.ljyh.mei.utils.VersionUpdateResult
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -68,41 +62,17 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
     val navController = LocalNavController.current
     val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     val (devMode, onDevModeChange) = rememberPreference(DevModeKey, false)
-    val betaUpdatesEnabled by rememberPreference(BetaUpdatesEnabledKey, false)
     var clickCount by remember { mutableIntStateOf(0) }
     val updateCheckScope = rememberCoroutineScope()
     var isCheckingUpdate by remember { mutableStateOf(false) }
-    var isSavingBetaPreference by remember { mutableStateOf(false) }
     var updateResult by remember { mutableStateOf<VersionUpdateResult?>(null) }
 
-    fun setBetaUpdatesEnabled(enabled: Boolean) {
-        if (isCheckingUpdate || isSavingBetaPreference) return
-        isSavingBetaPreference = true
-        updateCheckScope.launch {
-            try {
-                context.dataStore.edit { preferences ->
-                    preferences[BetaUpdatesEnabledKey] = enabled
-                }
-            } catch (cancellation: CancellationException) {
-                throw cancellation
-            } catch (_: Exception) {
-                updateResult = VersionUpdateResult.Failed
-            } finally {
-                isSavingBetaPreference = false
-            }
-        }
-    }
-
     fun checkForUpdates() {
-        if (isCheckingUpdate || isSavingBetaPreference) return
+        if (isCheckingUpdate) return
         isCheckingUpdate = true
         updateCheckScope.launch {
             try {
-                val checkBetaUpdates = context.dataStore.data.first()[BetaUpdatesEnabledKey] ?: false
-                updateResult = VersionUpdateChecker.check(
-                    BuildConfig.VERSION_NAME,
-                    betaUpdatesEnabled = checkBetaUpdates,
-                )
+                updateResult = VersionUpdateChecker.check(BuildConfig.VERSION_NAME)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
@@ -138,7 +108,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                             }
                         },
                 )
-                Text("MeiloX", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text("MeiloB", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                 Text(
                     stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -159,27 +129,11 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                     },
 //                    stringResource(R.string.about_check_updates_description),
                 ) { checkForUpdates() }
-                GlassCard(
-                    Modifier.fillMaxWidth(),
-                    onClick = if (isCheckingUpdate || isSavingBetaPreference) null else ({ setBetaUpdatesEnabled(!betaUpdatesEnabled) }),
-                ) {
-                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        SfIcon("moon", null, size = 21.dp)
-                        Text(
-                            stringResource(R.string.about_check_beta_updates),
-                            modifier = Modifier.weight(1f).padding(horizontal = 13.dp),
-                        )
-                        GlassToggle(
-                            checked = betaUpdatesEnabled,
-                            onCheckedChange = ::setBetaUpdatesEnabled,
-                            enabled = !isCheckingUpdate && !isSavingBetaPreference,
-                        )
-                    }
-                }
             }
         }
         item {
             com.ljyh.mei.ui.screen.setting.SettingsGroup(stringResource(R.string.about_acknowledgements)) {
+                AboutEntry("arrowshape.turn.up.right", "MeiloX", stringResource(R.string.about_fork_source_description)) { openUrl(context, "https://github.com/NEORUAA/MeiloX") }
                 AboutEntry("chevron.left.forwardslash.chevron.right", "Mei", stringResource(R.string.about_upstream_description)) { openUrl(context, "https://github.com/ljyh223/Mei") }
                 AboutEntry("iphone", "MeloX", stringResource(R.string.about_melox_description)) { openUrl(context, "https://github.com/youshen2/MeloX") }
                 AboutEntry("quote.bubble", "amll-ttml-db", stringResource(R.string.about_amll_description)) { openUrl(context, "https://github.com/Steve-xmh/amll-ttml-db") }
@@ -201,7 +155,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
         }
         item {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top = 24.dp).fillMaxWidth()) {
-                Text("MeiloX · ${LocalDate.now().year}", style = MaterialTheme.typography.labelSmall)
+                Text("MeiloB · ${LocalDate.now().year}", style = MaterialTheme.typography.labelSmall)
                 Text(
                     stringResource(R.string.about_compose),
                     style = MaterialTheme.typography.labelSmall,

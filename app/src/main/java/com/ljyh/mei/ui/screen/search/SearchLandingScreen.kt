@@ -1,381 +1,352 @@
 package com.ljyh.mei.ui.screen.search
 
-import android.net.Uri
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.compose.AsyncImage
-import com.kyant.capsule.ContinuousRoundedRectangle
-import com.ljyh.mei.R
-import com.ljyh.mei.constants.PodcastsEnabledKey
-import com.ljyh.mei.data.model.melox.SearchDiscovery
-import com.ljyh.mei.data.model.melox.SearchDiscoveryPlaylist
-import com.ljyh.mei.data.repository.MeloXRepository
-import com.ljyh.mei.ui.glass.GlassButton
-import com.ljyh.mei.ui.glass.GlassSurfaceStyle
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosListRow
+import com.ljyh.mei.data.model.bili.BiliVideo
+import com.ljyh.mei.data.model.bili.toMediaItem
+import com.ljyh.mei.data.network.Resource
+import com.ljyh.mei.data.repository.BiliRepository
+import com.ljyh.mei.utils.dataStore
+import com.ljyh.mei.playback.queue.ListQueue
 import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.IosTypography
 import com.ljyh.mei.ui.glass.LocalGlassColors
 import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
 import com.ljyh.mei.ui.local.LocalNavController
-import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.screen.Screen
-import com.ljyh.mei.utils.rememberPreference
+import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
+import com.ljyh.mei.ui.local.LocalPlayerConnection
+import com.ljyh.mei.ui.screen.account.BiliTrackRow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import android.content.Context
 import javax.inject.Inject
 
-data class SearchDiscoveryState(
-    val loading: Boolean = true,
-    val discovery: SearchDiscovery? = null,
-    val error: Boolean = false,
-)
-
 @HiltViewModel
-class SearchDiscoveryViewModel @Inject constructor(
-    private val repository: MeloXRepository,
+class BiliSearchViewModel @Inject constructor(
+    private val biliRepository: BiliRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(SearchDiscoveryState())
-    val state = _state.asStateFlow()
 
-    init { refresh() }
-
-    fun refresh() {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(loading = true, error = false)
-            runCatching { repository.searchDiscovery() }
-                .onSuccess { _state.value = SearchDiscoveryState(loading = false, discovery = it) }
-                .onFailure { _state.value = _state.value.copy(loading = false, error = true) }
+    /** B 站全站搜索接口需要登录（SESSDATA），未登录时结果为空。 */
+    val account: kotlinx.coroutines.flow.StateFlow<com.ljyh.mei.data.model.bili.BiliAccount?> =
+        biliRepository.accountFlow.let { flow ->
+            val state = MutableStateFlow<com.ljyh.mei.data.model.bili.BiliAccount?>(null)
+            viewModelScope.launch { flow.collect { state.value = it } }
+            state.asStateFlow()
         }
+
+    data class UiState(
+        val history: List<String> = emptyList(),
+        val results: Resource<List<BiliVideo>> = Resource.Loading,
+        val searchedKeyword: String = "",
+    )
+
+    private val _state = MutableStateFlow(UiState())
+    val state: StateFlow<UiState> = _state.asStateFlow()
+
+    private var searchJob: Job? = null
+    private var page = 1
+    private var exhausted = false
+    private val loaded = mutableListOf<BiliVideo>()
+
+    init {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(history = decodeSearchHistory(readHistoryRaw()))
+        }
+    }
+
+    private suspend fun readHistoryRaw(): String? =
+        appContext.dataStore.data.first()[SearchHistoryKey]
+
+    fun search(keyword: String) {
+        val query = keyword.trim()
+        if (query.isEmpty()) return
+        if (account.value == null) return
+        searchJob?.cancel()
+        exhausted = false
+        page = 1
+        loaded.clear()
+        _state.value = _state.value.copy(results = Resource.Loading, searchedKeyword = query)
+        searchJob = viewModelScope.launch {
+            appContext.recordSearchHistory(query)
+            _state.value = _state.value.copy(history = decodeSearchHistory(readHistoryRaw()))
+            when (val result = biliRepository.search(query, page = 1)) {
+                is Resource.Success -> {
+                    loaded.addAll(result.data.distinctBy { it.aid })
+                    if (result.data.isEmpty()) exhausted = true
+                    _state.value = _state.value.copy(results = Resource.Success(loaded.toList()))
+                }
+                is Resource.Error -> _state.value =
+                    _state.value.copy(results = Resource.Error(result.message ?: "搜索失败"))
+                Resource.Loading -> Unit
+            }
+        }
+    }
+
+    fun loadMore() {
+        if (exhausted || searchJob?.isActive == true) return
+        val keyword = _state.value.searchedKeyword
+        if (keyword.isEmpty()) return
+        searchJob = viewModelScope.launch {
+            val next = page + 1
+            when (val result = biliRepository.search(keyword, page = next)) {
+                is Resource.Success -> {
+                    if (result.data.isEmpty()) {
+                        exhausted = true
+                    } else {
+                        page = next
+                        loaded.addAll(result.data.filter { new -> loaded.none { it.aid == new.aid } })
+                        _state.value = _state.value.copy(results = Resource.Success(loaded.toList()))
+                    }
+                }
+                else -> exhausted = true
+            }
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            appContext.clearSearchHistory()
+            _state.value = _state.value.copy(history = emptyList())
+        }
+    }
+
+    /** 搜索结果缺少 cid：按 bvid 补齐视频详情。 */
+    suspend fun resolveVideo(video: BiliVideo): BiliVideo = when {
+        video.cid > 0 -> video
+        video.bvid == null -> video
+        else -> (biliRepository.videoDetail(video.bvid) as? Resource.Success)?.data ?: video
     }
 }
 
-private data class SearchCategory(
-    @param:StringRes val titleRes: Int,
-    val apiName: String?,
-    val icon: SfSymbol,
-    val startColor: Color,
-    val endColor: Color,
-    val opensPodcasts: Boolean = false,
-)
-
-private val searchCategories = listOf(
-    SearchCategory(R.string.search_category_rankings, "排行榜", SfSymbol.MusicNoteList, Color(0xFF5B5CE2), Color(0xFF9A6BFF)),
-    SearchCategory(R.string.search_category_podcasts, null, SfSymbol.RadioWaves, Color(0xFFDB4B83), Color(0xFFFF8B6A), opensPodcasts = true),
-    SearchCategory(R.string.search_category_chinese, "华语", SfSymbol.MusicNote, Color(0xFF158CBA), Color(0xFF45D6C6)),
-    SearchCategory(R.string.search_category_western, "欧美", SfSymbol.Safari, Color(0xFF1776D2), Color(0xFF55B4FF)),
-    SearchCategory(R.string.search_category_japanese, "日语", SfSymbol.Sparkles, Color(0xFFE4568E), Color(0xFFFFA4C5)),
-    SearchCategory(R.string.search_category_korean, "韩语", SfSymbol.Sparkles, Color(0xFF7E55D9), Color(0xFFC185FF)),
-    SearchCategory(R.string.search_category_cantonese, "粤语", SfSymbol.Waveform, Color(0xFF008B8B), Color(0xFF43D6B2)),
-    SearchCategory(R.string.search_category_pop, "流行", SfSymbol.StarFilled, Color(0xFFFF7B39), Color(0xFFFFC34D)),
-    SearchCategory(R.string.search_category_rock, "摇滚", SfSymbol.MusicNote, Color(0xFFB92B27), Color(0xFFEB5757)),
-    SearchCategory(R.string.search_category_folk, "民谣", SfSymbol.MusicNote, Color(0xFF458C4B), Color(0xFF9CCB5B)),
-    SearchCategory(R.string.search_category_electronic, "电子", SfSymbol.Waveform, Color(0xFF3155C6), Color(0xFF4AC4FF)),
-    SearchCategory(R.string.search_category_rap, "说唱", SfSymbol.Microphone, Color(0xFF46318A), Color(0xFF8F68DC)),
-    SearchCategory(R.string.search_category_rnb_soul, "R&B/Soul", SfSymbol.MusicNote, Color(0xFF984EAB), Color(0xFFD98EDC)),
-    SearchCategory(R.string.search_category_classical, "古典", SfSymbol.MusicNoteList, Color(0xFF8B633B), Color(0xFFD5A86A)),
-    SearchCategory(R.string.search_category_acg, "ACG", SfSymbol.Sparkles, Color(0xFFE34B74), Color(0xFFFFA14A)),
-    SearchCategory(R.string.search_category_soundtrack, "影视原声", SfSymbol.MusicNote, Color(0xFF40506C), Color(0xFF7D9BC7)),
-    SearchCategory(R.string.search_category_study, "学习", SfSymbol.MusicNoteList, Color(0xFF2B7A78), Color(0xFF6BCB9E)),
-    SearchCategory(R.string.search_category_work, "工作", SfSymbol.Clock, Color(0xFF52616B), Color(0xFF8EA7B5)),
-    SearchCategory(R.string.search_category_relax, "放松", SfSymbol.Waveform, Color(0xFF348F50), Color(0xFF56B4D3)),
-    SearchCategory(R.string.search_category_night, "夜晚", SfSymbol.Clock, Color(0xFF24243E), Color(0xFF5D5D9B)),
-)
-
+/** B 站搜索页：关键词搜索视频，结果可直接播放。 */
 @Composable
-fun SearchLandingScreen(viewModel: SearchDiscoveryViewModel = hiltViewModel()) {
-    val state by viewModel.state.collectAsState()
+fun SearchLandingScreen(
+    isNavigationTab: Boolean = false,
+    viewModel: BiliSearchViewModel = hiltViewModel(),
+) {
     val navController = LocalNavController.current
-    val bottomPaddingValues = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-    val podcastsEnabled by rememberPreference(PodcastsEnabledKey, true)
-    val categories = searchCategories.filterNot { it.opensPodcasts && !podcastsEnabled }
-    val colors = LocalGlassColors.current
-    val context = LocalContext.current
+    val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
+    val playerConnection = LocalPlayerConnection.current
     val scope = rememberCoroutineScope()
-    val historyJson by rememberPreference(SearchHistoryKey, "")
-    val history = remember(historyJson) { decodeSearchHistory(historyJson) }
-    var showAllHistory by rememberSaveable { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val state by viewModel.state.collectAsState()
+    val account by viewModel.account.collectAsState()
+
+    // 底部共享搜索工具栏（MainActivity 组合）通过总线驱动本页的全站搜索。
+    val bottomSearch = com.ljyh.mei.ui.local.LocalBottomSearchState.current
+    DisposableEffect(bottomSearch, viewModel) {
+        bottomSearch.submit = { keyword ->
+            keyboardController?.hide()
+            viewModel.search(keyword)
+        }
+        onDispose { bottomSearch.submit = null }
+    }
+
+    fun playVideos(videos: List<BiliVideo>, startIndex: Int) {
+        val connection = playerConnection ?: return
+        if (videos.getOrNull(startIndex) == null) return
+        scope.launch {
+            // 只解析点击的这条（缺 cid 的其余条目由播放器按 aid 兜底解析），
+            // 否则要串行请求整页视频详情，点击会卡好几秒毫无反应。
+            val clicked = viewModel.resolveVideo(videos[startIndex])
+            val items = videos.map { video ->
+                if (video.aid == clicked.aid) clicked else video
+            }.map { it.toMediaItem() }
+            connection.playQueue(
+                ListQueue(
+                    id = "bili_search_" + System.currentTimeMillis(),
+                    title = "搜索：" + state.searchedKeyword,
+                    items = items.map { it.mediaId to it },
+                    startIndex = startIndex.coerceAtMost(items.lastIndex),
+                )
+            )
+        }
+    }
 
     IosPinnedListPage(
-        title = stringResource(R.string.app_tab_search),
-        bottomPadding = 0.dp,
-        bottomPaddingValues = bottomPaddingValues,
-        horizontalContentPadding = 0.dp,
-        largeTitleHorizontalPadding = 16.dp,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        title = "搜索",
+        onNavigateBack = if (isNavigationTab) null else ({ navController.navigateUp() }),
+        bottomPadding = insets.calculateBottomPadding(),
     ) {
-            if (history.isNotEmpty()) {
-                item(key = "search-history") {
-                    SearchHistorySection(
-                        history = if (showAllHistory) history else history.take(5),
-                        canExpand = history.size > 5 && !showAllHistory,
-                        onExpand = { showAllHistory = true },
-                        onSearch = { query ->
-                            Screen.SearchResult.navigate(navController) {
-                                addPath(Uri.encode(query))
-                                addPath("1")
-                            }
-                        },
-                        onRemove = { query -> scope.launch { context.removeSearchHistory(query) } },
-                        onClear = { scope.launch { context.clearSearchHistory() } },
+        if (account == null) {
+            item(key = "search-login-gate") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    SfIcon("person.crop.circle", contentDescription = null, size = 40.dp, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f))
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        "登录 B 站后可使用全站搜索",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    Text(
+                        "去登录",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                            .clickable { Screen.BiliLogin.navigate(navController) }
+                            .padding(horizontal = 20.dp, vertical = 10.dp),
                     )
                 }
             }
-            item(key = "popular-title") {
-                Text(
-                    text = stringResource(R.string.search_popular_recommendations),
-                    style = IosTypography.title2,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.content,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-            }
-            if (state.loading && state.discovery == null) {
-                item(key = "loading") {
-                    Box(
+        } else if (state.searchedKeyword.isEmpty()) {
+            if (state.history.isNotEmpty()) {
+                item(key = "history-clear") {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 32.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-            }
-            if (state.error) {
-                item(key = "error") {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = stringResource(R.string.load_failed),
-                            style = IosTypography.body,
-                            color = colors.secondaryContent,
+                            "搜索历史",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = LocalGlassColors.current.content,
                         )
-                        GlassButton(
-                            onClick = viewModel::refresh,
-                            modifier = Modifier.padding(top = 8.dp),
-                        ) {
-                            Text(stringResource(R.string.retry))
-                        }
+                        Text(
+                            "清空",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            modifier = Modifier
+                                .clickable { viewModel.clearHistory() }
+                                .padding(6.dp),
+                        )
+                    }
+                }
+                itemsIndexed(
+                    state.history,
+                    key = { _, item -> "history_$item" },
+                    contentType = { _, _ -> "history" },
+                ) { _, keyword ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.search(keyword)
+                            }
+                            .padding(horizontal = 8.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        SfIcon("timer", contentDescription = null, size = 18.dp)
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            keyword,
+                            fontSize = 14.sp,
+                            color = LocalGlassColors.current.content,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 }
             }
-            state.discovery?.let { discovery ->
-                item(key = "recommendations") {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    ) {
-                        items(discovery.recommendations, key = SearchDiscoveryPlaylist::id) { playlist ->
-                            SearchRecommendationCard(playlist) {
-                                Screen.PlayList.navigate(navController) { addPath(playlist.id.toString()) }
+        } else {
+            when (val result = state.results) {
+                is Resource.Success -> {
+                    if (result.data.isEmpty()) {
+                        item(key = "search-empty") {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 48.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    "没有找到相关内容",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                )
                             }
                         }
                     }
+                    itemsIndexed(
+                        result.data,
+                        key = { _, video -> "result_${video.aid}_${video.cid}" },
+                        contentType = { _, _ -> "result" },
+                    ) { index, video ->
+                        BiliTrackRow(video = video, onClick = { playVideos(result.data, index) })
+                        if (index == result.data.lastIndex) {
+                            LaunchedEffect(video.aid) { viewModel.loadMore() }
+                        }
+                    }
                 }
-            }
-            item(key = "categories-title") {
-                Text(
-                    text = stringResource(R.string.search_browse_categories),
-                    style = IosTypography.title2,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.content,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                )
-            }
-            items(
-                categories.chunked(2),
-                key = { row -> row.joinToString("-") { it.titleRes.toString() } },
-            ) { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    row.forEach { category ->
-                        val title = stringResource(category.titleRes)
-                        SearchCategoryCard(
-                            category = category,
-                            title = title,
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                if (category.opensPodcasts) {
-                                    Screen.Podcasts.navigate(navController)
-                                } else {
-                                    Screen.PlaylistCategory.navigate(navController) {
-                                        addPath(Uri.encode(checkNotNull(category.apiName)))
-                                        addPath(Uri.encode(title))
-                                    }
-                                }
-                            },
+                is Resource.Error -> item(key = "search-error") {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            result.message ?: "搜索失败",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         )
                     }
-                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+                Resource.Loading -> item(key = "search-loading") {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            "搜索中…",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        )
+                    }
                 }
             }
-    }
-}
-
-@Composable
-internal fun SearchHistorySection(
-    history: List<String>,
-    canExpand: Boolean,
-    onExpand: () -> Unit,
-    onSearch: (String) -> Unit,
-    onRemove: (String) -> Unit,
-    onClear: () -> Unit,
-) {
-    val colors = LocalGlassColors.current
-    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.search_history_title), Modifier.weight(1f),
-                style = IosTypography.title2, fontWeight = FontWeight.Bold, color = colors.content)
-            GlassButton(onClick = onClear, style = GlassSurfaceStyle.Navigation) {
-                Text(stringResource(R.string.search_history_clear))
-            }
         }
-        IosGroupedList(Modifier.padding(top = 8.dp)) {
-            history.forEachIndexed { index, query ->
-                IosListRow(
-                    title = query, systemName = "clock", showTopSeparator = index > 0,
-                    onClick = { onSearch(query) },
-                    trailing = {
-                        Box(
-                            modifier = Modifier
-                                .offset(x = 8.dp)
-                                .size(44.dp)
-                                .clickable(role = Role.Button, onClick = { onRemove(query) }),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            SfIcon(SfSymbol.Close, stringResource(R.string.search_history_remove, query), size = 14.dp)
-                        }
-                    },
-                )
-            }
-            if (canExpand) IosListRow(
-                title = stringResource(R.string.search_history_show_all), onClick = onExpand,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SearchRecommendationCard(
-    playlist: SearchDiscoveryPlaylist,
-    onClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.width(172.dp).clickable(onClick = onClick),
-    ) {
-        AsyncImage(
-            model = playlist.artworkUrl,
-            contentDescription = playlist.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(ContinuousRoundedRectangle(14.dp)),
-            contentScale = ContentScale.Crop,
-        )
-        Text(
-            text = playlist.name,
-            style = IosTypography.subheadline,
-            fontWeight = FontWeight.Medium,
-            color = LocalGlassColors.current.content,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        val subtitle = playlist.copywriter?.takeIf(String::isNotBlank)
-            ?: playlist.creatorNickname?.takeIf(String::isNotBlank)
-        subtitle?.let {
-            Text(
-                text = it,
-                style = IosTypography.caption,
-                color = LocalGlassColors.current.secondaryContent,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SearchCategoryCard(
-    category: SearchCategory,
-    title: String,
-    modifier: Modifier,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1.55f)
-            .clip(ContinuousRoundedRectangle(14.dp))
-            .background(Brush.linearGradient(listOf(category.startColor, category.endColor)))
-            .clickable(onClick = onClick),
-    ) {
-        SfIcon(
-            symbol = category.icon,
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).rotate(-8f),
-            tint = Color.White.copy(alpha = 0.22f),
-            size = 60.dp,
-            weight = FontWeight.Bold,
-        )
-        Text(
-            text = title,
-            style = IosTypography.headline,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.align(Alignment.BottomStart).padding(12.dp),
-        )
     }
 }

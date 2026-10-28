@@ -101,7 +101,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.kyant.shapes.Capsule
+import com.ljyh.mei.ui.glass.GlassCapsule
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.AutoMixEnabledKey
 import com.ljyh.mei.constants.LoopPlaybackKey
@@ -921,7 +921,7 @@ fun PlayerQueuePage(
                     )
                     if (inlineCurrent && activeNow && viewportSize.height > 0 && !reorderState.isAnyItemDragging &&
                         previous != null && next != null &&
-                        (changed || historyEmptied || rowsTransition != null && changedOrder)
+                        (changed || historyEmptied || changedOrder)
                     ) {
                         val before = rowsTransition?.frames(layout) ?: snapshot.rows()
                         if (historyEmptied) {
@@ -1065,20 +1065,11 @@ fun PlayerQueuePage(
             )
             QueueModeButton(
                 indication = indication,
-                systemName = "infinity",
-                label = stringResource(R.string.queue_autoplay),
-                selected = autoplayEnabled,
+                systemName = "arrow.up.arrow.down",
+                label = stringResource(R.string.queue_reverse),
+                selected = false,
                 modifier = Modifier.weight(1f),
-                enabled = !fmEnabled || autoplayEnabled,
-                onClick = { playerConnection.setQueueAutoplayEnabled(!autoplayEnabled) },
-            )
-            QueueModeButton(
-                indication = indication,
-                systemName = "circlebadge.2",
-                label = stringResource(R.string.automix_enabled),
-                selected = autoMixEnabled,
-                modifier = Modifier.weight(1f),
-                onClick = { setAutoMixEnabled(!autoMixEnabled) },
+                onClick = { playerConnection.reverseQueue() },
             )
         }
     }
@@ -1629,7 +1620,7 @@ private fun QueueModeButton(
         modifier = modifier
             .height(36.dp)
             .playerAdditiveBlend()
-            .clip(Capsule())
+            .clip(GlassCapsule)
             .background(Color.White.copy(alpha = if (selected) 0.45f else 0.1f))
             .semantics { this.selected = selected }
             .clickable(

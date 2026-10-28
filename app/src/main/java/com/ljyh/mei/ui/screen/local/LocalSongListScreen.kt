@@ -222,7 +222,7 @@ fun LocalSongListScreen(
         }
 
         shareTrack?.let { track ->
-            com.ljyh.mei.ui.screen.social.NeteaseShareSheet(
+            com.ljyh.mei.ui.component.TrackShareSheet(
                 metadata = track,
                 onDismiss = { shareTrack = null },
             )
