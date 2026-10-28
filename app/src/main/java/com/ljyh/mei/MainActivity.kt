@@ -662,9 +662,12 @@ class MainActivity : ComponentActivity() {
                         active, searchToolbarBottomPadding, navigationBottomMargin,
                     ) {
                         {
-                            // Read IME padding during placement so both controls move together.
-                            if (active) -(searchToolbarBottomPadding.calculateBottomPadding() -
-                                navigationBottomMargin).coerceAtLeast(0.dp)
+                            // The 64dp toolbar host sits at searchToolbarBottomPadding and is
+                            // nudged down 4dp; lift the mini player above its top edge so the
+                            // collapsed song bar yields to the search toolbar in both keyboard
+                            // states instead of overlapping it.
+                            if (active) -(searchToolbarBottomPadding.calculateBottomPadding() +
+                                60.dp - navigationBottomMargin).coerceAtLeast(0.dp)
                             else 0.dp
                         }
                     }
