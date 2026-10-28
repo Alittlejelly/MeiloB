@@ -1,0 +1,172 @@
+Third-Party Notices
+===================
+
+MeiloX is distributed under the GNU General Public License, version 3 (see
+LICENSE). The components below remain under their own terms. This file is a
+notice and does not replace any upstream license text.
+
+AndroidLiquidGlass / Backdrop
+-----------------------------
+The `io.github.kyant0:backdrop:2.0.0` dependency is from AndroidLiquidGlass:
+https://github.com/Kyant0/AndroidLiquidGlass
+
+Copyright (c) Kyant0 and contributors. It is licensed under the Apache
+License, Version 2.0. The Apache license text is available at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+Liquid-glass implementation skill
+---------------------------------
+The interaction, damped-drag, toggle, slider, tab-bar, sheet, dialog, and
+popup-menu patterns in `ui/liquidglass` and `ui/glass` are adapted from the
+local `skill-liquid-glass` reference project, which is derived from
+AndroidLiquidGlass / Backdrop and is licensed under the Apache License,
+Version 2.0. Original copyright and license headers are retained where the
+reference source provides them.
+
+Lyricon Provider
+----------------
+The `io.github.proify.lyricon:provider:0.1.70` dependency and its lyric model
+are Copyright 2026 Proify, Tomakino and licensed under the Apache License,
+Version 2.0:
+https://github.com/tomakino/lyricon
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+The media metadata output follows this public player integration contract:
+https://github.com/Andrea-lyz/ColorOS-Live-Lyrics-Bridge/blob/main/docs/PLAYER_INTEGRATION.md
+
+Accompanist Lyrics UI
+---------------------
+`PlayerLyricsView.kt` adapts the top-level `KaraokeLyricsView` from
+`com.mocharealm.accompanist:lyrics-ui:1.0.19` while reusing its line renderers.
+Scrolling is managed by the player to support timed manual lyric browsing.
+Copyright 2025 6xingyv. Licensed under the Apache License, Version 2.0:
+https://github.com/6xingyv/accompanist-lyrics-ui
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+SuperLyricApi
+-------------
+The `com.github.HChenX:SuperLyricApi:3.4` dependency is Copyright (C)
+2025-2026 HChenX and licensed under the GNU Lesser General Public License,
+version 2.1 or later:
+https://github.com/HChenX/SuperLyricApi
+License: https://www.gnu.org/licenses/lgpl-2.1.html
+
+Mei
+---
+Mei is the upstream Android project for this migration. Mei application code
+is Copyright (c) its respective contributors and is licensed under the Apache
+License, Version 2.0:
+https://github.com/ljyh223/Mei
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+Android Camera Samples
+----------------------
+The camera lifecycle and ImageAnalysis structure used by the PC QR login
+scanner is adapted from the CameraX QR Scanner sample:
+https://github.com/android/camera-samples/tree/main/samples/camerax-qrscanner
+
+Copyright 2026 The Android Open Source Project. It is licensed under the
+Apache License, Version 2.0. The Apache license text is available at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+NetEase login security runtimes
+-------------------------------
+The private PC QR-login compatibility path contains minimized device and
+WatchMan bytecode (`netease-device-sdk.dex`), the official device-ID bytecode
+(`netease-device-id-sdk.dex`), plus the ARM64 native runtimes
+(`libnesdk.so`, `libnetmobsec-4.4.7.so`, `libnetdev-1.0.0.so`, and
+`libAegisSDK.so`) and the URS login/captcha bytecode, key data, and native
+runtimes (`netease-urs-*.dex`, `key_*.dat`, `app_sign_private.dat`,
+`device_info_public.dat`, `error_log_public.dat`,
+`netease_official_signing_certificate.der`, `libursandroidunity.so`, and
+`libnedat.so`) extracted from the official NetEase Cloud Music Android app
+version 9.5.70. These files are
+proprietary NetEase components; no open-source or redistribution license was
+found. They are included only for private interoperability testing and must be
+removed or separately licensed before public distribution.
+
+Bouncy Castle
+-------------
+The URS compatibility path uses Bouncy Castle Provider `bcprov-jdk18on`
+version 1.85.2. Copyright (c) 2000-2026 The Legion of the Bouncy Castle Inc.
+It is distributed under the Bouncy Castle License:
+https://www.bouncycastle.org/license.html
+
+MeloX
+-----
+MeloX is the product/reference baseline for the migration. MeloX application
+code is Copyright (c) its respective contributors and is licensed under the
+GNU General Public License, version 3:
+https://github.com/youshen2/MeloX
+
+BeatNet
+-------
+BeatNet is the beat, downbeat, tempo, and meter analysis model by Mojtaba
+Heydari. The model and any converted model derived from it are licensed under
+the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+Source: https://github.com/mjhydri/BeatNet
+License: https://creativecommons.org/licenses/by/4.0/
+
+When distributing a BeatNet model or a conversion, retain attribution, the
+license link, and a description of changes as required by CC BY 4.0.
+
+Mei includes a conversion of BeatNet's generic `model_1_weights.pt` network.
+The PyTorch model was exported to an ONNX opset 17 model with a fixed
+`1 x 1600 x 272` (32-second) input. It returns beat and downbeat activation
+probabilities; feature extraction and temporal decoding run in Mei.
+
+NetEase audio fingerprint runtime
+----------------------------------
+The audio fingerprint runtime is based on the `@neteaseapireborn/api` audio
+matching implementation used by YesPlayMusic and the api-enhanced project:
+https://github.com/neteasecloudmusicapienhanced/api-enhanced
+
+The upstream runtime is distributed under the MIT License. Copyright
+(c) 2013-2022 Binaryify. The MIT license text is available at:
+https://opensource.org/licenses/MIT
+
+NCBL v3 protocol reference
+--------------------------
+The NCBL v3 wire format was independently implemented and cross-checked against
+`util/ncbl.js` in NeteaseCloudMusicApiEnhanced/api-enhanced at commit
+83ee2cda34a20f64c6d343f7dfe22aa6a1c84b3d. The referenced project is licensed
+under the MIT License, Copyright (c) 2013-2022 Binaryify:
+https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/83ee2cda34a20f64c6d343f7dfe22aa6a1c84b3d/LICENSE
+
+Zstd JNI
+--------
+The `com.github.luben:zstd-jni:1.5.7-23` Android archive and JVM runtime JAR
+provide Zstandard compression. The JNI bindings are Copyright (c) 2015-present
+Luben Karavelov and licensed under the BSD 2-Clause License. The bundled
+Zstandard native library is Copyright (c) 2016-present Facebook, Inc. and
+licensed under the BSD 3-Clause License:
+https://github.com/luben/zstd-jni/tree/v1.5.7-23
+https://github.com/luben/zstd-jni/blob/v1.5.7-23/src/main/native/LICENSE
+https://opensource.org/licenses/BSD-2-Clause
+https://opensource.org/licenses/BSD-3-Clause
+
+PV Tool
+-------
+PV Tool's text-PV templates and visual effects are Copyright (c) 2026
+DanteAlighieri13210914 and are subject to the PV Tool Non-Commercial License:
+https://github.com/DanteAlighieri13210914/pv-tool
+
+PV Tool-derived material may be used only for non-commercial purposes unless
+the copyright holder grants separate written permission. The GPLv3 license
+for Mei does not replace or broaden the PV Tool license.
+
+ONNX Runtime
+------------
+The Android ONNX Runtime artifact
+(`com.microsoft.onnxruntime:onnxruntime-android:1.28.0`) is Copyright (c)
+Microsoft and contributors and is licensed
+under the MIT License:
+https://github.com/microsoft/onnxruntime
+
+SF Pro private project resource
+-------------------------------
+SF Pro is an Apple font included in this private, personal-use project as
+`res/font/sf_pro.ttf` so debug and release builds can render the SF Symbols
+glyphs used by MeloX. It must not be extracted or redistributed separately,
+and public distribution of builds requires a fresh review of Apple's font
+license terms. Apple retains all rights in SF Pro.

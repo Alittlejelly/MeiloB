@@ -1,0 +1,400 @@
+package com.ljyh.mei.ui.component.player
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import com.ljyh.mei.ui.component.sheet.LocalPlayerSheet
+import com.ljyh.mei.ui.component.sheet.recordPlayerContent
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import com.kyant.backdrop.Backdrop
+import com.kyant.capsule.ContinuousRoundedRectangle
+import com.ljyh.mei.ui.glass.GlassCapsule
+import com.ljyh.mei.R
+import com.ljyh.mei.constants.BottomBarHorizontalPadding
+import com.ljyh.mei.constants.MiniPlayerHeight
+import com.ljyh.mei.constants.NavigationBarHeight
+import com.ljyh.mei.constants.NavigationBarBottomMargin
+import com.ljyh.mei.constants.MiniPlayerArtworkCornerRadius
+import com.ljyh.mei.data.model.MediaMetadata
+import com.ljyh.mei.extensions.togglePlayPause
+import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicPlayPauseMotionContent
+import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicSkipIcon
+import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicMarqueeText
+import com.ljyh.mei.ui.glass.GlassSurface
+import com.ljyh.mei.ui.glass.GlassSurfaceStyle
+import com.ljyh.mei.ui.glass.LocalGlassBackdrop
+import com.ljyh.mei.ui.glass.LocalGlassColors
+import com.ljyh.mei.ui.glass.SfIcon
+import com.ljyh.mei.ui.glass.SfSymbol
+import com.ljyh.mei.ui.glass.defaultGlassColors
+import com.ljyh.mei.ui.local.LocalPlayerConnection
+import com.ljyh.mei.ui.theme.LocalAccentSeedColor
+import com.ljyh.mei.ui.theme.MusicTheme
+import kotlin.math.roundToInt
+
+internal val LocalMiniPlayerAppearance = staticCompositionLocalOf<Boolean?> { null }
+
+private fun Modifier.compactMiniPlayerHorizontalPadding(
+    compactProgress: State<Float>,
+): Modifier = layout { measurable, constraints ->
+    val progress = compactProgress.value.coerceIn(0f, 1f)
+    val horizontalPadding = (BottomBarHorizontalPadding + 60.dp * progress).roundToPx()
+    val totalPadding = horizontalPadding * 2
+    val childConstraints = constraints.copy(
+        minWidth = (constraints.minWidth - totalPadding).coerceAtLeast(0),
+        maxWidth = (constraints.maxWidth - totalPadding).coerceAtLeast(0),
+    )
+    val placeable = measurable.measure(childConstraints)
+    val width = (placeable.width + totalPadding)
+        .coerceIn(constraints.minWidth, constraints.maxWidth)
+    val height = placeable.height.coerceIn(constraints.minHeight, constraints.maxHeight)
+    layout(width, height) {
+        placeable.placeRelative(horizontalPadding, 0)
+    }
+}
+
+private fun Modifier.compactNextButtonWidth(
+    compactProgress: State<Float>,
+): Modifier = layout { measurable, constraints ->
+    val visibility = 1f - compactProgress.value.coerceIn(0f, 1f)
+    val width = (40.dp.toPx() * visibility).roundToInt()
+        .coerceIn(constraints.minWidth, constraints.maxWidth)
+    val placeable = measurable.measure(
+        constraints.copy(minWidth = width, maxWidth = width),
+    )
+    layout(width, placeable.height) {
+        placeable.placeRelative(0, 0)
+    }
+}
+
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+fun MiniPlayer(
+    @Suppress("UNUSED_PARAMETER") position: Long,
+    @Suppress("UNUSED_PARAMETER") duration: Long,
+    modifier: Modifier = Modifier,
+    backdrop: Backdrop = LocalGlassBackdrop.current,
+    compactProgress: State<Float>,
+    onClick: () -> Unit,
+    onCoverBoundsChanged: ((Rect) -> Unit)? = null,
+) {
+    val appearance = LocalMiniPlayerAppearance.current
+    if (appearance == null) {
+        MiniPlayerContent(modifier, backdrop, compactProgress, onClick, onCoverBoundsChanged)
+    } else {
+        MusicTheme(
+            seedColor = LocalAccentSeedColor.current ?: defaultGlassColors(appearance).accent,
+            isDark = appearance,
+        ) {
+            CompositionLocalProvider(
+                LocalGlassColors provides defaultGlassColors(appearance, MaterialTheme.colorScheme.primary),
+            ) {
+                MiniPlayerContent(modifier, backdrop, compactProgress, onClick, onCoverBoundsChanged)
+            }
+        }
+    }
+}
+
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+private fun MiniPlayerContent(
+    modifier: Modifier,
+    backdrop: Backdrop,
+    compactProgress: State<Float>,
+    onClick: () -> Unit,
+    onCoverBoundsChanged: ((Rect) -> Unit)?,
+) {
+    val sheet = LocalPlayerSheet.current
+    val sheetTransitioning by remember(sheet) {
+        derivedStateOf { sheet?.state?.isTransitioning == true }
+    }
+    val playerConnection = LocalPlayerConnection.current ?: return
+    val isPlaying by playerConnection.isPlaying.collectAsState()
+    val playbackState by playerConnection.playbackState.collectAsState()
+    val error by playerConnection.error.collectAsState()
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
+    val canSkipNext by playerConnection.canSkipNext.collectAsState()
+    var nextClickCount by remember { mutableIntStateOf(0) }
+    val playPauseDescription = stringResource(if (isPlaying) R.string.player_pause else R.string.player_play)
+    val nextDescription = stringResource(R.string.player_next)
+    val showNextButton by remember(compactProgress) {
+        derivedStateOf { 1f - compactProgress.value.coerceIn(0f, 1f) > 0.001f }
+    }
+    GlassSurface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(MiniPlayerHeight)
+            .compactMiniPlayerHorizontalPadding(compactProgress)
+            .onGloballyPositioned {
+                // This modifier is outside GlassSurface's press layer. Avoid boundsInRoot,
+                // which can clip the hidden mini player against the moving sheet outline.
+                sheet?.miniBounds = Rect(it.localToRoot(Offset.Zero), Size(it.size.width.toFloat(), it.size.height.toFloat()))
+            },
+        backdrop = backdrop,
+        shape = GlassCapsule,
+        onVisualBoundsChanged = { bounds, light -> sheet?.updateMiniPressHighlight(bounds, light) },
+        cancelPressFeedback = sheetTransitioning,
+        pressHighlight = remember(sheet) { { sheet?.collapsedPressHighlight } },
+        morphProgress = compactProgress,
+        morphVerticalTravel = NavigationBarHeight - NavigationBarBottomMargin,
+        style = GlassSurfaceStyle.Navigation,
+        onClick = {
+            sheet?.prepareTransition()
+            sheet?.releasePressHighlight()
+            onClick()
+        },
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { sheet?.miniLayoutCoordinates = it }
+                .padding(horizontal = 4.dp)
+                .onGloballyPositioned {
+                    sheet?.miniContentCoordinates = it
+                    sheet?.miniLayoutBounds(it)?.let { bounds -> sheet.miniContentBounds = bounds }
+                }
+                .then(
+                    if (sheet != null) {
+                        Modifier.recordPlayerContent(sheet, sheet.miniContent, warmWhileVisible = true) {
+                            !sheet.isTransitioning
+                        }
+                    } else Modifier,
+                ),
+        ) {
+            Box(Modifier.weight(1f)) {
+                mediaMetadata?.let {
+                    MiniMediaInfo(
+                        mediaMetadata = it,
+                        error = error,
+                        onCoverBoundsChanged = onCoverBoundsChanged,
+                        modifier = Modifier.padding(horizontal = 2.dp),
+                    )
+                }
+            }
+
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                Row(
+                    modifier = Modifier.offset(x = (-4).dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(
+                        modifier = Modifier.size(40.dp).semantics { contentDescription = playPauseDescription },
+                        onClick = {
+                            if (playbackState == Player.STATE_ENDED) {
+                                playerConnection.player.seekTo(0, 0)
+                                playerConnection.player.playWhenReady = true
+                            } else {
+                                playerConnection.player.togglePlayPause()
+                            }
+                        },
+                    ) {
+                        AppleMusicPlayPauseMotionContent(
+                            systemName = when {
+                                playbackState == Player.STATE_ENDED -> "arrow.clockwise"
+                                isPlaying -> "pause.fill"
+                                else -> "play.fill"
+                            },
+                            modifier = Modifier.size(22.dp),
+                        ) { icon ->
+                            SfIcon(
+                                systemName = icon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                size = when (icon) {
+                                    "pause.fill" -> 18.dp
+                                    "play.fill" -> 16.dp
+                                    else -> 22.dp
+                                },
+                                modifier = if (icon == "play.fill") Modifier.offset(x = 1.dp) else Modifier,
+                                weight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+
+                    if (showNextButton) {
+                        Box(
+                            modifier = Modifier
+                                .compactNextButtonWidth(compactProgress)
+                                .graphicsLayer {
+                                    val nextVisibility = 1f - compactProgress.value.coerceIn(0f, 1f)
+                                    alpha = nextVisibility
+                                    val scale = 0.82f + 0.18f * nextVisibility
+                                    scaleX = scale
+                                    scaleY = scale
+                                    clip = true
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            IconButton(
+                                modifier = Modifier.size(40.dp).semantics { contentDescription = nextDescription },
+                                enabled = canSkipNext,
+                                onClick = {
+                                    nextClickCount++
+                                    playerConnection.seekToNext()
+                                },
+                            ) {
+                                AppleMusicSkipIcon(
+                                    forward = true,
+                                    clickCount = nextClickCount,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    size = 26.dp,
+                                    weight = FontWeight.SemiBold,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MiniMediaInfo(
+    mediaMetadata: MediaMetadata,
+    error: PlaybackException?,
+    modifier: Modifier = Modifier,
+    onCoverBoundsChanged: ((Rect) -> Unit)? = null,
+) {
+    val sheet = LocalPlayerSheet.current
+    val marqueeEnabled by remember(sheet) {
+        derivedStateOf { sheet == null || sheet.state.isCollapsed }
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(start = 4.dp),
+    ) {
+        Box(modifier = Modifier.padding(4.dp)) {
+            Spacer(modifier = Modifier.size(28.dp))
+            val artwork = LocalPlayerArtwork.current
+            AnimatedContent(
+                targetState = artwork,
+                transitionSpec = {
+                    (fadeIn(tween(400)) + scaleIn(initialScale = 0.92f, animationSpec = tween(400)))
+                        .togetherWith(fadeOut(tween(400)))
+                },
+                label = "MiniCoverTransition",
+                modifier = Modifier.size(28.dp)
+                    .onGloballyPositioned { coordinates ->
+                        val bounds = coordinates.boundsInRoot()
+                        sheet?.miniArtworkCoordinates = coordinates
+                        sheet?.miniLayoutBounds(coordinates)?.let { layoutBounds ->
+                            sheet.miniArtworkBounds = layoutBounds
+                        }
+                        onCoverBoundsChanged?.invoke(bounds)
+                    }
+                    .drawWithContent { if (sheet?.sharesArtwork != true) drawContent() }
+                    .clip(ContinuousRoundedRectangle(MiniPlayerArtworkCornerRadius)),
+            ) { cover ->
+                if (cover != null) Image(
+                    painter = cover.second,
+                    contentDescription = null,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = error != null,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Box(
+                    Modifier
+                        .size(28.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.6f),
+                            shape = ContinuousRoundedRectangle(MiniPlayerArtworkCornerRadius),
+                        ),
+                ) {
+                    SfIcon(
+                        symbol = SfSymbol.Warning,
+                        contentDescription = stringResource(R.string.player_playback_error),
+                        tint = MaterialTheme.colorScheme.error,
+                        size = 22.dp,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy((-1).dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 4.dp, end = 6.dp),
+        ) {
+            AppleMusicMarqueeText(
+                text = mediaMetadata.title,
+                style = LocalTextStyle.current.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                edgeWidth = 8.dp,
+                enabled = marqueeEnabled,
+            )
+            AppleMusicMarqueeText(
+                text = mediaMetadata.artists.joinToString { it.name },
+                style = LocalTextStyle.current.copy(
+                    fontSize = 11.sp,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                edgeWidth = 8.dp,
+                enabled = marqueeEnabled,
+            )
+        }
+    }
+}
