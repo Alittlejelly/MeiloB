@@ -85,6 +85,9 @@ android {
     namespace = "com.ljyh.mei"
     compileSdk = 37
     ndkVersion = "27.1.12297006"
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
     useLibrary("android.test.mock")
     testBuildType = providers.gradleProperty("mei.instrumentationBuildType").orElse("debug").get()
     defaultConfig {
@@ -103,8 +106,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["mei_build_id"] =
             "number=$buildNumber;sha=$buildCommitSha;dirty=$buildSourceDirty;ci=$ciRunNumber.$ciRunAttempt"
-        manifestPlaceholders["superlyricapi_version_name"] = "3.4"
-        manifestPlaceholders["superlyricapi_version_code"] = "34"
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters += "arm64-v8a"
@@ -263,8 +264,6 @@ dependencies {
     // 歌词组件
     implementation(libs.lyrics.core)
     implementation(libs.lyrics.ui)
-    implementation(libs.provider)
-    implementation(libs.superlyricapi)
     implementation(libs.zoomable)
     implementation(libs.timber)
     implementation(libs.compose.cloudy)

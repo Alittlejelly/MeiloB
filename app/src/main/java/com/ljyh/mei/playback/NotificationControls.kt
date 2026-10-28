@@ -1,51 +1,20 @@
 package com.ljyh.mei.playback
 
 import android.content.Context
-import android.app.ActivityOptions
-import android.app.PendingIntent
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
-import androidx.media3.session.MediaNotification
 import androidx.media3.session.SessionCommand
 import com.google.common.collect.ImmutableList
 import com.ljyh.mei.R
-import com.ljyh.mei.MainActivity
 import com.ljyh.mei.constants.NotificationAction
 
 internal const val NOTIFICATION_LEFT_COMMAND = "com.neoruaa.meilox.notification.LEFT"
 internal const val NOTIFICATION_RIGHT_COMMAND = "com.neoruaa.meilox.notification.RIGHT"
-internal const val FLOATING_LYRICS_BUTTON = "floatingLyrics"
-internal const val FLOATING_LYRICS_ENABLED = "floatingLyricsEnabled"
-internal const val ENABLE_FLOATING_LYRICS = "com.neoruaa.meilox.floatingLyrics.ENABLE"
-internal const val DISABLE_FLOATING_LYRICS = "com.neoruaa.meilox.floatingLyrics.DISABLE"
-
-internal fun floatingLyricsIntent(context: Context, enabled: Boolean): Intent =
-    Intent(context, MainActivity::class.java)
-        .setAction(if (enabled) ENABLE_FLOATING_LYRICS else DISABLE_FLOATING_LYRICS)
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-
-internal fun floatingLyricsPendingIntent(context: Context, enabled: Boolean): PendingIntent {
-    val options = ActivityOptions.makeBasic().apply {
-        if (Build.VERSION.SDK_INT >= 35) {
-            setPendingIntentCreatorBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
-        }
-    }
-    return PendingIntent.getActivity(
-        context,
-        if (enabled) 704 else 705,
-        floatingLyricsIntent(context, enabled),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        options.toBundle(),
-    )
-}
 
 internal fun notificationButton(
     context: Context,
@@ -55,7 +24,6 @@ internal fun notificationButton(
     shuffle: Boolean,
     liked: Boolean,
     enabled: Boolean,
-    floatingLyricsEnabled: Boolean = false,
 ): CommandButton? {
     val icon: Int
     val label: Int
@@ -83,12 +51,6 @@ internal fun notificationButton(
             icon = if (liked) R.drawable.ic_notification_sf_heart_fill else R.drawable.ic_notification_sf_heart
             label = if (liked) R.string.notification_remove_like else R.string.notification_add_like
         }
-        NotificationAction.FloatingLyrics -> {
-            icon = if (floatingLyricsEnabled) R.drawable.ic_notification_sf_text_rectangle_fill
-                else R.drawable.ic_notification_sf_text_rectangle
-            label = if (floatingLyricsEnabled) R.string.notification_disable_floating_lyrics
-                else R.string.notification_enable_floating_lyrics
-        }
     }
     // ICON_UNDEFINED keeps controllers from substituting a predefined icon for the SF glyph.
     return CommandButton.Builder(CommandButton.ICON_UNDEFINED)
@@ -103,12 +65,6 @@ internal fun notificationButton(
             CommandButton.SLOT_OVERFLOW,
         )
         .setEnabled(enabled)
-        .setExtras(Bundle().apply {
-            if (action == NotificationAction.FloatingLyrics) {
-                putBoolean(FLOATING_LYRICS_BUTTON, true)
-                putBoolean(FLOATING_LYRICS_ENABLED, floatingLyricsEnabled)
-            }
-        })
         .build()
 }
 
@@ -122,30 +78,6 @@ internal class PlaybackNotificationProvider(
     DefaultMediaNotificationProvider(context, { notificationId }, channelId, R.string.app_name_en) {
     override fun getNotificationContentTitle(metadata: MediaMetadata): CharSequence? =
         songTitle() ?: super.getNotificationContentTitle(metadata)
-
-    override fun addNotificationActions(
-        mediaSession: MediaSession,
-        mediaButtons: ImmutableList<CommandButton>,
-        builder: NotificationCompat.Builder,
-        actionFactory: MediaNotification.ActionFactory,
-    ): IntArray = super.addNotificationActions(mediaSession, mediaButtons, builder,
-        object : MediaNotification.ActionFactory by actionFactory {
-            override fun createCustomActionFromCustomCommandButton(
-                mediaSession: MediaSession,
-                customCommandButton: CommandButton,
-            ): NotificationCompat.Action {
-                if (!customCommandButton.extras.getBoolean(FLOATING_LYRICS_BUTTON)) {
-                    return actionFactory.createCustomActionFromCustomCommandButton(mediaSession, customCommandButton)
-                }
-                // Launch directly from the notification, without a service notification trampoline.
-                return NotificationCompat.Action.Builder(
-                    IconCompat.createWithResource(context, customCommandButton.iconResId),
-                    customCommandButton.displayName,
-                    floatingLyricsPendingIntent(context, !customCommandButton.extras.getBoolean(FLOATING_LYRICS_ENABLED)),
-                ).build()
-            }
-        },
-    )
 
     override fun getMediaButtons(
         session: MediaSession,

@@ -68,9 +68,6 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.ljyh.mei.MainActivity
-import com.ljyh.mei.ui.component.player.floatingLyricsPipParams
-import com.ljyh.mei.ui.component.player.hasFloatingLyricsBackgroundPermission
-import androidx.lifecycle.Lifecycle
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.AllowConcurrentPlaybackKey
 import com.ljyh.mei.constants.IsShuffleModeKey
@@ -145,12 +142,7 @@ class MusicService : MediaLibraryService(),
     lateinit var player: StableDeckPlayer
     val beatMeter = PlaybackBeatMeter()
     private lateinit var audioPlayer: AudioPlayer
-    private lateinit var flymeLyricsPublisher: FlymeStatusBarLyricsPublisher
-    private lateinit var flymeNotificationProvider: FlymeLyricsNotificationProvider
-    private lateinit var systemLyricsBridge: SystemLyricsBridge
 
-    @Inject
-    lateinit var lyricManager: com.ljyh.mei.utils.lyric.LyricManager
     private lateinit var autoMixController: AutoMixController
     private lateinit var equalizerConfigurationState: EqualizerConfigurationState
     val context = this
@@ -161,8 +153,6 @@ class MusicService : MediaLibraryService(),
     private var notificationAccount: Pair<String?, String?>? = null
     private var notificationLikeJob: Job? = null
     private var notificationButtons: List<CommandButton> = emptyList()
-    private var floatingLyricsActivity = WeakReference<MainActivity>(null)
-    private var floatingLyricsEnabled = false
 
     @Inject
     lateinit var playerRepository: PlayerRepository
@@ -286,11 +276,9 @@ class MusicService : MediaLibraryService(),
         }
 
 
-        flymeNotificationProvider = FlymeLyricsNotificationProvider(
+        setMediaNotificationProvider(
             PlaybackNotificationProvider(this, NOTIFICATION_ID, CHANNEL_ID) { player.mediaMetadata.title },
-            ::triggerNotificationUpdate,
         )
-        setMediaNotificationProvider(flymeNotificationProvider)
 
         val playbackAudioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
@@ -509,8 +497,6 @@ class MusicService : MediaLibraryService(),
         scope.launch {
             playerRepository.songLikes.collect { updateNotificationButtons() }
         }
-        systemLyricsBridge = SystemLyricsBridge(this, player, lyricManager, mediaSession)
-        flymeLyricsPublisher = FlymeStatusBarLyricsPublisher(this, player, lyricManager, flymeNotificationProvider)
         scope.launch {
             context.dataStore.data.map { it[CookieKey] }.distinctUntilChanged().drop(1).collect {
                 val mediaId = player.currentMediaItem?.mediaId
@@ -1050,71 +1036,6 @@ class MusicService : MediaLibraryService(),
         notificationLikeJob = scope.launch { playerRepository.checkSongLike(id, expectedSession) }
     }
 
-    fun attachFloatingLyricsActivity(activity: MainActivity) {
-        floatingLyricsActivity = WeakReference(activity)
-        NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
-        updateFloatingLyricsState(activity)
-    }
-
-    fun detachFloatingLyricsActivity(activity: MainActivity) {
-        if (floatingLyricsActivity.get() !== activity) return
-        floatingLyricsActivity.clear()
-        floatingLyricsEnabled = false
-        updateNotificationButtons()
-    }
-
-    fun updateFloatingLyricsState(activity: MainActivity) {
-        if (floatingLyricsActivity.get() !== activity) return
-        floatingLyricsEnabled = activity.isInPictureInPictureMode
-        if (floatingLyricsEnabled) NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
-        updateNotificationButtons()
-    }
-
-    private fun toggleFloatingLyrics(): Boolean {
-        val activity = floatingLyricsActivity.get()
-        if (activity?.isInPictureInPictureMode == true) return activity.moveTaskToBack(true)
-        if (activity != null && activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            return activity.enterPictureInPictureMode(floatingLyricsPipParams(activity, player.isPlaying))
-        }
-        if (hasFloatingLyricsBackgroundPermission(this)) {
-            try {
-                startActivity(floatingLyricsIntent(this, true))
-                return true
-            } catch (error: Exception) {
-                Timber.w(error, "Unable to open floating lyrics from the background")
-            }
-        }
-        val manager = NotificationManagerCompat.from(this)
-        if (!manager.areNotificationsEnabled()) {
-            Toast.makeText(this, R.string.notification_floating_lyrics_open_app, Toast.LENGTH_LONG).show()
-            return false
-        }
-        manager.createNotificationChannel(NotificationChannel(
-            "floating_lyrics", getString(R.string.more_action_floating_lyrics), NotificationManager.IMPORTANCE_DEFAULT,
-        ).apply {
-            setSound(null, null)
-            enableVibration(false)
-        })
-        // System media commands cannot launch an activity from the background. Let System UI
-        // send the activity PendingIntent directly when the user taps this short-lived entry.
-        val notification = NotificationCompat.Builder(this, "floating_lyrics")
-            .setSmallIcon(R.drawable.ic_notification_sf_text_rectangle)
-            .setContentTitle(getString(R.string.notification_enable_floating_lyrics))
-            .setContentText(getString(R.string.notification_floating_lyrics_open_hint))
-            .setContentIntent(floatingLyricsPendingIntent(this, true))
-            .setAutoCancel(true)
-            .setSilent(true)
-            .setTimeoutAfter(15_000L)
-            .build()
-        return try {
-            manager.notify(FLOATING_LYRICS_NOTIFICATION_ID, notification)
-            true
-        } catch (error: SecurityException) {
-            Toast.makeText(this, R.string.notification_floating_lyrics_open_app, Toast.LENGTH_LONG).show()
-            false
-        }
-    }
-
     private fun updateNotificationButtons() {
         if (!::mediaSession.isInitialized) return
         val songId = notificationLikeSongId()
@@ -1124,13 +1045,11 @@ class MusicService : MediaLibraryService(),
                 this, notificationLeftAction, true, player.repeatMode, player.shuffleModeEnabled, liked,
                 if (notificationLeftAction == NotificationAction.Like) songId != null && notificationSignedIn
                 else player.currentMediaItem != null,
-                floatingLyricsEnabled = floatingLyricsEnabled,
             ),
             notificationButton(
                 this, notificationRightAction, false, player.repeatMode, player.shuffleModeEnabled, liked,
                 if (notificationRightAction == NotificationAction.Like) songId != null && notificationSignedIn
                 else player.currentMediaItem != null,
-                floatingLyricsEnabled = floatingLyricsEnabled,
             ),
         )
         if (buttons != notificationButtons) {
@@ -1216,12 +1135,6 @@ class MusicService : MediaLibraryService(),
                     switchPlayMode()
                     return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
                 }
-                NotificationAction.FloatingLyrics -> {
-                    val success = player.currentMediaItem != null && toggleFloatingLyrics()
-                    return Futures.immediateFuture(SessionResult(
-                        if (success) SessionResult.RESULT_SUCCESS else SessionResult.RESULT_ERROR_INVALID_STATE,
-                    ))
-                }
                 NotificationAction.Like -> {
                     val id = notificationLikeSongId()
                         ?: return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_INVALID_STATE))
@@ -1265,9 +1178,6 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onDestroy() {
-        if (::flymeLyricsPublisher.isInitialized) flymeLyricsPublisher.release()
-        NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
-        if (::systemLyricsBridge.isInitialized) systemLyricsBridge.release()
         mediaUriProvider.onSourceResolved = null
         availableQualitiesJob?.cancel()
         sourceRecoveryJob?.cancel()
@@ -1590,7 +1500,6 @@ class MusicService : MediaLibraryService(),
     companion object {
         const val CHANNEL_ID = "music_channel_01"
         const val NOTIFICATION_ID = 888
-        private const val FLOATING_LYRICS_NOTIFICATION_ID = 889
         private const val PLAYBACK_SNAPSHOT_DEBOUNCE_MS = 500L
         private const val MAX_SOURCE_RECOVERY_ATTEMPTS = 1
         private const val STUCK_BUFFERING_TIMEOUT_MS = 30_000

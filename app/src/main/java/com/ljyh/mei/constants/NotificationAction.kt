@@ -9,7 +9,6 @@ enum class NotificationAction(
 ) {
     PlayMode(R.string.player_action_play_mode, "repeat"),
     Like(R.string.notification_action_like, "heart"),
-    FloatingLyrics(R.string.more_action_floating_lyrics, "text.rectangle"),
     None(R.string.notification_action_none, "minus");
 
     companion object {

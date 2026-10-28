@@ -202,7 +202,3 @@
 # zstd-jni resolves its native bindings by Java class and method name.
 -keep class com.github.luben.zstd.** { *; }
 
-# Preserve SuperLyricApi's cross-process Parcelable and Binder contract.
--keep class com.hchen.superlyricapi.* { *; }
-# SuperLyricApi compiles this framework entry point against its compile-only stubs.
--dontwarn android.os.ServiceManager

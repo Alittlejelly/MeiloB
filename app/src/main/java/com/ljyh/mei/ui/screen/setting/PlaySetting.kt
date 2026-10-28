@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.AllowConcurrentPlaybackKey
 import com.ljyh.mei.constants.AutoMixDurationKey
@@ -48,17 +46,13 @@ import com.ljyh.mei.constants.NotificationRightActionKey
 import com.ljyh.mei.constants.PreviousPlaybackKey
 import com.ljyh.mei.constants.RestorePlaybackPositionKey
 import com.ljyh.mei.constants.RestorePlaybackStateKey
-import com.ljyh.mei.ui.component.player.hasFloatingLyricsBackgroundPermission
-import com.ljyh.mei.ui.component.player.isXiaomiFloatingLyricsPermissionRequired
-import com.ljyh.mei.ui.component.player.openFloatingLyricsPermissionSettings
+
 import com.ljyh.mei.ui.glass.GlassCard
 import com.ljyh.mei.ui.glass.GlassIconButton
 import com.ljyh.mei.ui.glass.GlassSegmentedControl
 import com.ljyh.mei.ui.glass.GlassSlider
 import com.ljyh.mei.ui.glass.GlassToggle
-import com.ljyh.mei.ui.glass.IosAlertButtonRole
-import com.ljyh.mei.ui.glass.IosAlertButtonSpec
-import com.ljyh.mei.ui.glass.IosAlertDialog
+
 import com.ljyh.mei.ui.glass.IosPinnedListPage
 import com.ljyh.mei.ui.glass.IosPopupButton
 import com.ljyh.mei.ui.glass.LocalGlassColors
@@ -103,24 +97,6 @@ fun PlaySetting(
     var maximumTempoPreview by remember { mutableStateOf<Float?>(null) }
     val autoMixDuration = autoMixDurationPreview ?: storedAutoMixDuration
     val maximumTempo = maximumTempoPreview ?: storedMaximumTempo
-    val requiresXiaomiFloatingLyricsPermission = remember { isXiaomiFloatingLyricsPermissionRequired() }
-    val floatingLyricsPermissionDescription = stringResource(
-        if (requiresXiaomiFloatingLyricsPermission) R.string.notification_floating_lyrics_background_permission_description_xiaomi
-        else R.string.notification_floating_lyrics_background_permission_description,
-    )
-    var floatingLyricsBackgroundAllowed by remember(context) {
-        mutableStateOf(hasFloatingLyricsBackgroundPermission(context))
-    }
-    var showFloatingLyricsPermission by remember { mutableStateOf(false) }
-    val checkFloatingLyricsPermission: (NotificationAction) -> Unit = { action ->
-        if (action == NotificationAction.FloatingLyrics) {
-            floatingLyricsBackgroundAllowed = hasFloatingLyricsBackgroundPermission(context)
-            showFloatingLyricsPermission = !floatingLyricsBackgroundAllowed
-        }
-    }
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        floatingLyricsBackgroundAllowed = hasFloatingLyricsBackgroundPermission(context)
-    }
 
     IosPinnedListPage(
         title = stringResource(R.string.playback_settings),
@@ -181,10 +157,7 @@ fun PlaySetting(
                     IosPopupButton(
                         selected = notificationLeftAction,
                         items = NotificationAction.entries,
-                        onSelected = { action ->
-                            onNotificationLeftActionChange(action)
-                            checkFloatingLyricsPermission(action)
-                        },
+                        onSelected = onNotificationLeftActionChange,
                         label = { stringResource(it.labelRes) },
                     )
                 }
@@ -192,37 +165,9 @@ fun PlaySetting(
                     IosPopupButton(
                         selected = notificationRightAction,
                         items = NotificationAction.entries,
-                        onSelected = { action ->
-                            onNotificationRightActionChange(action)
-                            checkFloatingLyricsPermission(action)
-                        },
+                        onSelected = onNotificationRightActionChange,
                         label = { stringResource(it.labelRes) },
                     )
-                }
-                if (notificationLeftAction == NotificationAction.FloatingLyrics || notificationRightAction == NotificationAction.FloatingLyrics) {
-                    GlassCard(
-                        Modifier.fillMaxWidth(),
-                        onClick = { openFloatingLyricsPermissionSettings(context) },
-                    ) {
-                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            SfIcon("text.rectangle", contentDescription = null)
-                            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                                Text(stringResource(R.string.notification_floating_lyrics_background_permission))
-                                Text(
-                                    floatingLyricsPermissionDescription,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Text(
-                                stringResource(
-                                    if (floatingLyricsBackgroundAllowed) R.string.notification_floating_lyrics_permission_allowed
-                                    else R.string.notification_floating_lyrics_permission_allow,
-                                ),
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -279,27 +224,6 @@ fun PlaySetting(
                 }
             }
         }
-    }
-    if (showFloatingLyricsPermission) {
-        IosAlertDialog(
-            onDismissRequest = { showFloatingLyricsPermission = false },
-            title = stringResource(R.string.notification_floating_lyrics_background_permission),
-            message = floatingLyricsPermissionDescription,
-            buttons = listOf(
-                IosAlertButtonSpec(
-                    label = stringResource(R.string.notification_floating_lyrics_permission_later),
-                    role = IosAlertButtonRole.Cancel,
-                    onClick = { showFloatingLyricsPermission = false },
-                ),
-                IosAlertButtonSpec(
-                    label = stringResource(R.string.pc_qr_login_open_settings),
-                    onClick = {
-                        showFloatingLyricsPermission = false
-                        openFloatingLyricsPermissionSettings(context)
-                    },
-                ),
-            ),
-        )
     }
 }
 

@@ -83,7 +83,6 @@ import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.kyant.backdrop.drawBackdrop
 import com.kyant.shapes.Capsule
 import com.ljyh.mei.ui.liquidglass.PressHighlightRenderer
-import com.ljyh.mei.ui.screen.main.library.component.LibraryCollectionRefresh
 import com.ljyh.mei.ui.theme.MusicTheme
 import com.ljyh.mei.utils.color.ColorExtractionUtils
 import org.junit.Assert.assertEquals
@@ -484,46 +483,6 @@ class GlassControlsInteractionTest {
             compose.runOnIdle { assertEquals(5f, position.value, 0.001f) }
         } finally {
             compose.mainClock.autoAdvance = true
-        }
-    }
-
-    @Test
-    fun categoryRefreshChangesRetainTheContentOwnerAndListOffset() {
-        val selected = mutableStateOf(0)
-        val state = LazyListState(1, 16)
-        var disposals = 0
-        compose.setContent {
-            MaterialTheme {
-                LibraryCollectionRefresh(
-                    enabled = selected.value == 1,
-                    isRefreshing = false,
-                    topPadding = 0.dp,
-                    onRefresh = {},
-                ) {
-                    DisposableEffect(Unit) { onDispose { disposals++ } }
-                    LazyColumn(Modifier.width(320.dp).height(240.dp), state = state) {
-                        items(2) { Box(Modifier.fillMaxWidth().height(48.dp)) }
-                        item("library-pages") {
-                            GlassSegmentedControl(
-                                items = listOf(0 to "Songs", 1 to "Playlists"),
-                                selected = selected.value,
-                                onSelected = { selected.value = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                backdrop = emptyBackdrop(),
-                            )
-                        }
-                        items(30) { Box(Modifier.fillMaxWidth().height(48.dp)) }
-                    }
-                }
-            }
-        }
-        compose.waitForIdle()
-        compose.onNodeWithText("Playlists").performClick()
-        compose.waitForIdle()
-        compose.runOnIdle {
-            assertEquals(0, disposals)
-            assertEquals(1, state.firstVisibleItemIndex)
-            assertEquals(16, state.firstVisibleItemScrollOffset)
         }
     }
 

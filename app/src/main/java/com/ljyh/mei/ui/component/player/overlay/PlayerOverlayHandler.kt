@@ -21,7 +21,6 @@ import com.ljyh.mei.ui.component.player.OverlayState
 import com.ljyh.mei.ui.component.player.PlayerViewModel
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
 import com.ljyh.mei.ui.model.MoreAction
-import com.ljyh.mei.ui.component.player.enterFloatingLyricsPip
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.ui.screen.playlist.PlaylistViewModel
 import com.ljyh.mei.ui.screen.playlist.PlaylistTrackAddOutcome
@@ -169,10 +168,6 @@ class PlayerOverlayHandler(
             }
             MoreAction.SLEEP_TIMER -> {
                 showSleepTimer()
-            }
-            MoreAction.PICTURE_IN_PICTURE -> {
-                dismiss()
-                enterFloatingLyricsPip(context, stateContainer.isPlaying.value)
             }
             MoreAction.BOTTOM_ACTION -> {
                 showBottomAction()
