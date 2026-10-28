@@ -31,7 +31,7 @@ MeiloB 使用 **Jetpack Compose** 构建，尝试把 iOS 27 的层次感、液�
 
 - 用 iOS 风格的页面结构重新组织 B 站音乐内容；
 - 用 Liquid Glass、动态背景和专辑封面让播放过程更有沉浸感；
-- 保留搜索、歌单、歌词和个人资料等熟悉的使用习惯。
+- 保留搜索、歌单和个人资料等熟悉的使用习惯。
 
 > MeiloB 是非官方的个人开源项目，不隶属于哔哩哔哩或 Apple；项目本身不提供音乐资源，音乐内容及相关版权归其权利人所有。
 
@@ -44,16 +44,9 @@ MeiloB 使用 **Jetpack Compose** 构建，尝试把 iOS 27 的层次感、液�
 - 播放队列、随机播放、循环播放和定时停止；
 - 播放历史、本地歌单管理；
 - Apple Music 风格全屏播放器与迷你播放器；
-- 状态栏歌词、悬浮歌词与桌面歌词共享；
 - 浅色/深色主题、动态专辑背景和 Liquid Glass 交互效果。
 
 功能仍在持续调整中，实际可用范围会随版本和哔哩哔哩接口状态变化。
-
-## 歌词共享
-
-已接入 [Lyricon Provider](https://tomakino.github.io/lyricon/zh-cn/developer/provider/)、[SuperLyricApi](https://github.com/HChenX/SuperLyricApi)、[ColorOS Live Lyrics Bridge](https://github.com/Andrea-lyz/ColorOS-Live-Lyrics-Bridge) 与 Flyme 状态栏歌词接口，用于共享歌词、逐字时间、翻译及播放状态。
-
-「设置 → 歌词设置 → 歌词共享」中的「启用歌词共享」默认开启。
 
 ## 构建
 
@@ -65,6 +58,19 @@ cd MeiloB
 
 要求 JDK 21+ 与 Android SDK（minSdk 33）。release 构建启用 R8 混淆与资源压缩。
 
+### CI 签名
+
+GitHub Actions（`.github/workflows/main.yml`）通过 **Repository Secrets** 注入签名密钥，在 *Settings → Secrets and variables → Actions* 配置：
+
+| Secret | 内容 |
+|---|---|
+| `SIGNING_KEY` | keystore 文件的 Base64（`certutil -encode` 或 `base64 -w0 keystore.jks`） |
+| `ALIAS` | 密钥别名 |
+| `KEY_STORE_PASSWORD` | keystore 密码 |
+| `KEY_PASSWORD` | 私钥密码 |
+
+本地构建 release 不需要这些配置（未签名直接 `assembleRelease` 即可，或用你自己的 `~/.gradle/gradle.properties` 签名配置）。
+
 ## 开源致谢
 
 MeiloB 的界面和底层能力受以下项目启发或直接使用其开源组件，感谢所有贡献者：
@@ -72,11 +78,7 @@ MeiloB 的界面和底层能力受以下项目启发或直接使用其开源组�
 - [MeiloX](https://github.com/NEORUAA/MeiloX)：本项目的直接分叉来源（Android 版）；
 - [Mei](https://github.com/ljyh223/Mei)：上游 Android 项目与基础能力；
 - [MeloX](https://github.com/youshen2/MeloX)：iOS 版参考实现与产品方向；
-- [amll-ttml-db](https://github.com/Steve-xmh/amll-ttml-db)：高质量逐字歌词数据；
-- [accompanist-lyrics-ui](https://github.com/6xingyv/accompanist-lyrics-ui)：歌词模型与渲染组件；
-- [Lyricon](https://github.com/tomakino/lyricon)：词幕 Provider SDK；
-- [SuperLyricApi](https://github.com/HChenX/SuperLyricApi)：歌词共享 SDK；
-- [ColorOS Live Lyrics Bridge](https://github.com/Andrea-lyz/ColorOS-Live-Lyrics-Bridge)：ColorOS 锁屏歌词接口；
+- [accompanist-lyrics-ui](https://github.com/6xingyv/accompanist-lyrics-ui)：歌词解析与渲染底层组件；
 - [AndroidLiquidGlass / Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)：Compose Multiplatform 流体玻璃效果。
 
 ## 许可证与第三方声明

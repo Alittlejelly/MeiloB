@@ -23,13 +23,6 @@ val UserIdKey = stringPreferencesKey("userId")
 val UserNicknameKey = stringPreferencesKey("userNickname")
 val UserAvatarUrlKey = stringPreferencesKey("userAvatarUrl")
 val UserPhotoKey = stringPreferencesKey("userPhoto")
-val LyricTranslationEnabledKey = booleanPreferencesKey("lyrics.translationEnabled")
-val LyricRomanizationEnabledKey = booleanPreferencesKey("lyrics.romanizationEnabled")
-val SystemLyricsEnabledKey = booleanPreferencesKey("lyrics.systemEnabled")
-val BluetoothLyricsEnabledKey = booleanPreferencesKey("lyrics.bluetoothEnabled")
-val FloatingLyricsTranslationKey = booleanPreferencesKey("floatingLyrics.showsTranslation")
-val FloatingLyricsNextLineKey = booleanPreferencesKey("floatingLyrics.showsNextLine")
-val FloatingLyricsFontScaleKey = floatPreferencesKey("floatingLyrics.fontScale")
 
 
 val CookieKey = stringPreferencesKey("cookie")
@@ -239,8 +232,6 @@ enum class TabletAnimationStyle(val label: String) {
     ZOOM("缩放"),
     FLIP_3D("3D翻转")
 }
-
-val FlymeStatusBarLyricsEnabledKey = booleanPreferencesKey("lyrics.flymeStatusBarEnabled")
 
 // ---- Bilibili 会话 ----
 val BiliSessdataKey = stringPreferencesKey("bili_sessdata")

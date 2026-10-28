@@ -13,6 +13,9 @@ import com.ljyh.mei.data.model.api.GetSongUrlV1
 import com.ljyh.mei.data.model.room.Song
 import com.ljyh.mei.data.model.room.SourceType
 import com.ljyh.mei.data.network.api.ApiService
+import com.ljyh.mei.data.network.bili.BiliApiService
+import com.ljyh.mei.data.network.bili.BiliCookieStore
+import com.ljyh.mei.data.repository.BiliRepository
 import com.ljyh.mei.di.dao.SongDao
 import com.ljyh.mei.di.repository.SongRepository
 import java.io.IOException
@@ -573,7 +576,13 @@ class MediaUriProviderQualityTest {
             check(method.name == "getSong") { "Unexpected database call: ${method.name}" }
             flowOf((listOfNotNull(localSong) + extraSongs).firstOrNull { it.id == arguments!![0] })
         } as SongDao
-        return MediaUriProvider(api, SongRepository(songDao), InstrumentationRegistry.getInstrumentation().targetContext)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val biliApi = Proxy.newProxyInstance(
+            BiliApiService::class.java.classLoader,
+            arrayOf(BiliApiService::class.java),
+        ) { _, method, _ -> error("Unexpected Bili API call: ${method.name}") } as BiliApiService
+        val biliRepository = BiliRepository(biliApi, BiliCookieStore(context))
+        return MediaUriProvider(api, SongRepository(songDao), biliRepository, context)
     }
 
     private fun source(

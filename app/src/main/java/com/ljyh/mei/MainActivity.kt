@@ -161,12 +161,6 @@ import com.ljyh.mei.playback.PlayerConnection
 import com.ljyh.mei.ui.component.IconButton
 import com.ljyh.mei.ui.component.VersionUpdateAlert
 import com.ljyh.mei.ui.component.player.BottomSheetPlayer
-import com.ljyh.mei.ui.component.player.FloatingLyricsPipBackdrop
-import com.ljyh.mei.ui.component.player.FloatingLyricsPipScreen
-import com.ljyh.mei.ui.component.player.floatingLyricsPipParams
-import com.ljyh.mei.playback.ENABLE_FLOATING_LYRICS
-import com.ljyh.mei.playback.DISABLE_FLOATING_LYRICS
-import androidx.lifecycle.Lifecycle
 import com.ljyh.mei.ui.component.sheet.rememberBottomSheetState
 import com.ljyh.mei.ui.component.sheet.BottomSheetState
 import com.ljyh.mei.ui.component.sheet.syncPlaybackVisibility
@@ -243,8 +237,6 @@ class MainActivity : ComponentActivity() {
     lateinit var biliRepository: com.ljyh.mei.data.repository.BiliRepository
 
     private var userData by mutableStateOf(UserData.VISITOR)
-    private var pictureInPictureMode by mutableStateOf(false)
-    private var floatingLyricsRequest: Boolean? = null
     private var musicService: MusicService? = null
 
 
@@ -253,8 +245,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pictureInPictureMode = isInPictureInPictureMode
-        readFloatingLyricsIntent(intent)
         enableEdgeToEdge()
         CrashHandler.init(this)
         if (BuildConfig.DEBUG) {
@@ -340,8 +330,6 @@ class MainActivity : ComponentActivity() {
                         Timber.tag("MainActivity").d("Service Connected") // 添加日志
                         if (service is MusicService.MusicBinder) {
                             musicService = service.service
-                            service.service.attachFloatingLyricsActivity(this@MainActivity)
-                            applyFloatingLyricsRequest()
                             // 更新 State，触发 Recomposition
                             playerConnection = PlayerConnection(
                                 context,
@@ -353,7 +341,6 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun onServiceDisconnected(name: ComponentName?) {
-                        musicService?.detachFloatingLyricsActivity(this@MainActivity)
                         musicService = null
                         Timber.tag("MainActivity").d("Service Disconnected")
                         playerConnection?.dispose() // 假设你有 dispose 方法清理资源
@@ -513,13 +500,7 @@ class MainActivity : ComponentActivity() {
                 val staticGlassBackdrop = rememberCanvasBackdrop {
                     drawRect(glassColors.groupedBackground)
                 }
-                // Picture-in-picture still needs a recorded cover image backdrop.
-                val pipBackdrop = rememberLayerBackdrop()
-                val glassBackdrop = if (pictureInPictureMode && playerConnection != null) {
-                    pipBackdrop
-                } else {
-                    staticGlassBackdrop
-                }
+                val glassBackdrop = staticGlassBackdrop
                 // Keep the base page backdrop and the bottom controls' sample
                 // layer separate. Page glass samples [glassBackdrop], while the
                 // bottom layer records the page after it has rendered. Controls
@@ -851,34 +832,6 @@ class MainActivity : ComponentActivity() {
                         LocalPlayerConnection provides playerConnection,
                         LocalUserData provides userData,
                     ) {
-                        if (pictureInPictureMode && playerConnection != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .layerBackdrop(pipBackdrop)
-                                    .trackBackdropPosition(pipBackdrop),
-                            ) {
-                                FloatingLyricsPipBackdrop(playerConnection = playerConnection!!)
-                            }
-                        }
-
-                        if (pictureInPictureMode && playerConnection != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .graphicsLayer()
-                                    .layerBackdrop(bottomBackdrop)
-                                    .trackBackdropPosition(bottomBackdrop),
-                            ) {
-                                CompositionLocalProvider(
-                                    // Child glass controls sample the base page,
-                                    // never the bottom sample layer they create.
-                                    LocalGlassBackdrop provides glassBackdrop,
-                                ) {
-                                    FloatingLyricsPipScreen(playerConnection = playerConnection!!)
-                                }
-                            }
-                        } else {
                             // Page content is the backdrop source for the
                             // floating mini player and bottom controls. Its own
                             // glass controls sample the static backdrop instead
@@ -1183,63 +1136,12 @@ class MainActivity : ComponentActivity() {
                             result = startupUpdateResult,
                             onDismiss = { startupUpdateResult = null },
                         )
-                        }
                     }
                 }
             }
 
         }
     }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        readFloatingLyricsIntent(intent)
-        applyFloatingLyricsRequest()
-    }
-
-    override fun onPostResume() {
-        super.onPostResume()
-        applyFloatingLyricsRequest()
-    }
-
-    private fun readFloatingLyricsIntent(intent: Intent?) {
-        floatingLyricsRequest = when (intent?.action) {
-            ENABLE_FLOATING_LYRICS -> true
-            DISABLE_FLOATING_LYRICS -> false
-            else -> return
-        }
-        intent.action = null
-    }
-
-    private fun applyFloatingLyricsRequest() {
-        if (floatingLyricsRequest == null) return
-        window.decorView.post {
-            if (isFinishing || isDestroyed || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@post
-            val enabled = floatingLyricsRequest ?: return@post
-            val service = musicService ?: return@post
-            floatingLyricsRequest = null
-            if (enabled && !isInPictureInPictureMode) {
-                enterPictureInPictureMode(floatingLyricsPipParams(this, service.player.isPlaying))
-            } else if (!enabled) {
-                moveTaskToBack(true)
-            }
-        }
-    }
-
-    override fun onPictureInPictureModeChanged(
-        isInPictureInPictureMode: Boolean,
-        newConfig: Configuration,
-    ) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        pictureInPictureMode = isInPictureInPictureMode
-        musicService?.updateFloatingLyricsState(this)
-    }
-    override fun onDestroy() {
-        musicService?.detachFloatingLyricsActivity(this)
-        musicService = null
-        super.onDestroy()
     }
 
 }
