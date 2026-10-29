@@ -156,7 +156,7 @@ interface BiliApiService {
     /**
      * UP 主全部投稿（支持 pn 翻页读全）。参数形态对齐 BBPlayer（bbplayer-app）
      * 实测可用的调用：iPhone BiliApp UA（拦截器全局默认）+ 最小参数集 + wbi，
-     * 不带桌面语境的 dm_* 指纹——UA 与指纹语境矛盾正是 -403 的根因。
+     * 不带桌面语境的 dm_* 指纹——UA 与指纹语境矛盾反而更容易被风控。
      * 失败时回退 [spaceMedialist]。
      */
     @GET("x/space/wbi/arc/search")

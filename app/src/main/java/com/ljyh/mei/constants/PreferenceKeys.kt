@@ -236,10 +236,13 @@ enum class TabletAnimationStyle(val label: String) {
 // ---- Bilibili 会话 ----
 val BiliSessdataKey = stringPreferencesKey("bili_sessdata")
 val BiliJctKey = stringPreferencesKey("bili_jct")
+val BiliSidKey = stringPreferencesKey("bili_sid")
+val BiliBnutKey = stringPreferencesKey("bili_b_nut")
 val BiliDedeUserIdKey = stringPreferencesKey("bili_dede_user_id")
 val BiliDedeUserIdCkMd5Key = stringPreferencesKey("bili_dede_user_id_ckmd5")
 val BiliBuvid3Key = stringPreferencesKey("bili_buvid3")
 val BiliBuvid4Key = stringPreferencesKey("bili_buvid4")
+val BiliUuidKey = stringPreferencesKey("bili_uuid")
 val BiliNicknameKey = stringPreferencesKey("bili_nickname")
 val BiliAvatarKey = stringPreferencesKey("bili_avatar")
 val BiliLevelKey = stringPreferencesKey("bili_level")

@@ -16,6 +16,7 @@ import com.ljyh.mei.data.model.bili.toBiliVideo
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.network.bili.BiliApiService
 import com.ljyh.mei.data.network.bili.BiliCookieStore
+import com.ljyh.mei.data.network.bili.BiliWbi
 import com.ljyh.mei.data.network.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -161,8 +162,8 @@ class BiliRepository @Inject constructor(
                 // playurl / 搜索的 wbi 签名依赖它，必须始终保存。
                 data?.wbiImg?.let { wbi ->
                     cookieStore.applyWbiKeys(
-                        imgKey = wbi.imgUrl.orEmpty().substringBefore('?').substringAfterLast('/'),
-                        subKey = wbi.subUrl.orEmpty().substringBefore('?').substringAfterLast('/'),
+                        imgKey = BiliWbi.keyFromUrl(wbi.imgUrl),
+                        subKey = BiliWbi.keyFromUrl(wbi.subUrl),
                     )
                 }
                 if (body?.code != 0 || data == null || !data.isLogin) {
@@ -574,8 +575,16 @@ class BiliRepository @Inject constructor(
             return@withContext spaceArchives(mid)
         }
         ensureSession()
-        val attempt = safeApiCall {
+        var attempt = safeApiCall {
             api.spaceArcSearch(mid = mid, pn = pn, ps = ps.coerceIn(1, 50))
+        }
+        if (pn == 1 && (attempt as? Resource.Success)?.data?.code != 0) {
+            // -403 访问权限不足 是"签名没被接受"的通用回应（wbi 密钥过期或缺失时
+            // 拦截器发不出 w_rid）。强制换一次密钥再试，仍失败才回退。
+            runCatching { refreshAccount() }
+            attempt = safeApiCall {
+                api.spaceArcSearch(mid = mid, pn = pn, ps = ps.coerceIn(1, 50))
+            }
         }
         val arc = (attempt as? Resource.Success)?.data
         if (arc?.code == 0) {
@@ -609,7 +618,11 @@ class BiliRepository @Inject constructor(
             return@withContext Resource.Success(BiliSpaceArchivePage(emptyList(), 0, hasMore = false, full = true))
         }
         Timber.tag("BiliDiag").w(
-            "spaceArcSearch code=%s msg=%s mid=%s -> fallback medialist", arc?.code, arc?.message, mid,
+            "spaceArcSearch code=%s msg=%s mid=%s buvid3=%s b_nut=%s sid=%s -> fallback medialist",
+            arc?.code, arc?.message, mid,
+            if (cookieStore.snapshot().buvid3.isNotBlank()) "set" else "MISSING",
+            if (cookieStore.snapshot().bNut.isNotBlank()) "set" else "MISSING",
+            if (cookieStore.snapshot().sid.isNotBlank()) "set" else "MISSING",
         )
         arcSearchBlocked = true
         spaceArchives(mid)
@@ -752,11 +765,14 @@ class BiliRepository @Inject constructor(
 
     private suspend fun ensureBuvid() {
         val snap = cookieStore.snapshot()
+        // buvid3/buvid4 由 spi 接口下发（网页首跳同源），两者配套；
+        // 缺一就补齐，缺失 buvid3 会被风控直接 412。
         if (snap.buvid3.isBlank() || snap.buvid4.isBlank()) {
-            api.fingerSpi().data?.let { spi ->
-                cookieStore.applyBuvid(spi.b3, spi.b4)
+            runCatching { api.fingerSpi() }.getOrNull()?.data?.let { spi ->
+                cookieStore.applyBuvid(spi.b3.orEmpty(), spi.b4.orEmpty())
             }
         }
+        cookieStore.ensureUuid()
     }
 
     /**
@@ -772,8 +788,9 @@ class BiliRepository @Inject constructor(
     }
 
     /**
-     * 会话预检：buvid3（风控必需，缺失会被 -412 拦截）+ wbi 密钥。
-     * 播放、搜索、收藏等入口调用前先跑一遍。
+     * 会话预检：buvid3/buvid4 + `_uuid`（设备指纹，风控必需）+ wbi 密钥。
+     * 播放、搜索、收藏、空间等入口调用前先跑一遍。wbi 密钥是空间接口 -403
+     * 的直接来源，所以密钥缺失/过期时会强制刷新。
      */
     suspend fun ensureSession() {
         runCatching { ensureBuvid() }
@@ -782,7 +799,7 @@ class BiliRepository @Inject constructor(
 
     private companion object {
         const val WBI_KEY_TTL_MS = 12 * 60 * 60 * 1000L
-        val LOGIN_COOKIE_NAMES = setOf("SESSDATA", "bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid")
+        val LOGIN_COOKIE_NAMES = setOf("SESSDATA", "bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "b_nut", "buvid3", "buvid4")
     }
 
     // ---- 播放 ----
