@@ -12,11 +12,9 @@ import com.ljyh.mei.ui.glass.IosCascadingMenuItem
 /** Player destinations use the same cascading interaction as track download qualities. */
 @Composable
 fun PlayerNavigationMenu(
-    album: MediaMetadata.Album,
     artists: List<MediaMetadata.Artist>,
     playlistTitle: String?,
     anchorBounds: Rect,
-    onAlbumClick: (Long) -> Unit,
     onArtistClick: (Long) -> Unit,
     onPlaylistClick: () -> Unit,
     onDismiss: () -> Unit,
@@ -45,17 +43,10 @@ fun PlayerNavigationMenu(
             IosCascadingMenuItem(
                 title = stringResource(R.string.player_navigation_artist),
                 subtitle = artists.joinToString { it.name }.ifBlank { "—" },
-                systemName = "microphone.dynamic.on.stand",
+                systemName = "person.crop.circle",
                 enabled = navigableArtists.isNotEmpty(),
                 children = artistItems,
                 onClick = { navigableArtists.singleOrNull()?.let { onArtistClick(it.id) } },
-            ),
-            IosCascadingMenuItem(
-                title = stringResource(R.string.player_navigation_album),
-                subtitle = album.title.ifBlank { "—" },
-                systemName = "rectangle.stack",
-                enabled = album.id > 0,
-                onClick = { onAlbumClick(album.id) },
             ),
             IosCascadingMenuItem(
                 title = stringResource(R.string.player_navigation_playlist),

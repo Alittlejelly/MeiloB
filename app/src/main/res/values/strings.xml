@@ -79,8 +79,9 @@
     <string name="queue_autoplay_description">Similar music will keep playing</string>
     <string name="queue_reorder">Reorder song</string>
     <string name="player_navigation_title">Go To</string>
-    <string name="player_navigation_artist">Go to Artist</string>
-    <string name="player_navigation_album">Go to Album</string>
+    <string name="player_navigation_artist">Go to Uploader</string>
+    <string name="player_navigation_uploader_section">Uploader</string>
+    <string name="player_navigation_uploader_unavailable">This track has no linked uploader.</string>
     <string name="player_navigation_playlist">Go to Playlist</string>
     <string name="player_action_lyrics">Lyrics</string>
     <string name="player_action_customize">Customize Player Actions</string>
@@ -283,6 +284,9 @@
     <string name="about_feedback">Report an Issue</string>
     <string name="about_logs">Diagnostic Logs</string>
     <string name="about_check_updates">Check for Updates</string>
+    <string name="about_update_source">Update Source</string>
+    <string name="about_update_source_github">GitHub</string>
+    <string name="about_update_source_gitee">Gitee</string>
     <string name="about_checking_updates">Checking for Updates…</string>
     <string name="about_check_updates_description">Compare this version with the latest GitHub tag.</string>
     <string name="about_update_available_title">New Version Available</string>
@@ -296,6 +300,7 @@
     <string name="about_fork_source_description">Fork source of this project (Android)</string>
     <string name="about_upstream_description">Mei upstream repository</string>
     <string name="about_melox_description">iOS reference implementation</string>
+    <string name="about_bbplayer_description">Reference implementation for the Bilibili space archive API</string>
     <string name="about_backdrop_description">Compose Multiplatform fluid glass effects</string>
     <string name="about_developer_debug">Developer Diagnostics</string>
     <string name="about_developer_enabled">Developer diagnostics enabled</string>
@@ -613,6 +618,9 @@
     <string name="lyric_copy_failed">Could not copy lyric</string>
     <string name="content_settings">Content Settings</string>
     <string name="content_modules">Content Modules</string>
+    <string name="content_home">Home Feed</string>
+    <string name="content_guess_like">Guess You Like</string>
+    <string name="content_guess_like_description">Recommend from your public favorites instead of channel uploads. Private folders are never read.</string>
     <string name="content_podcasts">Podcasts</string>
     <string name="content_podcasts_description">Podcast discovery, subscriptions, and episodes</string>
     <string name="content_downloads">Downloads</string>

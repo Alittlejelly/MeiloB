@@ -138,6 +138,7 @@ import com.ljyh.mei.constants.DownloadsTabEnabledKey
 import com.ljyh.mei.constants.CloudMusicTabEnabledKey
 import com.ljyh.mei.constants.ListeningHistoryTabEnabledKey
 import com.ljyh.mei.constants.NavigationTabOrderKey
+import com.ljyh.mei.constants.UpdateSourceKey
 import com.ljyh.mei.constants.KeepBottomBarExpandedKey
 import com.ljyh.mei.constants.BottomFloatingContentExtraSpacingKey
 import com.ljyh.mei.constants.BottomBarHorizontalPadding
@@ -209,6 +210,7 @@ import com.ljyh.mei.utils.log.FileLoggingTree
 import com.ljyh.mei.utils.rememberPreference
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.utils.VersionUpdateChecker
+import com.ljyh.mei.utils.UpdateSource
 import com.ljyh.mei.utils.VersionUpdateResult
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.Backdrop
@@ -308,9 +310,10 @@ class MainActivity : ComponentActivity() {
             var playerConnection by remember { mutableStateOf<PlayerConnection?>(null) }
             var startupUpdateResult by remember { mutableStateOf<VersionUpdateResult?>(null) }
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(navigationPreferences?.get(UpdateSourceKey)) {
                 try {
-                    val result = VersionUpdateChecker.check(BuildConfig.VERSION_NAME)
+                    val source = UpdateSource.fromId(navigationPreferences?.get(UpdateSourceKey))
+                    val result = VersionUpdateChecker.check(BuildConfig.VERSION_NAME, source)
                     if (result is VersionUpdateResult.UpdateAvailable) {
                         startupUpdateResult = result
                     }
@@ -767,13 +770,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    val onSearchCancel = {
-                        clearSearchInput()
-                        if (navController.currentRoute == Screen.Search.route) {
-                            navController.popBackStack()
-                        }
-                    }
-
                     val onSearch: (String) -> Unit = {
                         if (it.isNotEmpty()) {
                             // 结果就地展示在搜索页，交给页面注册的处理器发起全站搜索。
@@ -1062,8 +1058,7 @@ class MainActivity : ComponentActivity() {
                                     query = query,
                                     onQueryChange = onQueryChange,
                                     onSearch = onSearch,
-                                    onCancel = onSearchCancel,
-                                    cancelLabel = stringResource(R.string.cancel),
+                                    submitLabel = stringResource(R.string.search_bar_search),
                                     placeholder = stringResource(R.string.search_bar_search),
                                     focusRequester = searchBarFocusRequester,
                                     autoFocus = focusSearchOnEntry,

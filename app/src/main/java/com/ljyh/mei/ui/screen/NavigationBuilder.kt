@@ -35,6 +35,8 @@ import com.ljyh.mei.ui.screen.log.LogScreen
 import com.ljyh.mei.ui.screen.account.BiliFavFolderScreen
 import com.ljyh.mei.ui.screen.account.BiliLoginScreen
 import com.ljyh.mei.ui.screen.account.BiliAccountHomeScreen
+import com.ljyh.mei.ui.screen.account.BiliUploaderScreen
+import com.ljyh.mei.ui.screen.account.BiliUploaderGroupScreen
 import com.ljyh.mei.ui.screen.search.SearchLandingScreen
 
 
@@ -66,6 +68,24 @@ fun navigationEntry(
                         ?.let { URLDecoder.decode(it, "UTF-8") }
                         .orEmpty()
                         .ifBlank { "收藏夹" },
+                )
+            }
+        }
+        route.startsWith("${Screen.BiliUploader.route}/") -> {
+            val mid = route.substringAfter("${Screen.BiliUploader.route}/").toLongOrNull()
+            if (mid != null) BiliUploaderScreen(mid = mid)
+        }
+        route.startsWith("${Screen.BiliUploaderGroup.route}/") -> {
+            val args = route.substringAfter("${Screen.BiliUploaderGroup.route}/").split('/', limit = 3)
+            val mid = args.getOrNull(0)?.toLongOrNull()
+            val seasonId = args.getOrNull(1)?.toLongOrNull()
+            if (mid != null && seasonId != null) {
+                BiliUploaderGroupScreen(
+                    mid = mid,
+                    seasonId = seasonId,
+                    groupName = args.getOrNull(2)
+                        ?.let { URLDecoder.decode(it, "UTF-8") }
+                        .orEmpty(),
                 )
             }
         }

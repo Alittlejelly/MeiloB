@@ -25,27 +25,53 @@ sealed interface VersionUpdateResult {
     data object Failed : VersionUpdateResult
 }
 
-/** Checks the GitHub release tags off the Compose thread. */
+/** 更新源。Gitee 在国内直连可达，GitHub 需要代理；两者 tag 命名保持一致。 */
+enum class UpdateSource(val id: String) {
+    GitHub("github"),
+    Gitee("gitee");
+
+    companion object {
+        fun fromId(id: String?): UpdateSource = entries.firstOrNull { it.id == id } ?: GitHub
+    }
+}
+
+/** Checks the release tags on GitHub or Gitee off the Compose thread. */
 object VersionUpdateChecker {
-    private const val Repository = "Alittlejelly/MeiloB"
-    private const val RepositoryUrl = "https://github.com/$Repository"
-    private const val ApiUrl = "https://api.github.com/repos/$Repository"
-    private const val TagsEndpoint = "$ApiUrl/tags?per_page=100"
+    private const val GithubRepository = "Alittlejelly/MeiloB"
+    private const val GiteeRepository = "littlejelly/MeiloB"
     private const val ConnectTimeoutMillis = 8_000
     private const val ReadTimeoutMillis = 8_000
 
-    suspend fun check(currentVersion: String): VersionUpdateResult = withContext(Dispatchers.IO) {
+    private fun tagsEndpoint(source: UpdateSource): String = when (source) {
+        // per_page 缺省时 GitHub 只给 30 个；Gitee 默认 20，显式放大。
+        UpdateSource.GitHub -> "https://api.github.com/repos/$GithubRepository/tags?per_page=100"
+        UpdateSource.Gitee -> "https://gitee.com/api/v5/repos/$GiteeRepository/tags?per_page=100"
+    }
+
+    private fun releaseUrl(source: UpdateSource, tag: String): String = when (source) {
+        UpdateSource.GitHub ->
+            "https://github.com/$GithubRepository/releases/tag/${URLEncoder.encode(tag, "UTF-8")}"
+        // Gitee 的 tag 详情页路径（已实测可达）。
+        UpdateSource.Gitee ->
+            "https://gitee.com/$GiteeRepository/tags/${URLEncoder.encode(tag, "UTF-8")}"
+    }
+
+    suspend fun check(
+        currentVersion: String,
+        source: UpdateSource = UpdateSource.GitHub,
+    ): VersionUpdateResult = withContext(Dispatchers.IO) {
         withTimeoutOrNull(30_000) {
-            checkWithFetcher(currentVersion, ::requestJson)
+            checkWithFetcher(currentVersion, source, ::requestJson)
         } ?: VersionUpdateResult.Failed
     }
 
     internal suspend fun checkWithFetcher(
         currentVersion: String,
+        source: UpdateSource,
         fetchJson: suspend (String) -> JsonElement,
     ): VersionUpdateResult = try {
         val current = parseVersion(currentVersion) ?: return VersionUpdateResult.Failed
-        val tags = fetchJson(TagsEndpoint).asJsonArray.mapNotNull { element ->
+        val tags = fetchJson(tagsEndpoint(source)).asJsonArray.mapNotNull { element ->
             val name = element.objectOrNull()?.string("name")?.trim() ?: return@mapNotNull null
             parseVersion(name)?.let { version -> VersionTag(name, version) }
         }
@@ -56,7 +82,7 @@ object VersionUpdateChecker {
         if (compareVersions(latest.version, current) > 0) {
             VersionUpdateResult.UpdateAvailable(
                 latestTag = latest.name,
-                releaseUrl = "$RepositoryUrl/releases/tag/${URLEncoder.encode(latest.name, "UTF-8")}",
+                releaseUrl = releaseUrl(source, latest.name),
             )
         } else {
             VersionUpdateResult.UpToDate
@@ -73,13 +99,13 @@ object VersionUpdateChecker {
             requestMethod = "GET"
             connectTimeout = ConnectTimeoutMillis
             readTimeout = ReadTimeoutMillis
-            setRequestProperty("Accept", "application/vnd.github+json")
+            instanceFollowRedirects = true
+            setRequestProperty("Accept", "application/json")
             setRequestProperty("User-Agent", UserAgent)
-            setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         }
         return try {
             val statusCode = connection.responseCode
-            if (statusCode !in 200..299) throw java.io.IOException("GitHub update request failed: HTTP $statusCode")
+            if (statusCode !in 200..299) throw java.io.IOException("Update request failed: HTTP $statusCode")
             val response = connection.inputStream.bufferedReader(Charsets.UTF_8).use { reader ->
                 JsonParser.parseReader(reader)
             }

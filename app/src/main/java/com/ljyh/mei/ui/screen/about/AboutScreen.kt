@@ -39,9 +39,11 @@ import com.ljyh.mei.BuildConfig
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.DevModeKey
 import com.ljyh.mei.constants.Github
+import com.ljyh.mei.constants.UpdateSourceKey
 import com.ljyh.mei.ui.glass.GlassCard
 import com.ljyh.mei.ui.glass.IosGroupedList
 import com.ljyh.mei.ui.glass.IosPinnedListPage
+import com.ljyh.mei.ui.glass.IosPopupButton
 import com.ljyh.mei.ui.glass.LocalGlassColors
 import com.ljyh.mei.ui.glass.SfIcon
 import com.ljyh.mei.ui.glass.SfSymbol
@@ -50,6 +52,7 @@ import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.ui.component.VersionUpdateAlert
 import com.ljyh.mei.utils.rememberPreference
+import com.ljyh.mei.utils.UpdateSource
 import com.ljyh.mei.utils.VersionUpdateChecker
 import com.ljyh.mei.utils.VersionUpdateResult
 import kotlinx.coroutines.CancellationException
@@ -62,6 +65,8 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
     val navController = LocalNavController.current
     val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     val (devMode, onDevModeChange) = rememberPreference(DevModeKey, false)
+    val (updateSourceId, setUpdateSourceId) = rememberPreference(UpdateSourceKey, UpdateSource.GitHub.id)
+    val updateSource = UpdateSource.fromId(updateSourceId)
     var clickCount by remember { mutableIntStateOf(0) }
     val updateCheckScope = rememberCoroutineScope()
     var isCheckingUpdate by remember { mutableStateOf(false) }
@@ -72,7 +77,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
         isCheckingUpdate = true
         updateCheckScope.launch {
             try {
-                updateResult = VersionUpdateChecker.check(BuildConfig.VERSION_NAME)
+                updateResult = VersionUpdateChecker.check(BuildConfig.VERSION_NAME, updateSource)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
@@ -129,6 +134,21 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                     },
 //                    stringResource(R.string.about_check_updates_description),
                 ) { checkForUpdates() }
+                GlassCard(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        SfIcon("icloud", null, size = 21.dp)
+                        Text(
+                            stringResource(R.string.about_update_source),
+                            modifier = Modifier.weight(1f).padding(horizontal = 13.dp),
+                        )
+                        IosPopupButton(
+                            selected = updateSource,
+                            items = UpdateSource.entries,
+                            onSelected = { setUpdateSourceId(it.id) },
+                            label = { stringResource(if (it == UpdateSource.GitHub) R.string.about_update_source_github else R.string.about_update_source_gitee) },
+                        )
+                    }
+                }
             }
         }
         item {
@@ -136,6 +156,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                 AboutEntry("arrowshape.turn.up.right", "MeiloX", stringResource(R.string.about_fork_source_description)) { openUrl(context, "https://github.com/NEORUAA/MeiloX") }
                 AboutEntry("chevron.left.forwardslash.chevron.right", "Mei", stringResource(R.string.about_upstream_description)) { openUrl(context, "https://github.com/ljyh223/Mei") }
                 AboutEntry("iphone", "MeloX", stringResource(R.string.about_melox_description)) { openUrl(context, "https://github.com/youshen2/MeloX") }
+                AboutEntry("play.fill", "BBPlayer", stringResource(R.string.about_bbplayer_description)) { openUrl(context, "https://github.com/bbplayer-app/BBPlayer") }
                 AboutEntry("circle.lefthalf.filled", "Backdrop", stringResource(R.string.about_backdrop_description)) { openUrl(context, "https://github.com/Kyant0/AndroidLiquidGlass") }
             }
         }

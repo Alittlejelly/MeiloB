@@ -15,6 +15,11 @@ import com.ljyh.mei.data.model.bili.BiliRegionDynamic
 import com.ljyh.mei.data.model.bili.BiliSearchAll
 import com.ljyh.mei.data.model.bili.BiliSmsLogin
 import com.ljyh.mei.data.model.bili.BiliSmsSend
+import com.ljyh.mei.data.model.bili.BiliSeasonArchives
+import com.ljyh.mei.data.model.bili.BiliSpaceArcList
+import com.ljyh.mei.data.model.bili.BiliSpaceCard
+import com.ljyh.mei.data.model.bili.BiliSpaceMedialist
+import com.ljyh.mei.data.model.bili.BiliSpaceSeasonsSeries
 import com.ljyh.mei.data.model.bili.BiliVideoDetail
 import retrofit2.Response
 import retrofit2.http.Field
@@ -140,4 +145,56 @@ interface BiliApiService {
         @Query("page_size") pageSize: Int = 20,
         @Query("platform") platform: String = "web",
     ): BiliSearchAll
+
+    /** UP 主空间名片：昵称、头像、签名、粉丝数。 */
+    @GET("x/web-interface/card")
+    suspend fun spaceCard(
+        @Query("mid") mid: Long,
+        @Query("photo") photo: Boolean = true,
+    ): BiliSpaceCard
+
+    /**
+     * UP 主全部投稿（支持 pn 翻页读全）。参数形态对齐 BBPlayer（bbplayer-app）
+     * 实测可用的调用：iPhone BiliApp UA（拦截器全局默认）+ 最小参数集 + wbi，
+     * 不带桌面语境的 dm_* 指纹——UA 与指纹语境矛盾正是 -403 的根因。
+     * 失败时回退 [spaceMedialist]。
+     */
+    @GET("x/space/wbi/arc/search")
+    suspend fun spaceArcSearch(
+        @Query("mid") mid: Long,
+        @Query("pn") pn: Int = 1,
+        @Query("ps") ps: Int = 30,
+        @Query("keyword") keyword: String = "",
+    ): BiliSpaceArcList
+
+    /** UP 主全部投稿（web 空间页"播放全部"同源接口）。免登录、免 wbi、免指纹。
+     * 注意：该接口实测固定返回前 20 条，任何翻页参数均被忽略。 */
+    @GET("x/v2/medialist/resource/list")
+    suspend fun spaceMedialist(
+        @Query("type") type: Int = 1,
+        @Query("biz_id") bizId: Long,
+        @Query("mobi_app") mobiApp: String = "web",
+        @Query("ps") ps: Int = 20,
+        @Query("direction") direction: Boolean = false,
+        @Query("sort_field") sortField: Int = 1,
+        @Query("tid") tid: Int = 0,
+        @Query("with_current") withCurrent: Boolean = false,
+    ): BiliSpaceMedialist
+
+    /** UP 主空间分组（合集 seasons + 系列 series）列表。 */
+    @GET("x/polymer/web-space/home/seasons_series")
+    suspend fun spaceSeasonsSeries(
+        @Query("mid") mid: Long,
+        @Query("page_num") pageNum: Int = 1,
+        @Query("page_size") pageSize: Int = 20,
+    ): BiliSpaceSeasonsSeries
+
+    /** 分组（合集/系列）内投稿，正常页码分页。 */
+    @GET("x/polymer/web-space/seasons_archives_list")
+    suspend fun seasonArchives(
+        @Query("mid") mid: Long,
+        @Query("season_id") seasonId: Long,
+        @Query("page_num") pageNum: Int = 1,
+        @Query("page_size") pageSize: Int = 20,
+    ): BiliSeasonArchives
 }

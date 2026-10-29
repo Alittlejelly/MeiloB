@@ -75,6 +75,7 @@ fun HomeScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val loadingMore by viewModel.loadingMoreLatest.collectAsState()
     val region by viewModel.region.collectAsState()
+    val guessLike by viewModel.guessLike.collectAsState()
 
     val systemBarsPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     val collapseDistancePx = with(LocalDensity.current) { 56.dp.toPx() }
@@ -93,7 +94,7 @@ fun HomeScreen(
             connection.playQueue(
                 ListQueue(
                     id = "bili_${videos.getOrNull(startIndex)?.aid}_${System.currentTimeMillis()}",
-                    title = region.label,
+                    title = viewModel.feedTitle,
                     items = items.map { it.mediaId to it },
                     startIndex = startIndex.coerceAtMost(items.lastIndex),
                 )
@@ -137,17 +138,19 @@ fun HomeScreen(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                             )
                         }
-                        item(key = "region-selector", contentType = "regions") {
-                            RegionSelectorRow(
-                                regions = viewModel.regions,
-                                selected = region,
-                                onSelect = viewModel::selectRegion,
-                            )
+                        if (!guessLike) {
+                            item(key = "region-selector", contentType = "regions") {
+                                RegionSelectorRow(
+                                    regions = viewModel.regions,
+                                    selected = region,
+                                    onSelect = viewModel::selectRegion,
+                                )
+                            }
                         }
                         if (videos.isEmpty()) {
                             item(key = "feed-empty", contentType = "empty") {
                                 Text(
-                                    "${region.label}暂时没有新投稿",
+                                    viewModel.feedEmptyText,
                                     fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                     textAlign = TextAlign.Center,

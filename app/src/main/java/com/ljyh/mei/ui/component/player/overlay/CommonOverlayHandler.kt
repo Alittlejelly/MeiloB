@@ -67,17 +67,16 @@ fun CommonOverlayHandler(
         }
 
         is OverlayState.AlbumArtist -> {
-            val onAlbumClick: (Long) -> Unit = { }
-            val onArtistClick: (Long) -> Unit = { }
             val anchor = overlay.anchorBounds
             if (anchor != null) {
                 PlayerNavigationMenu(
-                    album = overlay.album,
                     artists = overlay.artists,
                     playlistTitle = overlay.playlistTitle,
                     anchorBounds = anchor,
-                    onAlbumClick = onAlbumClick,
-                    onArtistClick = onArtistClick,
+                    onArtistClick = { mid ->
+                        Screen.BiliUploader.navigate(navController) { addPath(mid.toString()) }
+                        sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
+                    },
                     onPlaylistClick = {
                         val playlistId = overlay.playlistId
                         if (playlistId != null && playlistId > 0) {
@@ -91,11 +90,11 @@ fun CommonOverlayHandler(
                 )
             } else {
                 AlbumArtistBottomSheet(
-                    coverUrl = overlay.cover,
-                    albumInfo = overlay.album,
                     artistList = overlay.artists,
-                    onAlbumClick = onAlbumClick,
-                    onArtistClick = onArtistClick,
+                    onArtistClick = { mid ->
+                        Screen.BiliUploader.navigate(navController) { addPath(mid.toString()) }
+                        sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
+                    },
                     onDismissRequest = overlayHandler::dismiss,
                 )
             }

@@ -11,6 +11,8 @@ sealed class Screen(val route:String) {
     data object BiliLogin:Screen("bili/login")
     data object BiliAccount:Screen("bili/account")
     data object BiliFavFolder:Screen("bili_fav")
+    data object BiliUploader:Screen("bili_uploader")
+    data object BiliUploaderGroup:Screen("bili_uploader_group")
     data object Library:Screen("library")
     data object LibraryCategory:Screen("library_category")
     data object PlayList:Screen("playlist")

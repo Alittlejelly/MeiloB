@@ -465,8 +465,7 @@ fun IosBottomSearchToolbar(
     query: TextFieldValue,
     onQueryChange: (TextFieldValue) -> Unit,
     onSearch: (String) -> Unit,
-    onCancel: () -> Unit,
-    cancelLabel: String,
+    submitLabel: String,
     placeholder: String,
     modifier: Modifier = Modifier,
     style: GlassSurfaceStyle = GlassSurfaceStyle.Navigation,
@@ -519,12 +518,18 @@ fun IosBottomSearchToolbar(
             }
         }
         GlassIconButton(
-            onClick = onCancel,
+            onClick = { if (query.text.isNotBlank()) onSearch(query.text) },
             backdrop = backdrop,
             style = style,
             modifier = Modifier.size(56.dp),
         ) {
-            SfIcon("xmark", cancelLabel, size = 20.dp, tint = colors.content)
+            // Confirm-search button: magnifier glyph, dimmed while the query is empty.
+            SfIcon(
+                "magnifyingglass",
+                submitLabel,
+                size = 20.dp,
+                tint = if (query.text.isNotBlank()) colors.content else colors.tertiaryContent,
+            )
         }
     }
     LaunchedEffect(autoFocus) {

@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -23,31 +22,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import com.kyant.capsule.ContinuousRoundedRectangle
+import com.ljyh.mei.R
 import com.ljyh.mei.data.model.MediaMetadata
 import com.ljyh.mei.ui.glass.IosModalSheet
-import com.ljyh.mei.utils.smallImage
 
+/** Fallback sheet when no anchor bounds are available: opens the uploader's in-app page. */
 @Composable
 fun AlbumArtistBottomSheet(
-    albumInfo: MediaMetadata.Album,
     artistList: List<MediaMetadata.Artist>,
-    coverUrl: String,
-    onAlbumClick: (Long) -> Unit,
     onArtistClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val navigableArtists = artistList.filter { it.id > 0 }
 
     IosModalSheet(
@@ -57,71 +47,27 @@ fun AlbumArtistBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()) // 防止内容过多无法滚动
+                .verticalScroll(rememberScrollState()) // 防止内容过多时无法滚动
                 .padding(bottom = 32.dp) // 底部留白，避开手势导航条
         ) {
 
             // 标题：前往
             Text(
-                text = "前往",
+                text = stringResource(R.string.player_navigation_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // --- 1. 专辑部分 ---
-            SectionLabel(text = "专辑")
-
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = albumInfo.title,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1
-                    )
-                },
-                supportingContent = { Text("查看专辑") },
-                leadingContent = {
-                    // 显示专辑封面
-                    AsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(coverUrl.smallImage())
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Album Cover",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(ContinuousRoundedRectangle(8.dp)) // 圆角封面
-                    )
-                },
-                trailingContent = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                modifier = Modifier.clickable {
-                    onAlbumClick(albumInfo.id)
-                    onDismissRequest() // 点击后自动关闭
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // --- 2. 歌手部分 ---
+            // --- UP 主部分 ---
             if (navigableArtists.isNotEmpty()) {
-                SectionLabel(text = "歌手")
+                SectionLabel(text = stringResource(R.string.player_navigation_uploader_section))
 
                 navigableArtists.forEach { artist ->
                     ListItem(
                         headlineContent = { Text(artist.name) },
                         leadingContent = {
-                            // 歌手占位图 (圆形)
+                            // 头像占位图 (圆形)
                             Surface(
                                 shape = CircleShape,
                                 color = MaterialTheme.colorScheme.surfaceVariant,
@@ -151,6 +97,13 @@ fun AlbumArtistBottomSheet(
                         }
                     )
                 }
+            } else {
+                Text(
+                    text = stringResource(R.string.player_navigation_uploader_unavailable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
             }
         }
     }
