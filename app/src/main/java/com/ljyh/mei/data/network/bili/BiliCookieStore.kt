@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.edit
 import com.ljyh.mei.constants.BiliAvatarKey
 import com.ljyh.mei.constants.BiliBuvid3Key
 import com.ljyh.mei.constants.BiliBuvid4Key
+import com.ljyh.mei.constants.BiliUuidKey
 import com.ljyh.mei.constants.BiliCoinKey
 import com.ljyh.mei.constants.BiliDedeUserIdCkMd5Key
 import com.ljyh.mei.constants.BiliDedeUserIdKey
@@ -11,6 +12,8 @@ import com.ljyh.mei.constants.BiliJctKey
 import com.ljyh.mei.constants.BiliLevelKey
 import com.ljyh.mei.constants.BiliNicknameKey
 import com.ljyh.mei.constants.BiliSessdataKey
+import com.ljyh.mei.constants.BiliSidKey
+import com.ljyh.mei.constants.BiliBnutKey
 import com.ljyh.mei.constants.BiliVipKey
 import com.ljyh.mei.constants.BiliWbiImgKeyKey
 import com.ljyh.mei.constants.BiliWbiKeyAtKey
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import android.content.Context
 import javax.inject.Inject
+import kotlin.random.Random
 import javax.inject.Singleton
 
 /**
@@ -41,6 +45,10 @@ class BiliCookieStore @Inject constructor(
         val dedeUserIdCkMd5: String = "",
         val buvid3: String = "",
         val buvid4: String = "",
+        /** 设备标识 `_uuid`：真实浏览器/客户端必有，Gaia 风控用它绑定 buvid3。 */
+        val uuid: String = "",
+        val sid: String = "",
+        val bNut: String = "",
         val nickname: String = "",
         val avatar: String = "",
         val level: Int = 0,
@@ -56,6 +64,9 @@ class BiliCookieStore @Inject constructor(
         fun cookieHeader(): String = buildList {
             if (buvid3.isNotBlank()) add("buvid3=$buvid3")
             if (buvid4.isNotBlank()) add("buvid4=$buvid4")
+            if (sid.isNotBlank()) add("sid=$sid")
+            if (bNut.isNotBlank()) add("b_nut=$bNut")
+            if (uuid.isNotBlank()) add("_uuid=$uuid")
             if (dedeUserId.isNotBlank()) add("DedeUserID=$dedeUserId")
             if (dedeUserIdCkMd5.isNotBlank()) add("DedeUserID__ckMd5=$dedeUserIdCkMd5")
             if (sessdata.isNotBlank()) add("SESSDATA=$sessdata")
@@ -71,13 +82,16 @@ class BiliCookieStore @Inject constructor(
             dedeUserIdCkMd5 = p[BiliDedeUserIdCkMd5Key].orEmpty(),
             buvid3 = p[BiliBuvid3Key].orEmpty(),
             buvid4 = p[BiliBuvid4Key].orEmpty(),
+            uuid = p[BiliUuidKey].orEmpty(),
+            sid = p[BiliSidKey].orEmpty(),
+            bNut = p[BiliBnutKey].orEmpty(),
             nickname = p[BiliNicknameKey].orEmpty(),
             avatar = p[BiliAvatarKey].orEmpty(),
             level = p[BiliLevelKey]?.toIntOrNull() ?: 0,
             coin = (p[BiliCoinKey] ?: 0L) / 100.0,
             isVip = (p[BiliVipKey] ?: 0L) > 0,
-            wbiImgKey = p[BiliWbiImgKeyKey].orEmpty(),
-            wbiSubKey = p[BiliWbiSubKeyKey].orEmpty(),
+            wbiImgKey = BiliWbi.keyFromUrl(p[BiliWbiImgKeyKey]),
+            wbiSubKey = BiliWbi.keyFromUrl(p[BiliWbiSubKeyKey]),
             wbiKeyAt = p[BiliWbiKeyAtKey] ?: 0L,
         )
     }
@@ -103,6 +117,8 @@ class BiliCookieStore @Inject constructor(
             cookies["bili_jct"]?.let { p[BiliJctKey] = it }
             cookies["DedeUserID"]?.let { p[BiliDedeUserIdKey] = it }
             cookies["DedeUserID__ckMd5"]?.let { p[BiliDedeUserIdCkMd5Key] = it }
+            cookies["sid"]?.let { p[BiliSidKey] = it }
+            cookies["b_nut"]?.let { p[BiliBnutKey] = it }
         }
     }
 
@@ -124,11 +140,6 @@ class BiliCookieStore @Inject constructor(
         }
     }
 
-    suspend fun applyBuvid3(buvid3: String) {
-        if (buvid3.isBlank()) return
-        store.edit { it[BiliBuvid3Key] = buvid3 }
-    }
-
     suspend fun applyBuvid(b3: String?, b4: String?) {
         store.edit { p ->
             b3?.takeIf { it.isNotBlank() }?.let { p[BiliBuvid3Key] = it }
@@ -136,11 +147,46 @@ class BiliCookieStore @Inject constructor(
         }
     }
 
-    suspend fun applyWbiKeys(imgKey: String, subKey: String) {
-        if (imgKey.isBlank() || subKey.isBlank()) return
+    suspend fun applyUuid(uuid: String) {
+        if (uuid.isBlank()) return
+        store.edit { it[BiliUuidKey] = uuid }
+    }
+
+    /**
+     * `_uuid` 只在首次生成并持久化（保持不变才像真实设备；每次启动都换会与
+     * buvid3 对不上）。格式与浏览器一致：
+     * `8-4-4-4-12` 大写十六进制 + 时间戳后 5 位 + `infoc`。
+     */
+    suspend fun ensureUuid(): String {
+        val existing = snapshot().uuid
+        if (existing.isNotBlank()) return existing
+        val hex = { n: Int ->
+            buildString { repeat(n) { append("0123456789ABCDEF"[Random.nextInt(16)]) } }
+        }
+        val generated = buildString {
+            append(hex(8)).append('-').append(hex(4)).append('-').append(hex(4))
+            append('-').append(hex(4)).append('-').append(hex(12))
+            append(System.currentTimeMillis().toString().takeLast(5)).append("infoc")
+        }
+        applyUuid(generated)
+        return generated
+    }
+
+    /** 持久化响应头下发的会话补充 cookie（sid/b_nut）。 */
+    suspend fun applySessionSupplements(cookies: Map<String, String>) {
         store.edit { p ->
-            p[BiliWbiImgKeyKey] = imgKey
-            p[BiliWbiSubKeyKey] = subKey
+            cookies["sid"]?.takeIf { it.isNotBlank() }?.let { p[BiliSidKey] = it }
+            cookies["b_nut"]?.takeIf { it.isNotBlank() }?.let { p[BiliBnutKey] = it }
+        }
+    }
+
+    suspend fun applyWbiKeys(imgKey: String, subKey: String) {
+        val img = BiliWbi.keyFromUrl(imgKey)
+        val sub = BiliWbi.keyFromUrl(subKey)
+        if (img.isBlank() || sub.isBlank()) return
+        store.edit { p ->
+            p[BiliWbiImgKeyKey] = img
+            p[BiliWbiSubKeyKey] = sub
             p[BiliWbiKeyAtKey] = System.currentTimeMillis()
         }
     }

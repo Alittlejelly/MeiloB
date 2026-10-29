@@ -25,8 +25,8 @@ class BiliInterceptor(
             return chain.proceed(request)
         }
         val snap = snapshot()
-        // 与同类客户端一致：默认走移动端 BiliApp UA（桌面 UA 更容易触发风控）。
-        // UA/Referer/Origin 允许接口用 @Headers 覆盖（空间接口要求 web UA + space 来源）。
+        // 与 BBPlayer 一致：所有接口统一用移动端 BiliApp UA + web 来源头。
+        // 桌面 UA 与缺少浏览器指纹的组合更容易被空间接口风控。
         val builder = request.newBuilder()
         if (request.header("User-Agent") == null) {
             builder.header("User-Agent", PASSPORT_USER_AGENT)
@@ -60,6 +60,13 @@ class BiliInterceptor(
                 signedUrl = url.newBuilder()
                     .encodedQuery(query)
                     .build()
+                Timber.tag("BiliInterceptor").d(
+                    "wbi %s img=%s sub=%s -> %s",
+                    url.encodedPath,
+                    snap.wbiImgKey.take(8),
+                    snap.wbiSubKey.take(8),
+                    query.substringAfterLast("w_rid=").take(8),
+                )
             } else {
                 Timber.tag("BiliInterceptor").w("wbi keys missing for %s", url.encodedPath)
             }
@@ -67,25 +74,32 @@ class BiliInterceptor(
 
         val response = chain.proceed(builder.url(signedUrl).build())
 
-        // 捕获服务端下发的 buvid3，后续搜索等接口需要该 Cookie。
-        response.headers("set-cookie")
-            .filter { it.startsWith("buvid3=") }
-            .firstOrNull()
-            ?.let { raw ->
-                val value = raw.removePrefix("buvid3=").substringBefore(';')
-                if (value.isNotBlank() && value != snap.buvid3) {
-                    runBlocking { cookieStore.applyBuvid3(value) }
+        // 捕获服务端下发的会话补充 cookie（buvid3/sid/b_nut），空间接口风控
+        // 校验 cookie 组合完整性，缺 sid/b_nut 会被判伪造（-403）。
+        val supplements = mutableMapOf<String, String>()
+        response.headers("set-cookie").forEach { raw ->
+            val pair = raw.substringBefore(';').trim().split('=', limit = 2)
+            if (pair.size == 2 && pair[1].isNotBlank()) {
+                when (pair[0]) {
+                    "buvid3" -> supplements["buvid3"] = pair[1]
+                    "sid" -> supplements["sid"] = pair[1]
+                    "b_nut" -> supplements["b_nut"] = pair[1]
                 }
             }
+        }
+        if (supplements.isNotEmpty()) {
+            runBlocking {
+                if (supplements["buvid3"]?.takeIf { it.isNotBlank() && it != snap.buvid3 } != null) {
+                    cookieStore.applyBuvid(supplements["buvid3"], null)
+                }
+                cookieStore.applySessionSupplements(supplements)
+            }
+        }
         return response
     }
 
     companion object {
-        const val BILI_USER_AGENT =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
-                "Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0"
-
-        /** 参考同类客户端：passport 登录接口使用移动端 BiliApp UA。 */
+        /** 参考同类客户端（BBPlayer）：所有 bili 接口统一走移动端 BiliApp UA。 */
         const val PASSPORT_USER_AGENT =
             "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 " +
                 "(KHTML, like Gecko) Mobile/15E148 BiliApp/6.66.0"
