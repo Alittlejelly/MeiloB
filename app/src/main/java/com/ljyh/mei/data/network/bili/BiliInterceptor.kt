@@ -1,6 +1,9 @@
 package com.ljyh.mei.data.network.bili
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
 import timber.log.Timber
@@ -12,8 +15,11 @@ class BiliInterceptor(
     private val cookieStore: BiliCookieStore,
 ) : Interceptor {
 
-    private fun snapshot(): BiliCookieStore.Snapshot =
-        runBlocking { cookieStore.snapshot() }
+    /** Set-Cookie 落盘用的后台作用域（不该阻塞响应）。 */
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** 会话内存副本：热路径不碰 DataStore，只有进程首次请求会真的读盘。 */
+    private fun snapshot(): BiliCookieStore.Snapshot = cookieStore.cachedSnapshot()
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -88,7 +94,8 @@ class BiliInterceptor(
             }
         }
         if (supplements.isNotEmpty()) {
-            runBlocking {
+            // 落盘放到后台：Set-Cookie 只是补充会话，没必要卡住这次响应。
+            scope.launch {
                 if (supplements["buvid3"]?.takeIf { it.isNotBlank() && it != snap.buvid3 } != null) {
                     cookieStore.applyBuvid(supplements["buvid3"], null)
                 }
@@ -98,7 +105,7 @@ class BiliInterceptor(
         return response
     }
 
-    companion object {
+    private companion object {
         /** 参考同类客户端（BBPlayer）：所有 bili 接口统一走移动端 BiliApp UA。 */
         const val PASSPORT_USER_AGENT =
             "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 " +

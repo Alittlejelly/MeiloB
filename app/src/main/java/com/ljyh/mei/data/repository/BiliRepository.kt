@@ -617,12 +617,13 @@ class BiliRepository @Inject constructor(
             // 翻页中途被风控：已加载的完整列表照常展示，标记无更多。
             return@withContext Resource.Success(BiliSpaceArchivePage(emptyList(), 0, hasMore = false, full = true))
         }
+        val diag = cookieStore.cachedSnapshot()
         Timber.tag("BiliDiag").w(
             "spaceArcSearch code=%s msg=%s mid=%s buvid3=%s b_nut=%s sid=%s -> fallback medialist",
             arc?.code, arc?.message, mid,
-            if (cookieStore.snapshot().buvid3.isNotBlank()) "set" else "MISSING",
-            if (cookieStore.snapshot().bNut.isNotBlank()) "set" else "MISSING",
-            if (cookieStore.snapshot().sid.isNotBlank()) "set" else "MISSING",
+            if (diag.buvid3.isNotBlank()) "set" else "MISSING",
+            if (diag.bNut.isNotBlank()) "set" else "MISSING",
+            if (diag.sid.isNotBlank()) "set" else "MISSING",
         )
         arcSearchBlocked = true
         spaceArchives(mid)
@@ -764,7 +765,7 @@ class BiliRepository @Inject constructor(
         }
 
     private suspend fun ensureBuvid() {
-        val snap = cookieStore.snapshot()
+        val snap = cookieStore.cachedSnapshot()
         // buvid3/buvid4 由 spi 接口下发（网页首跳同源），两者配套；
         // 缺一就补齐，缺失 buvid3 会被风控直接 412。
         if (snap.buvid3.isBlank() || snap.buvid4.isBlank()) {
@@ -772,7 +773,7 @@ class BiliRepository @Inject constructor(
                 cookieStore.applyBuvid(spi.b3.orEmpty(), spi.b4.orEmpty())
             }
         }
-        cookieStore.ensureUuid()
+        if (snap.uuid.isBlank()) cookieStore.ensureUuid()
     }
 
     /**
@@ -780,7 +781,7 @@ class BiliRepository @Inject constructor(
      * 密钥会周期轮换，缺失或超过 12 小时都重新拉取。
      */
     suspend fun ensureWbiKeys() {
-        val snapshot = cookieStore.snapshot()
+        val snapshot = cookieStore.cachedSnapshot()
         val stale = System.currentTimeMillis() - snapshot.wbiKeyAt > WBI_KEY_TTL_MS
         if (snapshot.wbiImgKey.isBlank() || snapshot.wbiSubKey.isBlank() || stale) {
             runCatching { refreshAccount() }

@@ -4,7 +4,7 @@ package com.ljyh.mei.utils
 import android.content.Context
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
@@ -40,9 +40,13 @@ fun String.size1600():String{
 
 class CoilImageLoader {
     companion object {
+        /**
+         * 仅供通知栏等非 Compose 场景使用；必须复用全局 ImageLoader，
+         * 每次 new 一个会重复持有缓存与线程池。
+         */
         suspend fun loadImageDrawable(context: Context, imageUrl: String): ImageBitmap? =
             withContext(Dispatchers.IO) {
-                val loader = ImageLoader(context)
+                val loader = SingletonImageLoader.get(context)
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
                     .allowHardware(false) // 避免返回硬件加速的 Bitmap
