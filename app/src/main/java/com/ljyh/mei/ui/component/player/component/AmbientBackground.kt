@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.palette.graphics.Palette
-import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
@@ -32,6 +32,27 @@ import com.skydoves.cloudy.cloudy
 import com.ljyh.mei.ui.glass.LocalGlassColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
+
+/**
+ * 封面取色结果缓存。同一张封面在亮/暗主题下各算一次就够，
+ * 避免每次进出播放器都重新下载、解码、跑一遍调色板算法。
+ */
+private object AmbientPalettes {
+    private const val MAX_ENTRIES = 24
+    private val cache = ConcurrentHashMap<String, List<Color>>()
+
+    fun get(imageUrl: String, isDark: Boolean): List<Color>? = cache[key(imageUrl, isDark)]
+
+    fun put(imageUrl: String, isDark: Boolean, colors: List<Color>) {
+        if (cache.size >= MAX_ENTRIES && !cache.containsKey(key(imageUrl, isDark))) {
+            cache.keys.firstOrNull()?.let(cache::remove)
+        }
+        cache[key(imageUrl, isDark)] = colors
+    }
+
+    private fun key(imageUrl: String, isDark: Boolean) = if (isDark) "d|$imageUrl" else "l|$imageUrl"
+}
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -57,10 +78,17 @@ fun AmbientBackground(
     // 1. 异步取色
     LaunchedEffect(imageUrl) {
         if (imageUrl.isNullOrEmpty()) return@LaunchedEffect
+        // 同一张封面反复进出播放器时不必重新解码取色
+        AmbientPalettes.get(imageUrl, isDark)?.let {
+            fluidColors = it
+            return@LaunchedEffect
+        }
 
         // 放在 IO 线程，不阻塞 UI
         withContext(Dispatchers.IO) {
-            val loader = ImageLoader(context)
+            // 必须复用全局 ImageLoader：每次 new 一个会各自持有内存缓存、
+            // 线程池和磁盘缓存句柄，切歌就是一次泄漏。
+            val loader = SingletonImageLoader.get(context)
             val request = ImageRequest.Builder(context)
                 .data(imageUrl)
                 .size(200) // 稍微大一点点以获得更准确的色调，但仍然很小
@@ -72,6 +100,7 @@ fun AmbientBackground(
                 val bitmap = result.image.toBitmap()
                 // 使用增强版取色算法
                 val newColors = extractVibrantColorsImproved(bitmap, isDark)
+                AmbientPalettes.put(imageUrl, isDark, newColors)
                 fluidColors = newColors
             }
         }

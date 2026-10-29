@@ -24,19 +24,23 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import android.content.Context
 import javax.inject.Inject
 import kotlin.random.Random
 import javax.inject.Singleton
 
 /**
- * B 站网页版会话（Cookie）与 WBI 密钥的持久化。
- */
+ * B 绔欑綉椤电増浼氳瘽锛圕ookie锛変笌 WBI 瀵嗛挜鐨勬寔涔呭寲銆? */
 @Singleton
 class BiliCookieStore @Inject constructor(
     @ApplicationContext private val appContext: Context,
 ) {
     private val store get() = appContext.dataStore
+
+    /** 浼氳瘽鐨勫唴瀛樺壇鏈紝瑙?[cachedSnapshot]銆?*/
+    @Volatile
+    private var cached: Snapshot? = null
 
     data class Snapshot(
         val sessdata: String = "",
@@ -45,7 +49,7 @@ class BiliCookieStore @Inject constructor(
         val dedeUserIdCkMd5: String = "",
         val buvid3: String = "",
         val buvid4: String = "",
-        /** 设备标识 `_uuid`：真实浏览器/客户端必有，Gaia 风控用它绑定 buvid3。 */
+        /** 璁惧鏍囪瘑 `_uuid`锛氱湡瀹炴祻瑙堝櫒/瀹㈡埛绔繀鏈夛紝Gaia 椋庢帶鐢ㄥ畠缁戝畾 buvid3銆?*/
         val uuid: String = "",
         val sid: String = "",
         val bNut: String = "",
@@ -96,7 +100,25 @@ class BiliCookieStore @Inject constructor(
         )
     }
 
-    suspend fun snapshot(): Snapshot = snapshotFlow().first()
+    suspend fun snapshot(): Snapshot = readAndCache()
+
+    /**
+     * 缃戠粶鐑矾寰勭敤鐨勫厤鎸傝捣蹇収銆?     *
+     * 姣忎釜 bili 璇锋眰閮借璇讳竴娆?cookie锛堟嫤鎴櫒鍔犲ご銆亀bi 绛惧悕锛夛紝浠ュ墠姣忔閮芥槸
+     * `runBlocking { data.first() }`锛岀瓑浜庡湪 OkHttp 绾跨▼涓婂悓姝ヨ涓€娆?DataStore銆?     * 杩欓噷缁存姢涓€浠藉唴瀛樺壇鏈紝鍐欐搷浣滃悗绔嬪嵆鍒锋柊锛涘彧鏈夎繘绋嬪惎鍔ㄥ悗鐨勭涓€娆¤闂?     * 鎵嶉渶瑕佺湡鐨勫幓璇荤洏銆?     */
+    fun cachedSnapshot(): Snapshot = cached ?: runBlocking { readAndCache() }
+
+    private suspend fun readAndCache(): Snapshot {
+        val fresh = snapshotFlow().first()
+        cached = fresh
+        return fresh
+    }
+
+    /** DataStore 鍐欏叆鍚庡悓姝ュ埛鏂板唴瀛樺壇鏈紝璇昏矾寰勬案杩滀笉浼氱湅鍒版棫鍊笺€?*/
+    private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
+        store.edit(block)
+        cached = snapshotFlow().first()
+    }
 
     val accountFlow: Flow<BiliAccount?> = snapshotFlow().map { s ->
         if (!s.isLoggedIn) null else BiliAccount(
@@ -112,7 +134,7 @@ class BiliCookieStore @Inject constructor(
     suspend fun account(): BiliAccount? = accountFlow.first()
 
     suspend fun applyLoginCookies(cookies: Map<String, String>) {
-        store.edit { p ->
+        edit { p ->
             cookies["SESSDATA"]?.let { p[BiliSessdataKey] = it }
             cookies["bili_jct"]?.let { p[BiliJctKey] = it }
             cookies["DedeUserID"]?.let { p[BiliDedeUserIdKey] = it }
@@ -130,7 +152,7 @@ class BiliCookieStore @Inject constructor(
         coin: Double,
         isVip: Boolean,
     ) {
-        store.edit { p ->
+        edit { p ->
             p[BiliDedeUserIdKey] = mid.toString()
             p[BiliNicknameKey] = name
             p[BiliAvatarKey] = avatar
@@ -141,7 +163,7 @@ class BiliCookieStore @Inject constructor(
     }
 
     suspend fun applyBuvid(b3: String?, b4: String?) {
-        store.edit { p ->
+        edit { p ->
             b3?.takeIf { it.isNotBlank() }?.let { p[BiliBuvid3Key] = it }
             b4?.takeIf { it.isNotBlank() }?.let { p[BiliBuvid4Key] = it }
         }
@@ -149,14 +171,13 @@ class BiliCookieStore @Inject constructor(
 
     suspend fun applyUuid(uuid: String) {
         if (uuid.isBlank()) return
-        store.edit { it[BiliUuidKey] = uuid }
+        edit { it[BiliUuidKey] = uuid }
     }
 
     /**
-     * `_uuid` 只在首次生成并持久化（保持不变才像真实设备；每次启动都换会与
-     * buvid3 对不上）。格式与浏览器一致：
-     * `8-4-4-4-12` 大写十六进制 + 时间戳后 5 位 + `infoc`。
-     */
+     * `_uuid` 鍙湪棣栨鐢熸垚骞舵寔涔呭寲锛堜繚鎸佷笉鍙樻墠鍍忕湡瀹炶澶囷紱姣忔鍚姩閮芥崲浼氫笌
+     * buvid3 瀵逛笉涓婏級銆傛牸寮忎笌娴忚鍣ㄤ竴鑷达細
+     * `8-4-4-4-12` 澶у啓鍗佸叚杩涘埗 + 鏃堕棿鎴冲悗 5 浣?+ `infoc`銆?     */
     suspend fun ensureUuid(): String {
         val existing = snapshot().uuid
         if (existing.isNotBlank()) return existing
@@ -172,9 +193,9 @@ class BiliCookieStore @Inject constructor(
         return generated
     }
 
-    /** 持久化响应头下发的会话补充 cookie（sid/b_nut）。 */
+    /** 鎸佷箙鍖栧搷搴斿ご涓嬪彂鐨勪細璇濊ˉ鍏?cookie锛坰id/b_nut锛夈€?*/
     suspend fun applySessionSupplements(cookies: Map<String, String>) {
-        store.edit { p ->
+        edit { p ->
             cookies["sid"]?.takeIf { it.isNotBlank() }?.let { p[BiliSidKey] = it }
             cookies["b_nut"]?.takeIf { it.isNotBlank() }?.let { p[BiliBnutKey] = it }
         }
@@ -184,7 +205,7 @@ class BiliCookieStore @Inject constructor(
         val img = BiliWbi.keyFromUrl(imgKey)
         val sub = BiliWbi.keyFromUrl(subKey)
         if (img.isBlank() || sub.isBlank()) return
-        store.edit { p ->
+        edit { p ->
             p[BiliWbiImgKeyKey] = img
             p[BiliWbiSubKeyKey] = sub
             p[BiliWbiKeyAtKey] = System.currentTimeMillis()
@@ -192,7 +213,7 @@ class BiliCookieStore @Inject constructor(
     }
 
     suspend fun logout() {
-        store.edit { p ->
+        edit { p ->
             p.remove(BiliSessdataKey)
             p.remove(BiliJctKey)
             p.remove(BiliDedeUserIdKey)

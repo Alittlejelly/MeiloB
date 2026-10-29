@@ -16,20 +16,32 @@ import com.ljyh.mei.utils.dataStore
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class AppContext : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        // 图片缓存上限是"下次启动生效"的设置，启动时后台读一次放进内存，
+        // 免得首次加载图片时在 UI 线程同步读 DataStore。
+        appScope.launch {
+            imageCacheLimitMb = dataStore.data.first()[ImageCacheLimitMbKey] ?: DefaultImageCacheLimitMb
+        }
     }
 
     companion object {
         @JvmStatic
         lateinit var instance: AppContext
 
+        private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        @Volatile
+        private var imageCacheLimitMb: Int = DefaultImageCacheLimitMb
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
@@ -59,14 +71,10 @@ class AppContext : Application(), SingletonImageLoader.Factory {
             }
             .build()
     }
-    private fun newDiskCache(): DiskCache {
-        val limitMb = runBlocking {
-            dataStore.data.first()[ImageCacheLimitMbKey] ?: DefaultImageCacheLimitMb
-        }
-        return DiskCache.Builder()
-            .directory(cacheDir.resolve("image_cache"))
-            .maxSizeBytes(limitMb.coerceIn(50, 2048) * 1024L * 1024L)
-            .build()
-    }
+
+    private fun newDiskCache(): DiskCache = DiskCache.Builder()
+        .directory(cacheDir.resolve("image_cache"))
+        .maxSizeBytes(imageCacheLimitMb.coerceIn(50, 2048) * 1024L * 1024L)
+        .build()
 }
 
