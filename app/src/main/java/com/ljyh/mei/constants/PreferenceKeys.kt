@@ -239,6 +239,7 @@ val BiliJctKey = stringPreferencesKey("bili_jct")
 val BiliDedeUserIdKey = stringPreferencesKey("bili_dede_user_id")
 val BiliDedeUserIdCkMd5Key = stringPreferencesKey("bili_dede_user_id_ckmd5")
 val BiliBuvid3Key = stringPreferencesKey("bili_buvid3")
+val BiliBuvid4Key = stringPreferencesKey("bili_buvid4")
 val BiliNicknameKey = stringPreferencesKey("bili_nickname")
 val BiliAvatarKey = stringPreferencesKey("bili_avatar")
 val BiliLevelKey = stringPreferencesKey("bili_level")
@@ -251,3 +252,10 @@ val BiliWbiKeyAtKey = longPreferencesKey("bili_wbi_key_at")
 // ---- 首页分区 ----
 /** 首页当前展示的 B 站一级分区 rid；未设置时默认音乐区（3）。 */
 val BiliHomeRegionKey = intPreferencesKey("bili.homeRegionRid")
+
+/** 首页"猜你喜欢"：用公开收藏夹内容推荐替代分区投稿流。 */
+val BiliGuessLikeEnabledKey = booleanPreferencesKey("bili.guessLikeEnabled")
+
+// ---- 检查更新 ----
+/** 更新源："github"（默认）或 "gitee"。 */
+val UpdateSourceKey = stringPreferencesKey("update_source")

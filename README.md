@@ -40,10 +40,13 @@ MeiloB 使用 **Jetpack Compose** 构建，尝试把 iOS 27 的层次感、液�
 - 哔哩哔哩扫码 / 手机号短信登录与账号信息展示；
 - B 站全站视频搜索，结果直接播放音频流；
 - 音乐区排行榜、最新投稿与每日推荐；
+- 猜你喜欢：基于用户公开收藏夹内容的首页推荐（不读取隐私收藏夹）；
+- UP 主主页：app 内浏览投稿与合集/系列分组，直接播放；
 - 收藏夹 / 合集浏览，可同步为本地歌单；
 - 播放队列、随机播放、循环播放和定时停止；
 - 播放历史、本地歌单管理；
 - Apple Music 风格全屏播放器与迷你播放器；
+- 检查更新支持 GitHub / Gitee 双源切换；
 - 浅色/深色主题、动态专辑背景和 Liquid Glass 交互效果。
 
 功能仍在持续调整中，实际可用范围会随版本和哔哩哔哩接口状态变化。
@@ -78,6 +81,7 @@ MeiloB 的界面和底层能力受以下项目启发或直接使用其开源组�
 - [MeiloX](https://github.com/NEORUAA/MeiloX)：本项目的直接分叉来源（Android 版）；
 - [Mei](https://github.com/ljyh223/Mei)：上游 Android 项目与基础能力；
 - [MeloX](https://github.com/youshen2/MeloX)：iOS 版参考实现与产品方向；
+- [BBPlayer](https://github.com/bbplayer-app/BBPlayer)：B 站空间投稿（UP 主主页）接口的实现参考；
 - [accompanist-lyrics-ui](https://github.com/6xingyv/accompanist-lyrics-ui)：歌词解析与渲染底层组件；
 - [AndroidLiquidGlass / Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)：Compose Multiplatform 流体玻璃效果。
 

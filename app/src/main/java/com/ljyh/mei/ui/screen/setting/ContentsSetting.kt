@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ljyh.mei.R
+import com.ljyh.mei.constants.BiliGuessLikeEnabledKey
 import com.ljyh.mei.constants.DownloadsEnabledKey
 import com.ljyh.mei.constants.DownloadsTabEnabledKey
 import com.ljyh.mei.constants.LibraryTabEnabledKey
@@ -56,6 +57,7 @@ fun ContentsSetting(
     val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
     val (downloads, setDownloads) = rememberPreference(DownloadsEnabledKey, true)
     val (history, setHistory) = rememberPreference(ListeningHistoryEnabledKey, true)
+    val (guessLike, setGuessLike) = rememberPreference(BiliGuessLikeEnabledKey, false)
     val (libraryTab, setLibraryTab) = rememberPreference(LibraryTabEnabledKey, true)
     val (downloadsTab, setDownloadsTab) = rememberPreference(DownloadsTabEnabledKey, false)
     val (historyTab, setHistoryTab) = rememberPreference(ListeningHistoryTabEnabledKey, false)
@@ -104,6 +106,24 @@ fun ContentsSetting(
                             }
                             GlassToggle(enabled, onCheckedChange = { setFeature(setting.feature, it) })
                         }
+                    }
+                }
+            }
+        }
+        item {
+            SettingsGroup(stringResource(R.string.content_home)) {
+                GlassCard(Modifier.fillMaxWidth(), onClick = { setGuessLike(!guessLike) }) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SfIcon("sparkles", null)
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.content_guess_like))
+                            Text(
+                                stringResource(R.string.content_guess_like_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        GlassToggle(guessLike, onCheckedChange = { setGuessLike(it) })
                     }
                 }
             }

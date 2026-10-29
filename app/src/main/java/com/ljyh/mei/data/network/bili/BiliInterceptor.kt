@@ -25,11 +25,18 @@ class BiliInterceptor(
             return chain.proceed(request)
         }
         val snap = snapshot()
-        // 与同类客户端一致：全部走移动端 BiliApp UA（桌面 UA 更容易触发风控）。
+        // 与同类客户端一致：默认走移动端 BiliApp UA（桌面 UA 更容易触发风控）。
+        // UA/Referer/Origin 允许接口用 @Headers 覆盖（空间接口要求 web UA + space 来源）。
         val builder = request.newBuilder()
-            .header("User-Agent", PASSPORT_USER_AGENT)
-            .header("Referer", "https://www.bilibili.com/")
-            .header("Origin", "https://www.bilibili.com")
+        if (request.header("User-Agent") == null) {
+            builder.header("User-Agent", PASSPORT_USER_AGENT)
+        }
+        if (request.header("Referer") == null) {
+            builder.header("Referer", "https://www.bilibili.com/")
+        }
+        if (request.header("Origin") == null) {
+            builder.header("Origin", "https://www.bilibili.com")
+        }
 
         if (request.url.host.endsWith("bilibili.com") || request.url.host.endsWith("bilivideo.com")) {
             val cookie = snap.cookieHeader()
@@ -46,12 +53,12 @@ class BiliInterceptor(
                     val value = url.queryParameter(name) ?: continue
                     params.add(name to value)
                 }
-                val (wts, wRid) = BiliWbi.sign(params, snap.wbiImgKey, snap.wbiSubKey, System.currentTimeMillis() / 1000)
+                // 整条查询串用签名同款 encodeURIComponent 重建：若走
+                // addQueryParameter，OkHttp 对 {}[]:,+/ 的编码与签名不一致，
+                // 服务端重算 w_rid 必然对不上（空间接口表现为 -403）。
+                val query = BiliWbi.signedQuery(params, snap.wbiImgKey, snap.wbiSubKey, System.currentTimeMillis() / 1000)
                 signedUrl = url.newBuilder()
-                    .removeAllQueryParameters(BiliWbi.WTS_PARAM)
-                    .removeAllQueryParameters("w_rid")
-                    .addQueryParameter(BiliWbi.WTS_PARAM, wts.toString())
-                    .addQueryParameter("w_rid", wRid)
+                    .encodedQuery(query)
                     .build()
             } else {
                 Timber.tag("BiliInterceptor").w("wbi keys missing for %s", url.encodedPath)

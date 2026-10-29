@@ -42,8 +42,13 @@ object BiliWbi {
         return wts to wRid
     }
 
-    /** 等价于 JS 的 encodeURIComponent。 */
-    private fun encodeValue(value: String): String = URLEncoder
+    /**
+     * 与 JS encodeURIComponent 等价的百分号编码。签名和实际发出的 URL 必须
+     * 用同一套编码：OkHttp 的 addQueryParameter 不编码 `{}[]:,`，而
+     * encodeURIComponent 会编码成 %7B 等，两边不一致时服务端按收到的串重算
+     * w_rid 就会对不上（表现为空间接口 -403）。
+     */
+    fun encodeValue(value: String): String = URLEncoder
         .encode(value, Charsets.UTF_8)
         .replace("+", "%20")
         .replace("%21", "!")
@@ -51,6 +56,19 @@ object BiliWbi {
         .replace("%28", "(")
         .replace("%29", ")")
         .replace("%2A", "*")
+
+    /** 按签名顺序（key 升序）拼出最终查询串，包含 wts 与 w_rid。 */
+    fun signedQuery(
+        params: List<Pair<String, String>>,
+        imgKey: String,
+        subKey: String,
+        wts: Long,
+    ): String {
+        val (w, wRid) = sign(params, imgKey, subKey, wts)
+        return (params + (WTS_PARAM to w.toString()) + ("w_rid" to wRid))
+            .sortedBy { it.first }
+            .joinToString("&") { (k, v) -> "${encodeValue(k)}=${encodeValue(v)}" }
+    }
 
     private fun md5Hex(text: String): String =
         MessageDigest.getInstance("MD5").digest(text.toByteArray(Charsets.UTF_8))

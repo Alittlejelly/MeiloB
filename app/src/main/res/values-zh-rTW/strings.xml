@@ -79,8 +79,9 @@
     <string name="queue_autoplay_description">將繼續播放類似音樂</string>
     <string name="queue_reorder">調整歌曲順序</string>
     <string name="player_navigation_title">前往</string>
-    <string name="player_navigation_artist">前往藝人</string>
-    <string name="player_navigation_album">前往專輯</string>
+    <string name="player_navigation_artist">前往UP主</string>
+    <string name="player_navigation_uploader_section">UP主</string>
+    <string name="player_navigation_uploader_unavailable">該曲目沒有關聯的 UP 主。</string>
     <string name="player_navigation_playlist">前往播放列表</string>
     <string name="player_action_lyrics">歌詞</string>
     <string name="player_action_customize">自訂播放器動作</string>
@@ -282,6 +283,9 @@
     <string name="about_feedback">問題回報</string>
     <string name="about_logs">診斷日誌</string>
     <string name="about_check_updates">檢查更新</string>
+    <string name="about_update_source">更新來源</string>
+    <string name="about_update_source_github">GitHub</string>
+    <string name="about_update_source_gitee">Gitee（國內推薦）</string>
     <string name="about_checking_updates">正在檢查更新…</string>
     <string name="about_check_updates_description">與 GitHub 最新 tag 比較目前版本。</string>
     <string name="about_update_available_title">發現新版本</string>
@@ -295,6 +299,7 @@
     <string name="about_fork_source_description">本專案分叉來源（Android 版）</string>
     <string name="about_upstream_description">Mei 上游儲存庫</string>
     <string name="about_melox_description">iOS 版參考實作</string>
+    <string name="about_bbplayer_description">B 站空間投稿接口的實作參考</string>
     <string name="about_backdrop_description">Compose Multiplatform 流體玻璃效果</string>
     <string name="about_developer_debug">開發者除錯</string>
     <string name="about_developer_enabled">開發者除錯已開啟</string>
@@ -612,6 +617,9 @@
     <string name="lyric_copy_failed">複製歌詞失敗</string>
     <string name="content_settings">內容設定</string>
     <string name="content_modules">內容模組</string>
+    <string name="content_home">首頁推薦</string>
+    <string name="content_guess_like">猜你喜歡</string>
+    <string name="content_guess_like_description">首頁不再依分區推薦，改為根據你公開的收藏夾內容推薦；隱私收藏夾不會被讀取。</string>
     <string name="content_podcasts">播客</string>
     <string name="content_podcasts_description">播客發現、訂閱與節目</string>
     <string name="content_downloads">下載</string>

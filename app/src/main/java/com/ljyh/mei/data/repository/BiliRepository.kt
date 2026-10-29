@@ -8,7 +8,10 @@ import com.ljyh.mei.data.model.bili.BILI_AUDIO_ID_STANDARD
 import com.ljyh.mei.data.model.bili.BILI_MUSIC_RID
 import com.ljyh.mei.data.model.bili.BiliAccount
 import com.ljyh.mei.data.model.bili.BiliArchive
+import com.ljyh.mei.data.model.bili.BiliSpaceCard
 import com.ljyh.mei.data.model.bili.BiliVideo
+import com.ljyh.mei.data.model.bili.biliHttpsUrl
+import com.ljyh.mei.data.model.bili.parseBiliDuration
 import com.ljyh.mei.data.model.bili.toBiliVideo
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.network.bili.BiliApiService
@@ -48,12 +51,29 @@ data class BiliFavFolder(
     val id: Long,
     val title: String,
     val mediaCount: Int,
+    /** 自建收藏夹的可见性：visibility==10 为公开。猜你喜欢只读公开夹。 */
+    val isPublic: Boolean = true,
 )
 
 data class BiliFavFolderPage(
     val title: String,
     val videos: List<BiliVideo>,
     val hasMore: Boolean,
+)
+
+/** UP 主空间分组（合集/系列）条目。 */
+data class BiliSpaceGroup(
+    val id: Long,
+    val name: String,
+    val total: Int,
+)
+
+/** UP 主投稿分页结果。full=false 表示仅 medialist 最近 20 条（arc/search 被风控）。 */
+data class BiliSpaceArchivePage(
+    val videos: List<BiliVideo>,
+    val totalCount: Int,
+    val hasMore: Boolean,
+    val full: Boolean,
 )
 
 /**
@@ -335,12 +355,19 @@ class BiliRepository @Inject constructor(
                     }
                     val list = result.data?.data?.list.orEmpty()
                     Timber.tag("BiliDiag").i(
-                        "favFolders ok mid=%s count=%s ids=%s",
-                        mid, list.size, list.take(5).map { it.id },
+                        "favFolders ok mid=%s count=%s sample=%s",
+                        mid, list.size,
+                        list.take(3).map { "${it.id}:attr=${it.attr}" },
                     )
                     Resource.Success(
                         list.map {
-                            BiliFavFolder(id = it.id, title = it.title.orEmpty(), mediaCount = it.mediaCount)
+                            BiliFavFolder(
+                                id = it.id,
+                                title = it.title.orEmpty(),
+                                mediaCount = it.mediaCount,
+                                // attr bit0 = 1 表示私有收藏夹。
+                                isPublic = it.attr and 1 == 0,
+                            )
                         }
                     )
                 }
@@ -511,6 +538,199 @@ class BiliRepository @Inject constructor(
 
     // ---- 搜索 ----
 
+    /** UP 主空间名片（昵称/头像/签名/粉丝数）。 */
+    suspend fun spaceCard(mid: Long): Resource<BiliSpaceCard.Data> = withContext(Dispatchers.IO) {
+        ensureSession()
+        safeApiCall { api.spaceCard(mid) }.let { result ->
+            when (result) {
+                is Resource.Success -> {
+                    if (result.data?.code != 0 || result.data.data == null) {
+                        Timber.tag("BiliDiag").w("spaceCard code=%s msg=%s mid=%s", result.data?.code, result.data?.message, mid)
+                        Resource.Error(result.data?.message ?: "UP 主信息加载失败(${result.data?.code})")
+                    } else {
+                        Resource.Success(result.data.data!!)
+                    }
+                }
+                is Resource.Error -> Resource.Error(result.message ?: "UP 主信息加载失败")
+                Resource.Loading -> Resource.Loading
+            }
+        }
+    }
+
+    /**
+     * UP 主投稿分页。优先 web arc/search（真实格式 dm 指纹 + 精确 space Referer + wbi，
+     * 可 pn 翻页读全），被风控时回退 medialist（仅最近 20 条）。
+     * 同一进程内失败过一次即熔断，不再徒劳重试拖慢打开速度。
+     */
+    @Volatile
+    private var arcSearchBlocked = false
+
+    suspend fun spaceArchivesPage(
+        mid: Long,
+        pn: Int = 1,
+        ps: Int = 30,
+    ): Resource<BiliSpaceArchivePage> = withContext(Dispatchers.IO) {
+        if (arcSearchBlocked && pn == 1) {
+            return@withContext spaceArchives(mid)
+        }
+        ensureSession()
+        val attempt = safeApiCall {
+            api.spaceArcSearch(mid = mid, pn = pn, ps = ps.coerceIn(1, 50))
+        }
+        val arc = (attempt as? Resource.Success)?.data
+        if (arc?.code == 0) {
+            val vlist = arc.data?.list?.vlist.orEmpty()
+            val total = arc.data?.page?.count ?: 0
+            return@withContext Resource.Success(
+                BiliSpaceArchivePage(
+                    videos = vlist.map { a ->
+                        BiliVideo(
+                            aid = a.aid,
+                            bvid = a.bvid,
+                            // vlist 不返回 cid；播放时按 aid 兜底解析。
+                            cid = 0,
+                            title = a.title.orEmpty(),
+                            uploader = a.author,
+                            uploaderMid = a.mid.takeIf { it > 0 } ?: mid,
+                            cover = biliHttpsUrl(a.pic),
+                            durationMs = parseBiliDuration(a.length),
+                            playCount = a.play,
+                            danmakuCount = a.videoReview,
+                        )
+                    },
+                    totalCount = total,
+                    hasMore = pn * ps < total,
+                    full = true,
+                ),
+            )
+        }
+        if (pn > 1) {
+            // 翻页中途被风控：已加载的完整列表照常展示，标记无更多。
+            return@withContext Resource.Success(BiliSpaceArchivePage(emptyList(), 0, hasMore = false, full = true))
+        }
+        Timber.tag("BiliDiag").w(
+            "spaceArcSearch code=%s msg=%s mid=%s -> fallback medialist", arc?.code, arc?.message, mid,
+        )
+        arcSearchBlocked = true
+        spaceArchives(mid)
+    }
+
+    /** UP 主最近投稿（medialist 接口实测固定返回前 20 条，无翻页参数）。
+     * 返回 (最近投稿, 投稿总数)；完整内容通过分组（seasonArchives）浏览。
+     */
+    suspend fun spaceArchives(mid: Long): Resource<BiliSpaceArchivePage> = withContext(Dispatchers.IO) {
+        ensureSession()
+        safeApiCall { api.spaceMedialist(bizId = mid) }.let { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val body = result.data
+                    if (body?.code != 0) {
+                        Timber.tag("BiliDiag").w(
+                            "spaceMedialist code=%s msg=%s mid=%s", body?.code, body?.message, mid,
+                        )
+                        Resource.Error(body?.message ?: "投稿列表加载失败(${body?.code})")
+                    } else {
+                        val videos = body?.data?.mediaList.orEmpty()
+                            .filter { it.attr == 0 && it.type == 2 }
+                            .map { media ->
+                                BiliVideo(
+                                    aid = media.id,
+                                    bvid = media.bvId,
+                                    // medialist 不返回 cid；播放时按 aid 兜底解析。
+                                    cid = 0,
+                                    title = media.title.orEmpty(),
+                                    uploader = media.upper?.name,
+                                    uploaderMid = media.upper?.mid ?: mid,
+                                    cover = biliHttpsUrl(media.cover),
+                                    durationMs = media.duration * 1000L,
+                                    playCount = media.cntInfo?.play ?: 0,
+                                    danmakuCount = media.cntInfo?.danmaku ?: 0,
+                                )
+                            }
+                        val total = body?.data?.totalCount ?: videos.size
+                        Resource.Success(
+                            BiliSpaceArchivePage(
+                                videos = videos,
+                                totalCount = total,
+                                hasMore = false,
+                                full = false,
+                            ),
+                        )
+                    }
+                }
+                is Resource.Error -> Resource.Error(result.message ?: "投稿列表加载失败")
+                Resource.Loading -> Resource.Loading
+            }
+        }
+    }
+
+    /** UP 主空间分组（合集+系列），按展示顺序合并。 */
+    suspend fun spaceGroups(mid: Long): Resource<List<BiliSpaceGroup>> = withContext(Dispatchers.IO) {
+        safeApiCall { api.spaceSeasonsSeries(mid) }.let { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val body = result.data
+                    if (body?.code != 0) {
+                        Timber.tag("BiliDiag").w(
+                            "spaceSeasonsSeries code=%s msg=%s mid=%s", body?.code, body?.message, mid,
+                        )
+                        Resource.Error(body?.message ?: "分组加载失败(${body?.code})")
+                    } else {
+                        val lists = body?.data?.itemsLists
+                        val groups = lists?.seasonsList.orEmpty().mapNotNull { entry ->
+                            entry.meta?.takeIf { it.id > 0 }?.let {
+                                BiliSpaceGroup(id = it.id, name = it.name.orEmpty(), total = it.total)
+                            }
+                        } + lists?.seriesList.orEmpty().mapNotNull { entry ->
+                            entry.meta?.takeIf { it.id > 0 }?.let {
+                                BiliSpaceGroup(id = it.id, name = it.name.orEmpty(), total = it.total)
+                            }
+                        }
+                        Resource.Success(groups)
+                    }
+                }
+                is Resource.Error -> Resource.Error(result.message ?: "分组加载失败")
+                Resource.Loading -> Resource.Loading
+            }
+        }
+    }
+
+    /** 分组内投稿（页码分页）。 */
+    suspend fun seasonArchives(
+        mid: Long,
+        seasonId: Long,
+        pageNum: Int,
+        pageSize: Int = 20,
+    ): Resource<BiliFavFolderPage> = withContext(Dispatchers.IO) {
+        safeApiCall {
+            api.seasonArchives(mid = mid, seasonId = seasonId, pageNum = pageNum, pageSize = pageSize.coerceIn(1, 100))
+        }.let { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val body = result.data
+                    if (body?.code != 0) {
+                        Timber.tag("BiliDiag").w(
+                            "seasonArchives code=%s msg=%s season=%s", body?.code, body?.message, seasonId,
+                        )
+                        Resource.Error(body?.message ?: "分组内容加载失败(${body?.code})")
+                    } else {
+                        val videos = body?.data?.archives.orEmpty().map { it.toBiliVideo() }
+                        val total = body?.data?.page?.total ?: 0
+                        Resource.Success(
+                            BiliFavFolderPage(
+                                title = "",
+                                videos = videos,
+                                hasMore = pageNum * pageSize < total,
+                            ),
+                        )
+                    }
+                }
+                is Resource.Error -> Resource.Error(result.message ?: "分组内容加载失败")
+                Resource.Loading -> Resource.Loading
+            }
+        }
+    }
+
     suspend fun search(keyword: String, page: Int = 1): Resource<List<BiliVideo>> =
         withContext(Dispatchers.IO) {
             ensureSession()
@@ -531,8 +751,11 @@ class BiliRepository @Inject constructor(
         }
 
     private suspend fun ensureBuvid() {
-        if (cookieStore.snapshot().buvid3.isBlank()) {
-            api.fingerSpi().data?.b3?.let { cookieStore.applyBuvid3(it) }
+        val snap = cookieStore.snapshot()
+        if (snap.buvid3.isBlank() || snap.buvid4.isBlank()) {
+            api.fingerSpi().data?.let { spi ->
+                cookieStore.applyBuvid(spi.b3, spi.b4)
+            }
         }
     }
 

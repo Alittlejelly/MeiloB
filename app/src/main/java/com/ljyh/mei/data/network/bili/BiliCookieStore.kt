@@ -3,6 +3,7 @@ package com.ljyh.mei.data.network.bili
 import androidx.datastore.preferences.core.edit
 import com.ljyh.mei.constants.BiliAvatarKey
 import com.ljyh.mei.constants.BiliBuvid3Key
+import com.ljyh.mei.constants.BiliBuvid4Key
 import com.ljyh.mei.constants.BiliCoinKey
 import com.ljyh.mei.constants.BiliDedeUserIdCkMd5Key
 import com.ljyh.mei.constants.BiliDedeUserIdKey
@@ -39,6 +40,7 @@ class BiliCookieStore @Inject constructor(
         val dedeUserId: String = "",
         val dedeUserIdCkMd5: String = "",
         val buvid3: String = "",
+        val buvid4: String = "",
         val nickname: String = "",
         val avatar: String = "",
         val level: Int = 0,
@@ -53,6 +55,7 @@ class BiliCookieStore @Inject constructor(
 
         fun cookieHeader(): String = buildList {
             if (buvid3.isNotBlank()) add("buvid3=$buvid3")
+            if (buvid4.isNotBlank()) add("buvid4=$buvid4")
             if (dedeUserId.isNotBlank()) add("DedeUserID=$dedeUserId")
             if (dedeUserIdCkMd5.isNotBlank()) add("DedeUserID__ckMd5=$dedeUserIdCkMd5")
             if (sessdata.isNotBlank()) add("SESSDATA=$sessdata")
@@ -67,6 +70,7 @@ class BiliCookieStore @Inject constructor(
             dedeUserId = p[BiliDedeUserIdKey].orEmpty(),
             dedeUserIdCkMd5 = p[BiliDedeUserIdCkMd5Key].orEmpty(),
             buvid3 = p[BiliBuvid3Key].orEmpty(),
+            buvid4 = p[BiliBuvid4Key].orEmpty(),
             nickname = p[BiliNicknameKey].orEmpty(),
             avatar = p[BiliAvatarKey].orEmpty(),
             level = p[BiliLevelKey]?.toIntOrNull() ?: 0,
@@ -123,6 +127,13 @@ class BiliCookieStore @Inject constructor(
     suspend fun applyBuvid3(buvid3: String) {
         if (buvid3.isBlank()) return
         store.edit { it[BiliBuvid3Key] = buvid3 }
+    }
+
+    suspend fun applyBuvid(b3: String?, b4: String?) {
+        store.edit { p ->
+            b3?.takeIf { it.isNotBlank() }?.let { p[BiliBuvid3Key] = it }
+            b4?.takeIf { it.isNotBlank() }?.let { p[BiliBuvid4Key] = it }
+        }
     }
 
     suspend fun applyWbiKeys(imgKey: String, subKey: String) {
