@@ -1010,6 +1010,8 @@ class MainActivity : ComponentActivity() {
                         contentBackdrop = pageContentBackdrop,
                         // 默认 320dp 在平板上偏宽，内容区被挤掉一大截；缩到 250dp。
                         sidebarWidth = 250.dp,
+                        // 平板：返回键先退页面（还能回退时不收侧栏）。
+                        canNavigateBack = { backStack.size > 1 },
                         sidebar = {
                             Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()
                                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
