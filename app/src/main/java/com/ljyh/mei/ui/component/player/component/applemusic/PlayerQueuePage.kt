@@ -1258,6 +1258,8 @@ fun PlayerQueuePage(
     Column(modifier.testTag("player_queue_page")) {
         if (!inlineCurrent) {
             if (landscapeHeader) {
+                // 与手机端一致：队列顶部同样提供 随机 / 循环 / 倒序 三个胶囊按钮。
+                modeControls(Modifier.padding(horizontal = horizontalPadding))
                 landscapeHeading(Modifier.padding(start = horizontalPadding, end = contentEndPadding))
             } else {
                 modeControls(Modifier.padding(horizontal = horizontalPadding))
@@ -1363,6 +1365,8 @@ fun PlayerQueuePage(
                                 .padding(horizontal = selectionPadding),
                         ) {
                             if (landscapeHeader) {
+                                modeControls(Modifier)
+                                Spacer(Modifier.height(12.dp))
                                 landscapeHeading(Modifier)
                             } else {
                                 modeControls(Modifier)
