@@ -23,11 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # 必须是自己的 fork：上游 0.1.2 之后才有侧栏形变预热、底栏减层、
+      # 顶栏标题连续缩放和 canNavigateBack，用上游源码会编译失败。
       - name: Checkout pinned Glasmio source
         uses: actions/checkout@v4
         with:
-          repository: NEORUAA/Glasmio
-          ref: 395c890dc0b79533f2aaf3c8d93cf16f53f9dce6
+          repository: Alittlejelly/Glassmio
+          ref: 0.1.2
           path: .glasmio-ci
           persist-credentials: false
 
