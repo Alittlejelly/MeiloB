@@ -1185,18 +1185,39 @@ fun PlayerQueuePage(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             continueHeading(Modifier.weight(1f).playerAdditiveBlend())
+            // 与手机端一致：随机 / 循环 / 倒序（替换原来这里的 自动播放 / 自动混音 两个圆按钮）
             QueueModeButton(
-                systemName = "infinity", label = stringResource(R.string.queue_autoplay),
-                selected = autoplayEnabled, modifier = Modifier.width(76.dp),
+                systemName = "shuffle",
+                label = stringResource(R.string.notification_mode_shuffle),
+                selected = shuffleEnabled,
+                modifier = Modifier.width(76.dp),
                 enabled = !fmEnabled || autoplayEnabled,
                 indication = indication,
-                onClick = { playerConnection.setQueueAutoplayEnabled(!autoplayEnabled) },
+                onClick = { playerConnection.service.setShuffleModeEnabled(!shuffleEnabled) },
             )
             QueueModeButton(
-                systemName = "circlebadge.2", label = stringResource(R.string.automix_enabled),
-                selected = autoMixEnabled, modifier = Modifier.width(76.dp),
+                systemName = if (repeatMode == Player.REPEAT_MODE_ONE) "repeat.1" else "repeat",
+                label = stringResource(R.string.loop_playback),
+                selected = repeatMode != Player.REPEAT_MODE_OFF,
+                modifier = Modifier.width(76.dp),
                 indication = indication,
-                onClick = { setAutoMixEnabled(!autoMixEnabled) },
+                onClick = {
+                    val nextMode = when (repeatMode) {
+                        Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                        Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                        else -> Player.REPEAT_MODE_OFF
+                    }
+                    player.repeatMode = nextMode
+                    setLoopPlayback(nextMode != Player.REPEAT_MODE_OFF)
+                },
+            )
+            QueueModeButton(
+                systemName = "arrow.up.arrow.down",
+                label = stringResource(R.string.queue_reverse),
+                selected = false,
+                modifier = Modifier.width(76.dp),
+                indication = indication,
+                onClick = { playerConnection.reverseQueue() },
             )
         }
     }
@@ -1258,8 +1279,6 @@ fun PlayerQueuePage(
     Column(modifier.testTag("player_queue_page")) {
         if (!inlineCurrent) {
             if (landscapeHeader) {
-                // 与手机端一致：队列顶部同样提供 随机 / 循环 / 倒序 三个胶囊按钮。
-                modeControls(Modifier.padding(horizontal = horizontalPadding))
                 landscapeHeading(Modifier.padding(start = horizontalPadding, end = contentEndPadding))
             } else {
                 modeControls(Modifier.padding(horizontal = horizontalPadding))
@@ -1365,8 +1384,6 @@ fun PlayerQueuePage(
                                 .padding(horizontal = selectionPadding),
                         ) {
                             if (landscapeHeader) {
-                                modeControls(Modifier)
-                                Spacer(Modifier.height(12.dp))
                                 landscapeHeading(Modifier)
                             } else {
                                 modeControls(Modifier)
