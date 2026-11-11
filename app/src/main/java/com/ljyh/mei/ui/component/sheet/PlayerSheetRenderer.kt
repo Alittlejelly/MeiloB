@@ -1,5 +1,8 @@
 package com.ljyh.mei.ui.component.sheet
 
+import io.github.neoruaa.glasmio.scaffold.GlasmioBottomSheetState
+import io.github.neoruaa.glasmio.scaffold.HorizontalSwipeDirection
+
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -22,10 +25,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -74,13 +81,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kyant.backdrop.Backdrop
+import io.github.neoruaa.glasmio.glass.render.Backdrop
 import com.kyant.capsule.ContinuousRoundedRectangle
 import com.kyant.capsule.Continuity
 import com.kyant.capsule.continuities.G1Continuity
-import com.ljyh.mei.ui.glass.GlassPressHighlight
-import com.ljyh.mei.ui.glass.clipGlassShape
-import com.ljyh.mei.ui.glass.rememberGlassMorphRenderer
+import io.github.neoruaa.glasmio.glass.GlassPressHighlight
+import io.github.neoruaa.glasmio.glass.clipGlassShape
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import com.ljyh.mei.ui.component.player.LocalMiniPlayerAppearance
+import com.ljyh.mei.utils.FrameStats
 import com.ljyh.mei.ui.component.player.LocalPlayerArtwork
 import kotlinx.coroutines.CoroutineScope
 import kotlin.math.roundToInt
@@ -89,26 +98,58 @@ internal val LocalPlayerSheet = staticCompositionLocalOf<PlayerSheetLayers?> { n
 
 @Stable
 internal class PlayerSheetLayers(
-    val state: BottomSheetState,
+    val state: GlasmioBottomSheetState,
     val miniHost: GraphicsLayer,
     val miniContent: GraphicsLayer,
+    val miniTrailingContent: GraphicsLayer,
     val fullContent: GraphicsLayer,
     scope: CoroutineScope,
 ) {
+    private val motionPath = PlayerSheetMotionPath(state.isExpanded)
+    private var hostDensity by mutableStateOf(1f)
+    private fun baseMotionFrame(progress: Float, closing: Boolean): PlayerSheetMotionFrame {
+        val frame = playerCollapseFrame(progress, hostBounds.height,
+            (state.expandedBound.value - state.collapsedBound.value) * hostDensity, closing)
+        val bounds = if (closing) playerClosingContainerRect(sourceContainer, hostBounds, frame)
+            else playerContainerRect(sourceContainer, hostBounds, frame.morphProgress)
+        return PlayerSheetMotionFrame(bounds, frame.morphProgress)
+    }
+    private var motionGeometryVersion by mutableIntStateOf(0)
+    private val cachedMotionFrame = derivedStateOf(structuralEqualityPolicy()) {
+        motionGeometryVersion
+        motionPath.frame(state.progress, ::baseMotionFrame)
+    }
+    private val motionFrame get() = cachedMotionFrame.value
+    val fixedSizeContent get() = hostBounds.width > hostBounds.height
+    val backgroundOffset get() = if (fixedSizeContent) {
+        playerFullContentRect(containerBounds, hostBounds).topLeft - hostBounds.topLeft
+    } else motionOffset
+    val motionProgress get() = motionFrame.morphProgress
+    val containerBounds get() = motionFrame.bounds
+    val motionOffset get(): Offset {
+        val frame = motionFrame
+        val linear = playerContainerRect(sourceContainer, hostBounds, frame.morphProgress)
+        return Offset(0f, frame.bounds.top - linear.top)
+    }
+    fun containerCornerRadius(screenRadius: Float): Float = if (motionPath.closing && state.isTransitioning) {
+        playerClosingCornerRadius(sourceContainer.height / 2f, screenRadius, motionProgress)
+    } else playerContainerCornerRadius(sourceContainer.height / 2f, screenRadius, motionProgress)
+
     private val transitioning = derivedStateOf { state.isTransitioning }
     val isTransitioning get() = transitioning.value
     var hostBounds by mutableStateOf(Rect.Zero)
         private set
     var miniBounds by mutableStateOf(Rect.Zero)
     var miniContentBounds by mutableStateOf(Rect.Zero)
+    var miniTrailingBounds by mutableStateOf(Rect.Zero)
     var miniArtworkBounds by mutableStateOf(Rect.Zero)
+    var miniArtworkCornerRadius by mutableStateOf(com.ljyh.mei.constants.MiniPlayerArtworkCornerRadius)
     var fullArtworkBounds by mutableStateOf(Rect.Zero)
     var fullArtworkLayoutSize by mutableStateOf(IntSize.Zero)
     var fullArtworkGeometry by mutableStateOf<(() -> PlayerArtworkGeometry)?>(null)
     var artworkPlaybackScale by mutableStateOf<(() -> Float)?>(null)
     var artworkCornerRadius by mutableStateOf<() -> Dp>({ 12.dp })
     var artworkShadowElevation by mutableStateOf<() -> Dp>({ 16.dp })
-    var artworkTracksContainerTop by mutableStateOf<() -> Boolean>({ false })
     var artworkBackgroundColor by mutableStateOf(Color.Transparent)
     var artworkSourceAvailable by mutableStateOf(false)
     var sharedArtworkEnabled by mutableStateOf(true)
@@ -128,8 +169,9 @@ internal class PlayerSheetLayers(
     val transitionPressHighlight get() = pressLight.current(state.progress, transitionPressHighlightBounds)
     val transitionPressHighlightBounds get() = playerPressHighlightRect(
         pressHighlightSize,
-        playerContainerRect(sourceContainer, hostBounds, state.progress),
+        containerBounds,
     )
+    val transitionPressLayoutSize get() = (frozenContainer ?: sourceContainer).size
     val collapsedPressHighlight get() =
         if (state.isCollapsed && pressLight.hasCapture) transitionPressHighlight else null
 
@@ -144,20 +186,33 @@ internal class PlayerSheetLayers(
     }
 
     var miniContentCoordinates: LayoutCoordinates? = null
+    var miniTrailingCoordinates: LayoutCoordinates? = null
     var miniArtworkCoordinates: LayoutCoordinates? = null
     var fullArtworkCoordinates: LayoutCoordinates? = null
     val sourceMiniContent get() = openingBounds(
-        frozenMiniContent ?: miniLayoutBounds(miniContentCoordinates) ?: miniContentBounds,
+        frozenMiniContent,
+        miniLayoutBounds(miniContentCoordinates) ?: miniContentBounds,
     )
-    val miniScaleX get() = sourceContainer.width / (frozenContainer ?: miniBounds).width.coerceAtLeast(1f)
-    val miniScaleY get() = sourceContainer.height / (frozenContainer ?: miniBounds).height.coerceAtLeast(1f)
+    val miniScaleX get() = sourceMiniContent.width / miniContent.size.width.coerceAtLeast(1)
+    val miniScaleY get() = sourceMiniContent.height / miniContent.size.height.coerceAtLeast(1)
+    private var frozenMiniTrailing: Rect? = null
+    val sourceMiniTrailing get() = openingBounds(
+        frozenMiniTrailing,
+        miniLayoutBounds(miniTrailingCoordinates) ?: miniTrailingBounds,
+    )
+    val miniTrailingScaleX get() = sourceMiniTrailing.width / miniTrailingContent.size.width.coerceAtLeast(1)
+    val miniTrailingScaleY get() = sourceMiniTrailing.height / miniTrailingContent.size.height.coerceAtLeast(1)
     private var frozenTargetArtwork by mutableStateOf<PlayerArtworkGeometry?>(null)
     private val recordedTransitionLayers = PlayerSheetCaptures<GraphicsLayer>()
     private var transitionCaptureActive = false
+    private val trailingAnchor = PlayerMiniTrailingAnchor()
 
-    val sourceContainer get() = openingBounds(frozenContainer ?: miniBounds)
+    fun trailingAnchorsRight() = trailingAnchor.anchorsRight(state.progress)
+
+    val sourceContainer get() = openingBounds(frozenContainer, miniBounds)
     val sourceArtwork get() = openingBounds(
-        frozenMiniArtwork ?: miniLayoutBounds(miniArtworkCoordinates) ?: miniArtworkBounds,
+        frozenMiniArtwork,
+        miniLayoutBounds(miniArtworkCoordinates) ?: miniArtworkBounds,
     )
     private val targetArtworkGeometry get() = frozenTargetArtwork ?: playerArtworkTargetGeometry(
         fullArtworkGeometry?.invoke(),
@@ -180,14 +235,14 @@ internal class PlayerSheetLayers(
     }
     val sharesArtwork get() = artworkOwnership.value
 
-    private fun openingBounds(layoutBounds: Rect): Rect {
-        val layout = frozenContainer ?: return layoutBounds
-        val pressed = openingPressedContainer ?: return layoutBounds
-        // Keep the raw return endpoint intact. Only the opening leg inherits the last
-        // visible press transform. A reversal releases it continuously back to raw bounds.
-        val visual = playerUntransformRect(layoutBounds, layout, pressed)
-        return playerContainerRect(layoutBounds, visual, pressFraction)
-    }
+    private fun openingBounds(capturedBounds: Rect?, currentBounds: Rect): Rect = playerMiniTransitionBounds(
+        capturedBounds ?: currentBounds,
+        frozenContainer,
+        openingPressedContainer,
+        currentBounds,
+        pressFraction,
+        state.progress,
+    )
 
     // Both coordinates are inside the same press-transformed glass layer. Relative
     // coordinates cancel that transform; layout sizes never include its scale.
@@ -214,6 +269,7 @@ internal class PlayerSheetLayers(
             miniBounds,
         )
         frozenMiniContent = miniLayoutBounds(miniContentCoordinates, rawContainer) ?: miniContentBounds
+        frozenMiniTrailing = miniLayoutBounds(miniTrailingCoordinates, rawContainer) ?: miniTrailingBounds
         frozenMiniArtwork = miniLayoutBounds(miniArtworkCoordinates, rawContainer) ?: miniArtworkBounds
         frozenContainer = rawContainer
         openingPressedContainer = if (miniPressedBounds.isUsable()) {
@@ -222,23 +278,29 @@ internal class PlayerSheetLayers(
         pressRelease.reset()
         pressHighlightSize = (openingPressedContainer ?: rawContainer).size
         pressLight.capture(miniPressHighlight)
+        motionGeometryVersion++
     }
 
     fun releasePressHighlight() = pressLight.release(state.progress, transitionPressHighlightBounds)
 
-    fun updateHost(bounds: Rect) {
+    fun updateHost(bounds: Rect, density: Float = 1f) {
+        hostDensity = density
         if (bounds == hostBounds) return
         hostBounds = bounds
         frozenContainer = null
         openingPressedContainer = null
         frozenTargetArtwork = null
         frozenMiniContent = null
+        frozenMiniTrailing = null
         frozenMiniArtwork = null
     }
 
     fun updateFrozenBounds() {
         if (!state.isTransitioning) {
+            motionPath.reset(state.isExpanded, state.progress)
+            if (transitionCaptureActive) motionGeometryVersion++
             transitionCaptureActive = false
+            trailingAnchor.reset()
             recordedTransitionLayers.clear()
             if (state.isExpanded) {
                 pressLight.clear()
@@ -247,15 +309,17 @@ internal class PlayerSheetLayers(
                 openingPressedContainer = null
             }
             frozenTargetArtwork = null
-            // Keep the original unpressed endpoints through the expanded state. Hidden
-            // mini-player layout/press updates must not redefine the collapse destination.
+            // Retain the opening capture only for continuity during an early reversal.
+            // A full-player return uses the settled mini-player layout directly.
             if (state.isCollapsed || state.isDismissed) {
                 frozenContainer = null
                 openingPressedContainer = null
                 frozenMiniContent = null
+                frozenMiniTrailing = null
                 frozenMiniArtwork = null
             }
             pressRelease.reset()
+            if (state.isExpanded) pressRelease.update(1f)
         } else {
             if (!transitionCaptureActive) {
                 transitionCaptureActive = true
@@ -290,13 +354,14 @@ private fun LayoutCoordinates?.visualBounds(): Rect? {
 }
 
 @Composable
-internal fun rememberPlayerSheetLayers(state: BottomSheetState): PlayerSheetLayers {
+internal fun rememberPlayerSheetLayers(state: GlasmioBottomSheetState): PlayerSheetLayers {
     val scope = rememberCoroutineScope()
     val miniHost = rememberGraphicsLayer()
     val mini = rememberGraphicsLayer()
+    val miniTrailing = rememberGraphicsLayer()
     val full = rememberGraphicsLayer()
-    return remember(state, miniHost, mini, full, scope) {
-        PlayerSheetLayers(state, miniHost, mini, full, scope)
+    return remember(state, miniHost, mini, miniTrailing, full, scope) {
+        PlayerSheetLayers(state, miniHost, mini, miniTrailing, full, scope)
     }
 }
 
@@ -305,10 +370,12 @@ internal fun Modifier.recordPlayerContent(
     layers: PlayerSheetLayers,
     layer: GraphicsLayer,
     warmWhileVisible: Boolean = false,
+    warmWhileHidden: Boolean = false,
     drawInPlace: () -> Boolean,
 ): Modifier = drawWithContent {
     val visible = drawInPlace()
-    if ((warmWhileVisible && visible) || layers.shouldCapture(layer)) {
+    if ((warmWhileVisible && visible) ||
+        (warmWhileHidden && !visible && !layers.isTransitioning) || layers.shouldCapture(layer)) {
         layer.record { this@drawWithContent.drawContent() }
         layers.markCaptured(layer)
     }
@@ -329,7 +396,6 @@ internal fun Modifier.playerArtwork(
     circle: Boolean = false,
     shared: Boolean = true,
     shadowElevation: () -> Dp = { 16.dp },
-    trackContainerTop: () -> Boolean = { false },
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     geometry: (() -> PlayerArtworkGeometry)? = null,
     playbackScale: (() -> Float)? = null,
@@ -340,7 +406,6 @@ internal fun Modifier.playerArtwork(
         layers.artworkCornerRadius = cornerRadius
         layers.circularArtwork = circle
         layers.artworkShadowElevation = shadowElevation
-        layers.artworkTracksContainerTop = trackContainerTop
         layers.artworkBackgroundColor = backgroundColor
         layers.fullArtworkGeometry = geometry
         layers.artworkPlaybackScale = playbackScale
@@ -395,7 +460,7 @@ private fun Modifier.observePressHighlight(layers: PlayerSheetLayers): Modifier 
 
 @Composable
 private fun Modifier.sheetGestures(
-    state: BottomSheetState,
+    state: GlasmioBottomSheetState,
     layers: PlayerSheetLayers,
     onHorizontalSwipe: ((HorizontalSwipeDirection) -> Unit)?,
 ): Modifier = observePressHighlight(layers).pointerInput(state, onHorizontalSwipe) {
@@ -441,18 +506,28 @@ private fun Modifier.sheetGestures(
 private fun Modifier.clipPlayerRecordingHost(
     layers: PlayerSheetLayers,
     expandedCornerRadius: Float,
+    miniHost: Boolean = false,
 ): Modifier {
     val origin = remember { mutableStateOf(Offset.Zero) }
     return onGloballyPositioned { origin.value = it.positionInRoot() }
         .graphicsLayer {
-            clip = layers.state.isTransitioning
-            if (clip) {
-                val progress = layers.state.progress
-                val bounds = playerContainerRect(layers.sourceContainer, layers.hostBounds, progress)
+            val transitioning = layers.state.isTransitioning
+            clip = transitioning || (miniHost && !layers.state.isExpanded && layers.miniBounds.isUsable())
+            if (clip && !transitioning) {
+                // The mini host spans the row for layout, but must not steal hits
+                // from compact navigation controls in its empty horizontal margins.
+                // Keep the full vertical extent and include live press enlargement.
+                val visual = layers.miniLayoutCoordinates.visualBounds()
+                val left = minOf(layers.miniBounds.left, visual?.left ?: layers.miniBounds.left) - origin.value.x
+                val right = maxOf(layers.miniBounds.right, visual?.right ?: layers.miniBounds.right) - origin.value.x
+                shape = object : Shape {
+                    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density) =
+                        Outline.Rectangle(Rect(left, 0f, right, size.height))
+                }
+            } else if (transitioning) {
+                val bounds = layers.containerBounds
                     .translate(-origin.value)
-                val radius = playerContainerCornerRadius(
-                    layers.sourceContainer.height / 2f, expandedCornerRadius, progress,
-                )
+                val radius = layers.containerCornerRadius(expandedCornerRadius)
                 // The visible shell keeps its continuous corners in the tiled Canvas.
                 // A native rounded outline avoids a full-screen path mask while keeping
                 // hidden controls from intercepting touches in the exposed page corners.
@@ -484,40 +559,44 @@ private class PlayerHitShape(private val bounds: Rect, private val radius: Float
 private fun Modifier.clipPlayerBackground(
     layers: PlayerSheetLayers,
     expandedCornerRadius: Float,
+    translateContent: Boolean = true,
 ): Modifier = graphicsLayer {
     // Bound the full-screen background layer to the visible shell during motion.
     // The tiled draw clip below keeps the exact corners without a full-screen path mask.
+    val offset = if (translateContent) layers.backgroundOffset else Offset.Zero
+    translationX = offset.x
+    translationY = offset.y
     clip = layers.state.isTransitioning
     if (clip) {
-        val bounds = playerContainerRect(layers.sourceContainer, layers.hostBounds, layers.state.progress)
-            .translate(-layers.hostBounds.topLeft)
+        val bounds = layers.containerBounds
+            .translate(-layers.hostBounds.topLeft - offset)
         shape = object : Shape {
             override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density) =
                 Outline.Rectangle(bounds)
         }
     }
-}.drawWithContent {
+}.drawWithCache {
     if (!layers.state.isTransitioning) {
-        drawContent()
+        onDrawWithContent { drawContent() }
     } else {
-        val progress = layers.state.progress
-        val bounds = playerContainerRect(layers.sourceContainer, layers.hostBounds, progress)
-            .translate(-layers.hostBounds.topLeft)
-        val radius = playerContainerCornerRadius(
-            layers.sourceContainer.height / 2f, expandedCornerRadius, progress,
-        )
+        val offset = if (translateContent) layers.backgroundOffset else Offset.Zero
+        val bounds = layers.containerBounds
+            .translate(-layers.hostBounds.topLeft - offset)
+        val radius = layers.containerCornerRadius(expandedCornerRadius)
         val shape = ContinuousRoundedRectangle(radius.toDp())
         val outline = PlayerHitShape(bounds, radius).createOutline(size, layoutDirection, this)
         val path = (outline as? Outline.Generic)?.path
-        if (path != null) {
-            clipGlassShape(bounds, radius, shape, path) { this@drawWithContent.drawContent() }
+        onDrawWithContent {
+            if (path != null) {
+                clipGlassShape(bounds, radius, shape, path) { this@onDrawWithContent.drawContent() }
+            }
         }
     }
 }
 
 @Composable
 fun BottomSheet(
-    state: BottomSheetState,
+    state: GlasmioBottomSheetState,
     modifier: Modifier = Modifier,
     collapsedDragOffset: () -> Dp = { 0.dp },
     collapsedDragHeight: Dp = 0.dp,
@@ -529,6 +608,7 @@ fun BottomSheet(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val layers = checkNotNull(LocalPlayerSheet.current)
+    val landscape = com.ljyh.mei.ui.component.utils.rememberDeviceInfo().isLandscape
     val active by remember(state) { derivedStateOf { state.isTransitioning } }
     val expanded by remember(state) { derivedStateOf { state.isExpanded } }
     val collapsed by remember(state) { derivedStateOf { state.isCollapsed } }
@@ -543,25 +623,36 @@ fun BottomSheet(
     val transitionGeometryReady by remember(layers) {
         derivedStateOf { layers.hostBounds.isUsable() && layers.sourceContainer.isUsable() }
     }
-    val transitionGlassRenderer = rememberGlassMorphRenderer(
+    val materialDark = LocalMiniPlayerAppearance.current ?: LocalGlassColors.current.isDark
+    val transitionGlassRenderer = rememberPlayerTransitionGlassRenderer(
         backdrop = transitionBackdrop,
         active = active && transitionGeometryReady,
-        // Only the blurred page sample is reduced; all moving edges and content stay native.
-        renderScale = 0.25f,
+        isDark = materialDark,
     )
     val expandedCornerRadius = rememberPlayerScreenCornerRadius(layers.hostBounds)
     SideEffect { layers.updateFrozenBounds() }
+    // 探针：过渡期间打场景标签，并把 sheet 作用域的重组次数单独计数。
+    // 日志里 anim 高而 measure 接近 0 时，说明是组合在跑而不是布局——这两项能直接确认。
+    LaunchedEffect(active, expanded) {
+        when {
+            active -> FrameStats.enterScene("sheet")
+            expanded -> FrameStats.enterScene("player")
+            else -> FrameStats.exitScene()
+        }
+    }
+    SideEffect { FrameStats.countRecomposition("sheet") }
     BackHandler(enabled = !collapsed && !dismissed, onBack = state::collapseSoft)
 
-    Box(modifier.fillMaxSize().onGloballyPositioned { layers.updateHost(it.boundsInRoot()) }) {
+    val hostDensity = LocalDensity.current.density
+    Box(modifier.fillMaxSize().onGloballyPositioned { layers.updateHost(it.boundsInRoot(), hostDensity) }) {
         if (!dismissed || onDismiss == null) {
             Box(
-                Modifier.fillMaxWidth()
+                Modifier.align(Alignment.TopCenter)
                     .height(if (collapsedDragHeight > 0.dp) collapsedDragHeight else state.collapsedBound)
                     .offset {
                         IntOffset(0, (state.expandedBound - miniAnchor + collapsedDragOffset()).roundToPx())
                     }
-                    .clipPlayerRecordingHost(layers, expandedCornerRadius)
+                    .clipPlayerRecordingHost(layers, expandedCornerRadius, miniHost = true)
                     .sheetGestures(state, layers, onHorizontalSwipe)
                     .then(if (active || expanded) Modifier.clearAndSetSemantics { } else Modifier)
                     .recordPlayerContent(layers, layers.miniHost) { !active && !expanded },
@@ -570,22 +661,20 @@ fun BottomSheet(
         }
         // Draw transition glass below the mesh background. The background's alpha reveals
         // this glass during motion without tinting the fully expanded player background.
-        if (active && transitionGeometryReady) {
+        if ((active || collapsed) && transitionGeometryReady) {
             PlayerTransitionGlass(
                 layers = layers,
                 renderer = transitionGlassRenderer,
                 expandedCornerRadius = expandedCornerRadius,
+                active = active,
             )
         }
-        // Prepare the Compose mesh before the first opening. Its unplaced host
-        // neither draws nor receives input, and FluidBackground stops hidden frames.
+        // Place both endpoints before takeover so the first drag does not own their
+        // initial layout and display-list preparation. Hidden mesh frames stay stopped.
         Box(
             Modifier.fillMaxSize()
-                .layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    layout(placeable.width, placeable.height) {
-                        if (active || expanded) placeable.place(0, 0)
-                    }
+                .graphicsLayer {
+                    alpha = if (active || expanded) 1f else 0f
                 }
                 .clipPlayerBackground(layers, expandedCornerRadius)
                 .clearAndSetSemantics { },
@@ -594,11 +683,13 @@ fun BottomSheet(
         }
         run {
             val visible = active || expanded
-            // Keep pager/lyrics composition, but unplace the hidden host so it has no hit targets.
-            Box(Modifier.fillMaxSize().layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                layout(placeable.width, placeable.height) {
-                    if (visible) placeable.place(0, 0)
+            Box(Modifier.fillMaxSize().graphicsLayer {
+                alpha = if (visible) 1f else 0f
+                clip = !visible
+                if (!visible) {
+                    // Alpha alone leaves pointer targets active. An empty outline
+                    // excludes the placed endpoint from hit testing while warming it.
+                    shape = PlayerHitShape(Rect.Zero, 0f)
                 }
             }) {
                 BoxWithConstraints(
@@ -606,46 +697,62 @@ fun BottomSheet(
                         .clipPlayerRecordingHost(layers, expandedCornerRadius)
                         .sheetGestures(state, layers, onHorizontalSwipe)
                         .then(if (!expanded) Modifier.clearAndSetSemantics { } else Modifier)
-                        .recordPlayerContent(layers, layers.fullContent) { expanded },
+                        .recordPlayerContent(layers, layers.fullContent, warmWhileHidden = true) { expanded },
                     content = content,
                 )
             }
         }
         if (active && transitionGeometryReady) {
             Canvas(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxSize().then(
+                    if (landscape) Modifier.clipPlayerBackground(layers, expandedCornerRadius, translateContent = false)
+                    else Modifier,
+                ),
             ) {
-                val p = state.progress
-                val globalBounds = playerContainerRect(layers.sourceContainer, layers.hostBounds, p)
+                val p = layers.motionProgress
+                val trailingAnchorsRight = if (landscape) layers.trailingAnchorsRight() else false
+                val globalBounds = layers.containerBounds
                 val bounds = globalBounds.translate(-layers.hostBounds.topLeft)
                 // This snapshot contains inset controls, not the visible shell. The shell
                 // and mesh background retain their continuous corner clip separately.
                 // Replaying the text/icon display lists in seven corner tiles multiplies
                 // command preparation even when a tile contains no visible controls.
                 clipRect(bounds.left, bounds.top, bounds.right, bounds.bottom) {
-                    val scale = bounds.width / size.width.coerceAtLeast(1f)
                     val miniAlpha = playerMiniContentAlpha(p)
                     if (miniAlpha > 0f && layers.miniContent.size.width > 0) {
                         layers.miniContent.alpha = miniAlpha
-                        val source = layers.sourceContainer
-                        val offset = Offset(
-                            layers.sourceMiniContent.left - layers.hostBounds.left,
-                            layers.sourceMiniContent.top - source.top + bounds.top,
-                        )
+                        val offset = playerMiniContentOrigin(
+                            layers.sourceMiniContent, layers.sourceContainer,
+                            globalBounds,
+                        ) - layers.hostBounds.topLeft
                         withTransform({
-                            translate(offset.x + globalBounds.left - source.left, offset.y)
+                            translate(offset.x, offset.y)
                             scale(layers.miniScaleX, layers.miniScaleY, Offset.Zero)
                         }) { drawLayer(layers.miniContent) }
+                    }
+                    if (landscape && miniAlpha > 0f && layers.miniTrailingContent.size.width > 0) {
+                        layers.miniTrailingContent.alpha = miniAlpha
+                        val source = layers.sourceMiniTrailing
+                        val origin = playerMiniTrailingOrigin(
+                            source, layers.sourceContainer, globalBounds,
+                            rightAnchored = trailingAnchorsRight,
+                        ) - layers.hostBounds.topLeft
+                        withTransform({
+                            translate(origin.x, origin.y)
+                            scale(layers.miniTrailingScaleX, layers.miniTrailingScaleY, Offset.Zero)
+                        }) { drawLayer(layers.miniTrailingContent) }
                     }
 
                     val fullAlpha = playerContentAlpha(p)
                     if (fullAlpha > 0f && layers.fullContent.size.width > 0) {
-                        // Preserve descendant blend modes while the recorded controls fade.
                         layers.fullContent.compositingStrategy = CompositingStrategy.ModulateAlpha
                         layers.fullContent.alpha = fullAlpha
                         withTransform({
                             translate(bounds.left, bounds.top)
-                            scale(scale, scale, Offset.Zero)
+                            val contentBounds = playerFullContentRect(globalBounds, layers.hostBounds)
+                            val contentScale = if (layers.fixedSizeContent) 1f
+                                else contentBounds.width / size.width.coerceAtLeast(1f)
+                            scale(contentScale, contentScale, Offset.Zero)
                         }) { drawLayer(layers.fullContent) }
                     }
                 }
@@ -656,7 +763,7 @@ fun BottomSheet(
             // follow the drawn shell; the full-sized snapshot/background hosts keep their dimensions.
             Box(Modifier
                 .layout { measurable, constraints ->
-                    val bounds = playerContainerRect(layers.sourceContainer, layers.hostBounds, state.progress)
+                    val bounds = layers.containerBounds
                         .translate(-layers.hostBounds.topLeft)
                     val placeable = measurable.measure(Constraints.fixed(
                         bounds.width.roundToInt().coerceAtLeast(0),
@@ -668,9 +775,7 @@ fun BottomSheet(
                 }
                 .graphicsLayer {
                     clip = true
-                    shape = ContinuousRoundedRectangle(playerContainerCornerRadius(
-                        layers.sourceContainer.height / 2f, expandedCornerRadius, state.progress,
-                    ).toDp())
+                    shape = ContinuousRoundedRectangle(layers.containerCornerRadius(expandedCornerRadius).toDp())
                 }
                 .sheetGestures(state, layers, null)
                 .clearAndSetSemantics { })
@@ -699,7 +804,8 @@ internal fun PlayerSheetArtworkOverlay(layers: PlayerSheetLayers) {
                 }
                 val targetClip = layers.targetArtworkClipBounds
                 if (targetClip != null) {
-                    val clip = playerArtworkClipRect(targetClip, layers.hostBounds, layers.state.progress)
+                    val clip = playerArtworkClipRect(targetClip, layers.hostBounds, layers.motionProgress)
+                        .translate(layers.motionOffset)
                     clipRect(clip.left, clip.top, clip.right, clip.bottom) {
                         this@drawWithContent.drawContent()
                     }
@@ -725,16 +831,14 @@ internal fun PlayerSheetArtworkOverlay(layers: PlayerSheetLayers) {
                         shadowElevation = 0f
                         return@graphicsLayer
                     }
-                    val progress = layers.state.progress
+                    val progress = layers.motionProgress
                     alpha = playerArtworkOpacity(layers.targetArtworkOpacity, progress)
                     val target = layers.targetArtwork
-                    val artworkBounds = if (layers.artworkTracksContainerTop()) {
-                        playerTopAnchoredArtworkRect(
-                            layers.sourceArtwork, target,
-                            layers.sourceContainer, layers.hostBounds, progress,
-                        )
-                    } else playerArtworkRect(layers.sourceArtwork, target, progress)
-                    val bounds = artworkBounds.translate(-layers.hostBounds.topLeft)
+                    val artworkBounds = playerContainerAnchoredArtworkRect(
+                        layers.sourceArtwork, target,
+                        layers.sourceContainer, layers.hostBounds, progress,
+                    )
+                    val bounds = artworkBounds.translate(-layers.hostBounds.topLeft + layers.motionOffset)
                     val imageWidth = size.width.coerceAtLeast(1f)
                     val logicalTargetWidth = layers.targetArtworkLayoutSize.width.coerceAtLeast(1)
                     val visualScaleX = bounds.width / imageWidth
@@ -743,7 +847,7 @@ internal fun PlayerSheetArtworkOverlay(layers: PlayerSheetLayers) {
                     scaleY = bounds.height / size.height.coerceAtLeast(1f)
                     translationX = bounds.left
                     translationY = bounds.top
-                    val sourceRadius = com.ljyh.mei.constants.MiniPlayerArtworkCornerRadius.toPx()
+                    val sourceRadius = layers.miniArtworkCornerRadius.toPx()
                     val targetRadius = if (layers.circularArtwork) target.width / 2f else
                         layers.artworkCornerRadius().toPx() * target.width / logicalTargetWidth
                     val radius = mix(sourceRadius, targetRadius, progress) /

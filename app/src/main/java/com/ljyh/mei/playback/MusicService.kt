@@ -23,10 +23,12 @@ import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Player.EVENT_POSITION_DISCONTINUITY
 import androidx.media3.common.Player.EVENT_TIMELINE_CHANGED
 import androidx.media3.common.Timeline
+import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
@@ -41,19 +43,19 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.analytics.PlaybackStats
 import androidx.media3.exoplayer.analytics.PlaybackStatsListener
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.AudioOutputProvider
 import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider
 import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.audio.ForwardingAudioOutputProvider
 import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
-import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.preload.DefaultPreloadManager
-import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.session.MediaConstants
 import androidx.media3.session.CommandButton
 import androidx.media3.session.SessionCommand
@@ -68,8 +70,13 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.ljyh.mei.MainActivity
+import com.ljyh.mei.ui.component.player.floatingLyricsPipParams
+import com.ljyh.mei.ui.component.player.hasFloatingLyricsBackgroundPermission
+import androidx.lifecycle.Lifecycle
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.AllowConcurrentPlaybackKey
+import com.ljyh.mei.constants.AudioOutputMode
+import com.ljyh.mei.constants.AudioOutputModeKey
 import com.ljyh.mei.constants.IsShuffleModeKey
 import com.ljyh.mei.constants.LoopPlaybackKey
 import com.ljyh.mei.constants.NotificationAction
@@ -105,6 +112,7 @@ import com.ljyh.mei.playback.CacheManager.removePlaybackEntries
 import com.ljyh.mei.utils.CoilBitmapLoader
 import com.ljyh.mei.utils.dataStore
 import com.ljyh.mei.utils.get
+import com.ljyh.mei.utils.toEnum
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -143,8 +151,13 @@ class MusicService : MediaLibraryService(),
     val beatMeter = PlaybackBeatMeter()
     private lateinit var audioPlayer: AudioPlayer
 
+    @Inject
+    lateinit var lyricManager: com.ljyh.mei.utils.lyric.LyricManager
     private lateinit var autoMixController: AutoMixController
     private lateinit var equalizerConfigurationState: EqualizerConfigurationState
+    private lateinit var usbAudioOutput: UsbAudioOutput
+    val audioOutputStatus get() = usbAudioOutput.status
+    private var audioOutputMode = AudioOutputMode.AudioTrack
     val context = this
     private lateinit var mediaSession: MediaLibrarySession
     private var notificationLeftAction = NotificationAction.PlayMode
@@ -153,6 +166,8 @@ class MusicService : MediaLibraryService(),
     private var notificationAccount: Pair<String?, String?>? = null
     private var notificationLikeJob: Job? = null
     private var notificationButtons: List<CommandButton> = emptyList()
+    private var floatingLyricsActivity = WeakReference<MainActivity>(null)
+    private var floatingLyricsEnabled = false
 
     @Inject
     lateinit var playerRepository: PlayerRepository
@@ -162,7 +177,7 @@ class MusicService : MediaLibraryService(),
         private set
     private val serviceJob = SupervisorJob()
     var scope = CoroutineScope(Dispatchers.Main + serviceJob)
-    private var automaticCacheJob: Job? = null
+    private val automaticCachePlayback = AutomaticCachePlaybackTracker(scope)
     private lateinit var playbackHistoryReporter: PlaybackHistoryReporter
     private val playbackHistorySession = PlaybackHistorySession()
     private var playbackSnapshotJob: Job? = null
@@ -171,10 +186,6 @@ class MusicService : MediaLibraryService(),
     private lateinit var playbackPersistence: PlaybackPersistence
     private var isRestoringPlayback = true
     private lateinit var connectivityManager: ConnectivityManager
-    private lateinit var baseMediaSourceFactory: DefaultMediaSourceFactory
-    private lateinit var preloadManager: DefaultPreloadManager
-    private val preloadStrategy = MusicPreloadStrategy()
-    private var preloadedMediaItem: MediaItem? = null
     val currentMediaMetadata = MutableStateFlow<MediaMetadata?>(null)
     val availableMusicQualities = MutableStateFlow<List<MusicQuality>>(emptyList())
     val currentMusicQuality = MutableStateFlow<MusicQuality?>(null)
@@ -246,36 +257,15 @@ class MusicService : MediaLibraryService(),
         }
         playbackHistoryReporter = PlaybackHistoryReporter(meloXRepository, neteaseClientLogClient)
         equalizerConfigurationState = EqualizerConfigurationState(this, scope)
-        baseMediaSourceFactory = DefaultMediaSourceFactory(createDataSourceFactory())
-            .setLoadErrorHandlingPolicy(MusicLoadErrorHandlingPolicy()) // 应用自定义错误策略
-        val preloadManagerBuilder = DefaultPreloadManager.Builder(
-            this,
-            preloadStrategy
-        )
-            .setMediaSourceFactory(baseMediaSourceFactory) // 告诉管理器用什么去下载
-
-        val playerMediaSourceFactory = object : MediaSource.Factory {
-            // 必须实现的方法，委托给 baseMediaSourceFactory
-            override fun setDrmSessionManagerProvider(provider: DrmSessionManagerProvider) = apply {
-                baseMediaSourceFactory.setDrmSessionManagerProvider(provider)
-            }
-
-            override fun setLoadErrorHandlingPolicy(policy: LoadErrorHandlingPolicy) = apply {
-                baseMediaSourceFactory.setLoadErrorHandlingPolicy(policy)
-            }
-
-            override fun getSupportedTypes(): IntArray = baseMediaSourceFactory.supportedTypes
-
-            // 创建 MediaSource
-            override fun createMediaSource(mediaItem: MediaItem): MediaSource {
-                // 优先问 PreloadManager 要预加载好的 Source
-                return preloadManager.getMediaSource(mediaItem)
-                // 如果没预加载过，就创建一个新的
-                    ?: baseMediaSourceFactory.createMediaSource(mediaItem)
+        audioOutputMode = context.dataStore[AudioOutputModeKey].toEnum(AudioOutputMode.AudioTrack)
+        usbAudioOutput = UsbAudioOutput(this) {
+            scope.launch {
+                if (::player.isInitialized && audioOutputMode == AudioOutputMode.UsbBitPerfect) {
+                    applyAudioOutputMode(audioOutputMode, force = true)
+                }
             }
         }
-
-
+        usbAudioOutput.setEnabled(audioOutputMode == AudioOutputMode.UsbBitPerfect)
         setMediaNotificationProvider(
             PlaybackNotificationProvider(this, NOTIFICATION_ID, CHANNEL_ID) { player.mediaMetadata.title },
         )
@@ -287,11 +277,23 @@ class MusicService : MediaLibraryService(),
         val handleAudioFocus = !context.dataStore.get(AllowConcurrentPlaybackKey, false)
         // Media3 1.11 dynamic scheduling batches position updates. Both decks need
         // continuous timestamps for karaoke highlighting and beat synchronization.
+        // 少数稿件只有渐进式 MP4（音轨混在视频里），关掉视频轨选择可以避免
+        // MediaCodecVideoRenderer 白解码一路视频、白耗电。两台 player 各需一个 selector。
+        fun audioOnlySelector() = DefaultTrackSelector(
+            this,
+            TrackSelectionParameters.Builder()
+                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true)
+                .build(),
+        )
         val firstDeck = ExoPlayer.Builder(this)
             .experimentalSetDynamicSchedulingEnabled(false)
             .setStuckBufferingDetectionTimeoutMs(STUCK_BUFFERING_TIMEOUT_MS)
-            //媒体源工厂
-            .setMediaSourceFactory(playerMediaSourceFactory)
+            .setTrackSelector(audioOnlySelector())
+            // Keep next-period loading on the deck that will consume those bytes.
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(createDataSourceFactory())
+                    .setLoadErrorHandlingPolicy(MusicLoadErrorHandlingPolicy()),
+            )
             //渲染器工厂
             .setRenderersFactory(createRenderersFactory())
             //处理音频焦点变化和音频播放行为
@@ -305,15 +307,10 @@ class MusicService : MediaLibraryService(),
             .setSeekBackIncrementMs(5000)
             .setSeekForwardIncrementMs(5000)
             .build()
-            .also { builtPlayer ->
-                // PreloadMediaSource must be prepared on the same looper that consumes it.
-                preloadManager = preloadManagerBuilder
-                    .setPreloadLooper(builtPlayer.playbackLooper)
-                    .build()
-            }
         val secondDeck = ExoPlayer.Builder(this)
             .experimentalSetDynamicSchedulingEnabled(false)
             .setStuckBufferingDetectionTimeoutMs(STUCK_BUFFERING_TIMEOUT_MS)
+            .setTrackSelector(audioOnlySelector())
             .setMediaSourceFactory(
                 DefaultMediaSourceFactory(createDataSourceFactory())
                     .setLoadErrorHandlingPolicy(MusicLoadErrorHandlingPolicy()),
@@ -371,29 +368,14 @@ class MusicService : MediaLibraryService(),
                     playbackPersistence.invalidateQueue()
                     schedulePlaybackSnapshot()
                 }
-                updatePreload()
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 if (isRefreshingPlaybackSource) return
-                updatePreload()
-                automaticCacheJob?.cancel()
-                if (mediaItem != null) {
-                    automaticCacheJob = scope.launch {
-                        delay(AUTOMATIC_CACHE_DELAY_MS)
-                        try {
-                            automaticCacheController.recordPlayback(mediaItem)
-                        } catch (error: CancellationException) {
-                            throw error
-                        } catch (error: Exception) {
-                            Timber.tag("MusicService").e(error, "record automatic cache playback error")
-                        }
-                    }
-                }
+                automaticCachePlayback.reset()
             }
 
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                updatePreload()
                 schedulePlaybackSnapshot()
                 scope.launch {
                     context.dataStore.edit { preferences ->
@@ -403,7 +385,6 @@ class MusicService : MediaLibraryService(),
             }
 
             override fun onRepeatModeChanged(repeatMode: Int) {
-                updatePreload()
                 schedulePlaybackSnapshot()
                 scope.launch {
                     context.dataStore.edit { preferences ->
@@ -441,7 +422,7 @@ class MusicService : MediaLibraryService(),
             },
         )
         audioPlayer = AudioPlayer(player) {
-            autoMixController.isTransitioning
+            autoMixController.isTransitioning || audioOutputMode == AudioOutputMode.UsbBitPerfect
         }
         listenTogetherStore.attachPlayer(player)
         val singletonImageLoader = SingletonImageLoader.get(this)
@@ -467,6 +448,11 @@ class MusicService : MediaLibraryService(),
         }
 
 
+        scope.launch {
+            context.dataStore.data.map { it[AudioOutputModeKey].toEnum(AudioOutputMode.AudioTrack) }
+                .distinctUntilChanged()
+                .collect { applyAudioOutputMode(it) }
+        }
         scope.launch {
             context.dataStore.data.map { it[AllowConcurrentPlaybackKey] ?: false }
                 .distinctUntilChanged()
@@ -648,31 +634,10 @@ class MusicService : MediaLibraryService(),
         }.onFailure { Timber.tag("MusicService").w(it, "Unable to save final playback snapshot") }
     }
 
-    private fun updatePreload() {
-        val nextIndex = player.nextPlaybackMediaItemIndex().takeIf {
-            it != player.currentMediaItemIndex && it in 0 until player.mediaItemCount
-        } ?: C.INDEX_UNSET
-        val nextItem = if (nextIndex == C.INDEX_UNSET) null else player.getMediaItemAt(nextIndex)
-        if (nextItem == preloadedMediaItem && nextIndex == preloadStrategy.nextPlayingIndex) return
-        preloadedMediaItem?.let(preloadManager::remove)
-        preloadedMediaItem = nextItem
-        preloadStrategy.nextPlayingIndex = nextIndex
-        if (nextItem != null) {
-            preloadManager.add(nextItem, nextIndex)
-        }
-        preloadManager.invalidate()
-    }
-
     /** Clears sources tied to the previous quality while keeping the player playlist intact. */
     fun resetPlaybackSourcesForQualityChange() {
         if (::autoMixController.isInitialized) {
             autoMixController.resetForQualityChange()
-        }
-        if (::preloadManager.isInitialized) {
-            // BasePreloadManager requires all lifecycle calls on its construction thread.
-            preloadManager.reset()
-            preloadedMediaItem = null
-            preloadStrategy.nextPlayingIndex = C.INDEX_UNSET
         }
     }
 
@@ -693,7 +658,6 @@ class MusicService : MediaLibraryService(),
         } finally {
             isRefreshingPlaybackSource = false
         }
-        updatePreload()
         refreshAvailableMusicQualities()
     }
 
@@ -807,6 +771,10 @@ class MusicService : MediaLibraryService(),
     }
 
     private fun updateAudioEffectSession() {
+        if (audioOutputMode != AudioOutputMode.AudioTrack) {
+            closeAudioEffectSession()
+            return
+        }
         val isBufferingOrReady =
             player.playbackState == Player.STATE_BUFFERING || player.playbackState == Player.STATE_READY
         if (isBufferingOrReady && player.playWhenReady) {
@@ -822,6 +790,7 @@ class MusicService : MediaLibraryService(),
         }
         updateAudioEffectSession()
         if (!::audioPlayer.isInitialized) return
+        if (audioOutputMode == AudioOutputMode.UsbBitPerfect) return
         if (
             ::autoMixController.isInitialized &&
             autoMixController.isTransitioning
@@ -873,6 +842,15 @@ class MusicService : MediaLibraryService(),
             )
         ) {
             val mediaItem = player.currentMediaItem
+            automaticCachePlayback.update(player.isPlaying && mediaItem != null) {
+                try {
+                    automaticCacheController.recordPlayback(checkNotNull(mediaItem))
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Exception) {
+                    Timber.tag("MusicService").e(error, "record automatic cache playback error")
+                }
+            }
             val update = playbackHistorySession.update(
                 mediaId = mediaItem?.mediaId,
                 isPlaying = player.isPlaying,
@@ -1036,6 +1014,71 @@ class MusicService : MediaLibraryService(),
         notificationLikeJob = scope.launch { playerRepository.checkSongLike(id, expectedSession) }
     }
 
+    fun attachFloatingLyricsActivity(activity: MainActivity) {
+        floatingLyricsActivity = WeakReference(activity)
+        NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
+        updateFloatingLyricsState(activity)
+    }
+
+    fun detachFloatingLyricsActivity(activity: MainActivity) {
+        if (floatingLyricsActivity.get() !== activity) return
+        floatingLyricsActivity.clear()
+        floatingLyricsEnabled = false
+        updateNotificationButtons()
+    }
+
+    fun updateFloatingLyricsState(activity: MainActivity) {
+        if (floatingLyricsActivity.get() !== activity) return
+        floatingLyricsEnabled = activity.isInPictureInPictureMode
+        if (floatingLyricsEnabled) NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
+        updateNotificationButtons()
+    }
+
+    private fun toggleFloatingLyrics(): Boolean {
+        val activity = floatingLyricsActivity.get()
+        if (activity?.isInPictureInPictureMode == true) return activity.moveTaskToBack(true)
+        if (activity != null && activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            return activity.enterPictureInPictureMode(floatingLyricsPipParams(activity, player.isPlaying))
+        }
+        if (hasFloatingLyricsBackgroundPermission(this)) {
+            try {
+                startActivity(floatingLyricsIntent(this, true))
+                return true
+            } catch (error: Exception) {
+                Timber.w(error, "Unable to open floating lyrics from the background")
+            }
+        }
+        val manager = NotificationManagerCompat.from(this)
+        if (!manager.areNotificationsEnabled()) {
+            Toast.makeText(this, R.string.notification_floating_lyrics_open_app, Toast.LENGTH_LONG).show()
+            return false
+        }
+        manager.createNotificationChannel(NotificationChannel(
+            "floating_lyrics", getString(R.string.more_action_floating_lyrics), NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            setSound(null, null)
+            enableVibration(false)
+        })
+        // System media commands cannot launch an activity from the background. Let System UI
+        // send the activity PendingIntent directly when the user taps this short-lived entry.
+        val notification = NotificationCompat.Builder(this, "floating_lyrics")
+            .setSmallIcon(R.drawable.ic_notification_sf_text_rectangle)
+            .setContentTitle(getString(R.string.notification_enable_floating_lyrics))
+            .setContentText(getString(R.string.notification_floating_lyrics_open_hint))
+            .setContentIntent(floatingLyricsPendingIntent(this, true))
+            .setAutoCancel(true)
+            .setSilent(true)
+            .setTimeoutAfter(15_000L)
+            .build()
+        return try {
+            manager.notify(FLOATING_LYRICS_NOTIFICATION_ID, notification)
+            true
+        } catch (error: SecurityException) {
+            Toast.makeText(this, R.string.notification_floating_lyrics_open_app, Toast.LENGTH_LONG).show()
+            false
+        }
+    }
+
     private fun updateNotificationButtons() {
         if (!::mediaSession.isInitialized) return
         val songId = notificationLikeSongId()
@@ -1045,11 +1088,13 @@ class MusicService : MediaLibraryService(),
                 this, notificationLeftAction, true, player.repeatMode, player.shuffleModeEnabled, liked,
                 if (notificationLeftAction == NotificationAction.Like) songId != null && notificationSignedIn
                 else player.currentMediaItem != null,
+                floatingLyricsEnabled = floatingLyricsEnabled,
             ),
             notificationButton(
                 this, notificationRightAction, false, player.repeatMode, player.shuffleModeEnabled, liked,
                 if (notificationRightAction == NotificationAction.Like) songId != null && notificationSignedIn
                 else player.currentMediaItem != null,
+                floatingLyricsEnabled = floatingLyricsEnabled,
             ),
         )
         if (buttons != notificationButtons) {
@@ -1135,6 +1180,12 @@ class MusicService : MediaLibraryService(),
                     switchPlayMode()
                     return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
                 }
+                NotificationAction.FloatingLyrics -> {
+                    val success = player.currentMediaItem != null && toggleFloatingLyrics()
+                    return Futures.immediateFuture(SessionResult(
+                        if (success) SessionResult.RESULT_SUCCESS else SessionResult.RESULT_ERROR_INVALID_STATE,
+                    ))
+                }
                 NotificationAction.Like -> {
                     val id = notificationLikeSongId()
                         ?: return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_INVALID_STATE))
@@ -1178,13 +1229,14 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onDestroy() {
+        NotificationManagerCompat.from(this).cancel(FLOATING_LYRICS_NOTIFICATION_ID)
         mediaUriProvider.onSourceResolved = null
         availableQualitiesJob?.cancel()
         sourceRecoveryJob?.cancel()
         periodicSnapshotJob?.cancel()
         playbackRestoreJob?.cancel()
         playbackSnapshotJob?.cancel()
-        automaticCacheJob?.cancel()
+        automaticCachePlayback.reset()
         if (::playbackHistoryReporter.isInitialized) {
             recordPlaybackDuration(playbackHistorySession.finish(SystemClock.elapsedRealtime()))
             playbackHistoryReporter.close()
@@ -1196,7 +1248,6 @@ class MusicService : MediaLibraryService(),
         sleepTimer.clear()
         player.removeListener(sleepTimer)
         queueManager.release()
-        preloadManager.release()
         autoMixController.release()
         if (::audioPlayer.isInitialized) audioPlayer.release()
         equalizerConfigurationState.release()
@@ -1204,6 +1255,7 @@ class MusicService : MediaLibraryService(),
 
         closeAudioEffectSession()
         player.release()
+        usbAudioOutput.release()
         serviceJob.cancel()
         super.onDestroy()
     }
@@ -1256,28 +1308,81 @@ class MusicService : MediaLibraryService(),
         }
     }
 
+    private class ProfileAudioOutputProvider(
+        val mode: AudioOutputMode,
+        delegate: AudioOutputProvider,
+    ) : ForwardingAudioOutputProvider(delegate)
+
+    private fun createAudioOutputProvider(mode: AudioOutputMode): AudioOutputProvider =
+        ProfileAudioOutputProvider(mode, when (mode) {
+            AudioOutputMode.AAudio -> NativeAudioOutputProvider(this, useOpenSles = false)
+            AudioOutputMode.OpenSLES -> NativeAudioOutputProvider(this, useOpenSles = true)
+            else -> AudioTrackAudioOutputProvider.Builder(this).build()
+        })
+
+    /** Reopen both physical outputs without replacing the queue or its entry identities. */
+    private fun applyAudioOutputMode(mode: AudioOutputMode, force: Boolean = false) {
+        if (!force && audioOutputMode == mode) return
+        audioOutputMode = mode
+        autoMixController.resetForQualityChange()
+        audioPlayer.reset()
+        val deck = player.activeDeck
+        val index = deck.currentMediaItemIndex
+        val position = deck.currentPosition
+        val prepared = deck.playbackState != Player.STATE_IDLE
+        val resumePlayback = deck.playWhenReady
+        usbAudioOutput.setEnabled(mode == AudioOutputMode.UsbBitPerfect)
+        closeAudioEffectSession()
+        player.deckPlayers.forEach { physicalDeck ->
+            // Re-negotiate the decoder too: the old output may use passthrough or a
+            // different PCM depth that the newly selected engine cannot consume.
+            physicalDeck.stop()
+            physicalDeck.volume = 1f
+            physicalDeck.playbackParameters = PlaybackParameters.DEFAULT
+            physicalDeck.skipSilenceEnabled = false
+            for (rendererIndex in 0 until physicalDeck.rendererCount) {
+                if (physicalDeck.getRendererType(rendererIndex) == C.TRACK_TYPE_AUDIO) {
+                    physicalDeck.createMessage(physicalDeck.getRenderer(rendererIndex))
+                        .setType(Renderer.MSG_SET_AUDIO_OUTPUT_PROVIDER)
+                        .setPayload(createAudioOutputProvider(mode))
+                        .send()
+                }
+            }
+        }
+        if (prepared && index in 0 until deck.mediaItemCount) {
+            deck.seekTo(index, position)
+            deck.prepare()
+            deck.playWhenReady = resumePlayback
+        }
+        updateAudioEffectSession()
+    }
+
     private fun createRenderersFactory() =
         object : DefaultRenderersFactory(this) {
             override fun buildAudioSink(
                 context: Context,
                 enableFloatOutput: Boolean,
                 enableAudioTrackPlaybackParams: Boolean,
-            ) = DefaultAudioSink.Builder(this@MusicService)
-                .setAudioOutputProvider(
-                    beatMeter.wrap(AudioTrackAudioOutputProvider.Builder(this@MusicService).build()),
-                )
-                .setEnableFloatOutput(enableFloatOutput)
-                // AutoMix continuously changes tempo. Sonic's parameter changes drain and
-                // restart the PCM processor chain, producing periodic gaps during overlap.
-                // Apply tempo at AudioTrack instead, keeping the EQ/PCM pipeline continuous.
-                .setEnableAudioOutputPlaybackParameters(true)
-                .setAudioProcessorChain(
-                    DefaultAudioSink.DefaultAudioProcessorChain(
-                        arrayOf(TenBandEqualizerProcessor(equalizerConfigurationState)),
-                        SilenceSkippingAudioProcessor(2_000_000, 0.01f, 2_000_000, 0, 256),
-                        SonicAudioProcessor()
-                    )
-                ).build()
+            ): AudioSink = ModeAudioSink(createAudioOutputProvider(audioOutputMode)) { provider ->
+                val mode = (provider as ProfileAudioOutputProvider).mode
+                val fallback = DefaultAudioSink.Builder(this@MusicService)
+                    .setAudioOutputProvider(beatMeter.wrap(provider))
+                    .setEnableFloatOutput(enableFloatOutput)
+                    // AutoMix continuously changes tempo. Keep its PCM pipeline continuous
+                    // with AudioTrack playback parameters; native providers use Sonic.
+                    .setEnableAudioOutputPlaybackParameters(true)
+                    .setAudioProcessorChain(
+                        DefaultAudioSink.DefaultAudioProcessorChain(
+                            if (mode == AudioOutputMode.UsbBitPerfect) emptyArray()
+                            else arrayOf(TenBandEqualizerProcessor(equalizerConfigurationState)),
+                            SilenceSkippingAudioProcessor(2_000_000, 0.01f, 2_000_000, 0, 256),
+                            SonicAudioProcessor(),
+                        ),
+                    ).build()
+                if (mode == AudioOutputMode.UsbBitPerfect) {
+                    UsbBitPerfectAudioSink(this@MusicService, usbAudioOutput, fallback)
+                } else fallback
+            }
         }.setEnableDecoderFallback(true)
 
     inner class MusicBinder : Binder() {
@@ -1290,10 +1395,15 @@ class MusicService : MediaLibraryService(),
         failureProgressJob?.cancel()
         failureProgressJob = null
         playbackFailures.resetProgress()
-        val causeTypes = generateSequence(error.cause) { it.cause }.take(16)
-            .joinToString(" -> ") { it.javaClass.simpleName }
+        val causeChain = generateSequence(error.cause) { it.cause }.take(16).toList()
+        val causeTypes = causeChain.joinToString(" -> ") { it.javaClass.simpleName }
         Timber.tag("MusicService").e(
-            "Player Error: %s, %s, causes=%s", error.errorCodeName, error.message, causeTypes,
+            "Player Error: %s, %s, causes=%s, details=%s",
+            error.errorCodeName,
+            error.message,
+            causeTypes,
+            // 只有类名时完全看不出原因（-404 / -10403 / -352 都在 message 里）。
+            causeChain.joinToString(" | ") { "${it.javaClass.simpleName}: ${it.message}" },
         )
 
         val stalled = shouldRecoverStalledPlayback(error.errorCode, error.cause)
@@ -1326,27 +1436,28 @@ class MusicService : MediaLibraryService(),
                 currentMusicQuality.value = null
                 availableMusicQualities.value = availableMusicQualities.value - listOfNotNull(failedQuality).toSet()
                 isLoadingMusicQualities.value = false
-                if (scheduleSourceRecovery(qualityFallback = true, failedCacheKey = failedCacheKey)) return
+                // A timeout can justify a lower bitrate without proving the cached bytes corrupt.
+                if (scheduleSourceRecovery(
+                        qualityFallback = true,
+                        failedCacheKey = failedCacheKey,
+                        preserveCache = stalled,
+                    )
+                ) return
             }
         }
 
         val isSourceError = error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS ||
                 error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND ||
-                error.cause is SourceNotFoundException ||
+                // 解析失败可能被 IOException 包一层，必须扫整条 cause 链，否则会被当成
+                // 普通未知错误、既不自动跳过也不给出原因。
+                causeChain.any { it is SourceNotFoundException } ||
                 error.message?.contains("Unable to resolve url") == true
 
         if (isSourceError) {
             val limitReached = playbackFailures.recordFailure()
             Timber.tag("MusicService").e("Play failure detected. Count: %s", playbackFailures.consecutiveFailures)
             if (limitReached) {
-                val detail = generateSequence(error.cause) { it.cause }
-                    .mapNotNull { it.message }
-                    .firstOrNull { it.isNotBlank() }
-                Toast.makeText(
-                    context,
-                    "播放失败，已连续跳过多首歌曲" + (detail?.let { "：${it.take(80)}" } ?: ""),
-                    Toast.LENGTH_LONG,
-                ).show()
+                Toast.makeText(context, "播放失败，已连续跳过多首歌曲", Toast.LENGTH_LONG).show()
                 player.pause()
                 player.stop()
                 return
@@ -1363,7 +1474,17 @@ class MusicService : MediaLibraryService(),
                 Toast.makeText(context, "播放结束，部分歌曲无法加载", Toast.LENGTH_SHORT).show()
             }
         } else {
-            Toast.makeText(context, "播放出错: ${error.errorCodeName}", Toast.LENGTH_SHORT).show()
+            // 只给错误码无法定位；把第一层有内容的 cause 文案一起显示出来。
+            val reason = causeChain.firstNotNullOfOrNull {
+                it.message?.trim()?.takeIf(String::isNotBlank)
+            }
+            // 错误码对用户没有信息量，且 Toast 两行就被截断：把真正的原因放第一行。
+            val text = if (reason == null) {
+                "播放出错: ${error.errorCodeName}"
+            } else {
+                "播放出错：${reason.take(70)}"
+            }
+            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -1470,7 +1591,6 @@ class MusicService : MediaLibraryService(),
             reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
             checkFmModeLoadMore()
         }
-        updatePreload()
     }
 
     private fun checkFmModeLoadMore() {
@@ -1500,11 +1620,11 @@ class MusicService : MediaLibraryService(),
     companion object {
         const val CHANNEL_ID = "music_channel_01"
         const val NOTIFICATION_ID = 888
+        private const val FLOATING_LYRICS_NOTIFICATION_ID = 889
         private const val PLAYBACK_SNAPSHOT_DEBOUNCE_MS = 500L
         private const val MAX_SOURCE_RECOVERY_ATTEMPTS = 1
         private const val STUCK_BUFFERING_TIMEOUT_MS = 30_000
         private const val PLAYBACK_SNAPSHOT_INTERVAL_MS = 5_000L
-        private const val AUTOMATIC_CACHE_DELAY_MS = 5_000L
         private const val FAILURE_PROGRESS_SAMPLE_MS = 500L
         const val ACTION_CANCEL_SLEEP_TIMER = "com.ljyh.mei.action.CANCEL_SLEEP_TIMER"
         const val ACTION_TOGGLE_PLAYBACK = "com.ljyh.mei.action.TOGGLE_PLAYBACK"

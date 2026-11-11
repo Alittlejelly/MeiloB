@@ -42,10 +42,22 @@ object VersionUpdateChecker {
     private const val ConnectTimeoutMillis = 8_000
     private const val ReadTimeoutMillis = 8_000
 
+    /** release 里挂的 APK 资产，用于应用内下载安装。 */
+    data class ApkAsset(
+        val tag: String,
+        val url: String,
+        val sizeBytes: Long?,
+    )
+
     private fun tagsEndpoint(source: UpdateSource): String = when (source) {
         // per_page 缺省时 GitHub 只给 30 个；Gitee 默认 20，显式放大。
         UpdateSource.GitHub -> "https://api.github.com/repos/$GithubRepository/tags?per_page=100"
         UpdateSource.Gitee -> "https://gitee.com/api/v5/repos/$GiteeRepository/tags?per_page=100"
+    }
+
+    private fun latestReleaseEndpoint(source: UpdateSource): String = when (source) {
+        UpdateSource.GitHub -> "https://api.github.com/repos/$GithubRepository/releases/latest"
+        UpdateSource.Gitee -> "https://gitee.com/api/v5/repos/$GiteeRepository/releases/latest"
     }
 
     private fun releaseUrl(source: UpdateSource, tag: String): String = when (source) {
@@ -63,6 +75,38 @@ object VersionUpdateChecker {
         withTimeoutOrNull(30_000) {
             checkWithFetcher(currentVersion, source, ::requestJson)
         } ?: VersionUpdateResult.Failed
+    }
+
+    /**
+     * 取最新 release 里挂的 APK 资产（应用内更新用）。
+     * 拿不到（未登录 API 限流、没有资产、网络失败）一律返回 null，
+     * 由界面回退到「打开 release 页面手动下载」。
+     */
+    suspend fun latestApk(source: UpdateSource = UpdateSource.GitHub): ApkAsset? =
+        withContext(Dispatchers.IO) {
+            withTimeoutOrNull(20_000) {
+                try {
+                    parseApkAsset(requestJson(latestReleaseEndpoint(source)))
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    null
+                }
+            }
+        }
+
+    internal fun parseApkAsset(json: JsonElement): ApkAsset? {
+        val release = json.objectOrNull() ?: return null
+        val tag = release.string("tag_name")?.trim()?.takeIf(String::isNotEmpty) ?: return null
+        val assets = release.get("assets")?.takeIf { it.isJsonArray }?.asJsonArray ?: return null
+        val apk = assets.mapNotNull { it.objectOrNull() }.firstOrNull { asset ->
+            asset.string("name")?.endsWith(".apk", ignoreCase = true) == true
+        } ?: return null
+        val url = apk.string("browser_download_url") ?: return null
+        val size = apk.get("size")
+            ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+            ?.asLong
+        return ApkAsset(tag = tag, url = url, sizeBytes = size)
     }
 
     internal suspend fun checkWithFetcher(

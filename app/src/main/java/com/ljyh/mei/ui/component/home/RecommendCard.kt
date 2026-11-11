@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,15 +51,15 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
+import coil3.request.crossfade
 import coil3.toBitmap
-import com.kyant.backdrop.backdrops.rememberCanvasBackdrop
-import com.kyant.backdrop.drawPlainBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.rememberCanvasBackdrop
+import io.github.neoruaa.glasmio.glass.render.drawPlainBackdrop
 import com.kyant.capsule.ContinuousRoundedRectangle
 import com.ljyh.mei.constants.RecommendCardCornerRadius
 import com.ljyh.mei.constants.RecommendCardHeight
-import com.ljyh.mei.constants.RecommendCardReflectionHeight
 import com.ljyh.mei.constants.RecommendCardWidth
-import com.ljyh.mei.ui.glass.progressiveBackdropBlur
+import io.github.neoruaa.glasmio.glass.progressiveBackdropBlur
 import com.ljyh.mei.utils.largeImage
 import kotlin.math.max
 
@@ -79,19 +80,23 @@ fun RecommendCard(
         coverModel?.let {
             ImageRequest.Builder(context)
                 .data(it)
+                // The extension uses the decoded bitmap directly; reveal both without a cover-only fade.
+                .crossfade(false)
                 .allowHardware(false)
                 .build()
         }
     }
     val currentCoverModel = rememberUpdatedState(coverModel)
     var loadedBitmap by remember(coverModel) { mutableStateOf<Bitmap?>(null) }
-    val clearArtworkHeight = cardHeight - RecommendCardReflectionHeight
-    val reflectionLayerHeight = RecommendCardReflectionHeight * 2
+    val clearArtworkHeight = cardWidth
+    val reflectionHeight = cardHeight - clearArtworkHeight
+    val reflectionLayerHeight = cardHeight / 3
 
     Box(
         modifier = Modifier
             .size(cardWidth, cardHeight)
             .clip(ContinuousRoundedRectangle(RecommendCardCornerRadius))
+            .homeArtworkBorder(ContinuousRoundedRectangle(RecommendCardCornerRadius))
             .background(Color.DarkGray)
             .clickable(enabled = !isLoading, onClick = onClick),
     ) {
@@ -99,7 +104,9 @@ fun RecommendCard(
             model = coverRequest,
             modifier = Modifier.size(cardWidth, clearArtworkHeight),
             onLoading = {
-                if (currentCoverModel.value == coverModel) loadedBitmap = null
+                if (currentCoverModel.value == coverModel) {
+                    loadedBitmap = null
+                }
             },
             onSuccess = { state ->
                 if (currentCoverModel.value == coverModel) {
@@ -107,13 +114,16 @@ fun RecommendCard(
                 }
             },
             onError = {
-                if (currentCoverModel.value == coverModel) loadedBitmap = null
+                if (currentCoverModel.value == coverModel) {
+                    loadedBitmap = null
+                }
             },
         )
         loadedBitmap?.let { bitmap ->
-            RecommendationReflection(
+            RecommendationArtworkExtension(
                 bitmap,
                 clearArtworkHeight,
+                reflectionHeight,
                 Modifier.align(Alignment.BottomStart).size(cardWidth, reflectionLayerHeight),
             )
         }
@@ -125,8 +135,8 @@ fun RecommendCard(
                 .drawWithCache {
                     val layerTop = cardHeight.roundToPx() - size.height
                     val scrim = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.38f)),
-                        startY = (clearArtworkHeight - RecommendCardReflectionHeight).toPx() - layerTop,
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.30f)),
+                        startY = cardHeight.toPx() * 2f / 3f - layerTop,
                         endY = size.height,
                     )
                     onDrawBehind { drawRect(scrim) }
@@ -139,10 +149,11 @@ fun RecommendCard(
                 .padding(
                     start = 16.dp,
                     end = if (isLoading || showPlay) 56.dp else 16.dp,
-                    bottom = 14.dp,
+                    bottom = 16.dp,
                 ),
         ) {
             RecommendationDescription(extInfo)
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = title.orEmpty(),
                 color = Color.White,
@@ -172,12 +183,13 @@ fun RecommendCard(
 }
 
 @Composable
-private fun RecommendationReflection(
+private fun RecommendationArtworkExtension(
     bitmap: Bitmap,
     clearArtworkHeight: Dp,
+    reflectionHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val cardHeight = clearArtworkHeight + RecommendCardReflectionHeight
+    val cardHeight = clearArtworkHeight + reflectionHeight
     val paint = remember {
         Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply {
             colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(1.5f) })
@@ -204,13 +216,18 @@ private fun RecommendationReflection(
             nativeCanvas.drawBitmap(bitmap, null, artworkBounds, paint)
             nativeCanvas.restoreToCount(transitionSave)
 
-            // Reflect the cover's bottom edge into the footer, without recropping the image.
+            // Extend the visible cover's bottom row while preserving its horizontal crop.
             nativeCanvas.clipRect(0f, clearHeight, size.width, cardHeightPx)
-            nativeCanvas.scale(1f, -1f, size.width / 2f, clearHeight)
-            nativeCanvas.drawBitmap(bitmap, null, artworkBounds, paint)
+            val edgeY = kotlin.math.floor((clearHeight - top) / scale - 0.5f)
+                .toInt().coerceIn(0, bitmap.height - 1)
+            nativeCanvas.drawBitmap(
+                bitmap,
+                Rect(0, edgeY, bitmap.width, edgeY + 1),
+                RectF(left, clearHeight, left + width, cardHeightPx),
+                paint,
+            )
             nativeCanvas.restoreToCount(save)
         }
-        drawRect(Color.Black.copy(alpha = 0.3f))
     }
     Box(
         modifier
@@ -219,7 +236,7 @@ private fun RecommendationReflection(
                 val layerTop = cardHeight.roundToPx() - size.height
                 val mask = Brush.verticalGradient(
                     colors = listOf(Color.Transparent, Color.Black),
-                    startY = (clearArtworkHeight - RecommendCardReflectionHeight).toPx() - layerTop,
+                    startY = cardHeight.toPx() * 2f / 3f - layerTop,
                     endY = clearArtworkHeight.toPx() - layerTop,
                 )
                 onDrawWithContent {
@@ -233,9 +250,9 @@ private fun RecommendationReflection(
                 effects = {
                     val layerTop = cardHeight.roundToPx() - size.height
                     progressiveBackdropBlur(
-                        maxRadius = 24.dp.toPx(),
-                        startYFraction = ((clearArtworkHeight - RecommendCardReflectionHeight).toPx() - layerTop) / size.height,
-                        endYFraction = (clearArtworkHeight.toPx() - layerTop) / size.height,
+                        maxRadius = 100.dp.toPx(),
+                        startYFraction = (cardHeight.toPx() * 2f / 3f - layerTop) / size.height,
+                        endYFraction = 1f,
                         startIntensity = 0f,
                         endIntensity = 1f,
                     )

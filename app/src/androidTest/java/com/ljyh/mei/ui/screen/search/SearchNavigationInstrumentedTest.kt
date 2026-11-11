@@ -1,6 +1,16 @@
 package com.ljyh.mei.ui.screen.search
 
+import kotlin.math.abs
+import org.junit.Assume.assumeTrue
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.activity.BackEventCompat
+import android.content.res.Configuration
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
@@ -69,6 +79,74 @@ class SearchNavigationInstrumentedTest {
     }
 
     @Test
+    fun miniPlayerUsesTheSearchControlGapWithAndWithoutTheKeyboard() {
+        // Exercise the retained queue without replacing the user's tracks or playback state.
+        val miniTag = "MeiloXMiniPlayerSurface"
+        try {
+            // Service connection and its retained playback snapshot can follow the Home title.
+            compose.waitUntil(5_000) {
+                compose.onAllNodesWithTag(miniTag, useUnmergedTree = true)
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+        } catch (_: ComposeTimeoutException) {
+            // An empty retained queue has no mini player; the assumption below covers that case.
+        }
+        assumeTrue(
+            "This placement regression needs an existing retained mini player",
+            compose.onAllNodesWithTag(miniTag, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty(),
+        )
+        openSearch()
+        val density = compose.activity.resources.displayMetrics.density
+        val tolerance = density
+        fun bounds(tag: String): Rect = compose.onNodeWithTag(tag, useUnmergedTree = true)
+            .fetchSemanticsNode().boundsInRoot
+        fun keyboardVisible(): Boolean = ViewCompat.getRootWindowInsets(compose.activity.window.decorView)
+            ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+        fun assertSpacing(imeVisible: Boolean): Rect {
+            compose.waitUntil(10_000) {
+                val field = bounds("GlasmioSearchFieldSurface")
+                val cancel = bounds("GlasmioSearchCancelSurface")
+                val mini = bounds(miniTag)
+                keyboardVisible() == imeVisible &&
+                    abs((field.top - mini.bottom) - (cancel.left - field.right)) <= tolerance &&
+                    mini.height >= 43f * density
+            }
+            val field = bounds("GlasmioSearchFieldSurface")
+            val cancel = bounds("GlasmioSearchCancelSurface")
+            val mini = bounds(miniTag)
+            assertEquals("Horizontal controls retain their 8dp visible gap", 8f * density,
+                cancel.left - field.right, tolerance)
+            assertEquals("Mini player and search use the same visible edge gap",
+                cancel.left - field.right, field.top - mini.bottom, tolerance)
+            assertTrue("Search field retains a 44dp target", field.height >= 44f * density)
+            assertTrue("Cancel retains a 44dp target", cancel.height >= 44f * density)
+            return field
+        }
+        try {
+            compose.runOnUiThread {
+                WindowCompat.getInsetsController(compose.activity.window, compose.activity.window.decorView)
+                    .hide(WindowInsetsCompat.Type.ime())
+            }
+            val restingField = assertSpacing(imeVisible = false)
+            val configuration = compose.activity.resources.configuration
+            if (configuration.keyboard == Configuration.KEYBOARD_NOKEYS ||
+                configuration.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES
+            ) {
+                searchInput().performClick()
+                compose.runOnUiThread {
+                    WindowCompat.getInsetsController(compose.activity.window, compose.activity.window.decorView)
+                        .show(WindowInsetsCompat.Type.ime())
+                }
+                val raisedField = assertSpacing(imeVisible = true)
+                assertTrue("Both controls must move above the keyboard", raisedField.top < restingField.top)
+            }
+        } finally {
+            navigateBack()
+            assertHome()
+        }
+    }
+
+    @Test
     fun recentQueriesCanBeReusedRemovedAndCleared() {
         val query = "MeiloX search history check"
         runBlocking(Dispatchers.IO) { compose.activity.clearSearchHistory() }
@@ -98,14 +176,13 @@ class SearchNavigationInstrumentedTest {
     }
 
     @Test
-    fun emptySearchBackRemovesTheToolbarWithTheDiscoveryPage() {
+    fun emptySearchBackRemovesTheToolbar() {
         openSearch()
-        showDiscoveryCategory(R.string.search_browse_categories)
 
         navigateBack()
 
         assertHome()
-        compose.onNodeWithText(text(R.string.search_browse_categories)).assertDoesNotExist()
+        searchInput().assertDoesNotExist()
     }
 
     @Test
@@ -118,56 +195,6 @@ class SearchNavigationInstrumentedTest {
         openSearch()
 
         assertEmptyQuery()
-        compose.onNodeWithContentDescription(text(R.string.cancel)).performClick()
-        assertHome()
-    }
-
-    @Test
-    fun resultsBackRestoresDiscoveryWithoutRefocusingTheInput() {
-        openSearch()
-        searchInput().performTextInput("Codex navigation regression")
-        searchInput().performImeAction()
-        assertResultQuery("Codex navigation regression")
-
-        val updatedQuery = "Updated search query"
-        searchInput().performTextReplacement("  $updatedQuery  ")
-        searchInput().performImeAction()
-        assertResultQuery(updatedQuery)
-        compose.waitUntil(5_000) {
-            runBlocking(Dispatchers.IO) {
-                decodeSearchHistory(compose.activity.dataStore.data.first()[SearchHistoryKey]).firstOrNull() == updatedQuery
-            }
-        }
-        searchInput().performClick().performTextReplacement("Unsubmitted draft")
-        compose.onNodeWithContentDescription(text(R.string.cancel)).performClick()
-        assertResultQuery(updatedQuery)
-
-        navigateBack()
-
-        searchInput().assertIsDisplayed().assertIsNotFocused()
-        assertEmptyQuery()
-        showDiscoveryCategory(R.string.search_browse_categories)
-
-        navigateBack()
-        assertHome()
-    }
-
-    @Test
-    fun categoryNavigationHidesTheToolbarAndBackRestoresIt() {
-        openSearch()
-        showDiscoveryCategory(R.string.search_category_rankings)
-        // The IME can still be moving after scrolling; invoke the destination action directly.
-        compose.onNodeWithText(text(R.string.search_category_rankings))
-            .performSemanticsAction(SemanticsActions.OnClick) { it() }
-
-        searchInput().assertDoesNotExist()
-
-        navigateBack()
-
-        searchInput().assertIsDisplayed().assertIsNotFocused()
-        assertEmptyQuery()
-        showDiscoveryCategory(R.string.search_browse_categories)
-
         navigateBack()
         assertHome()
     }
@@ -283,26 +310,18 @@ class SearchNavigationInstrumentedTest {
         compose.onNodeWithContentDescription(text(R.string.app_tab_search)).assertIsDisplayed()
     }
 
+    /**
+     * 确认搜索后进入 B 站全站搜索结果页：页面标题就是关键词，搜索栏随之关闭。
+     */
     private fun assertResultQuery(query: String) {
-        compose.onAllNodesWithText(text(R.string.search_details_title))[0].assertIsDisplayed()
-        searchInput().assertIsDisplayed().assertIsNotFocused().assert(
-            SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString(query)),
-        )
+        compose.onAllNodesWithText(query)[0].assertIsDisplayed()
+        searchInput().assertDoesNotExist()
     }
 
     private fun assertEmptyQuery() {
         searchInput().assert(
             SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")),
         )
-    }
-
-    private fun showDiscoveryCategory(resource: Int) {
-        // The static categories remain available while network recommendations load or fail.
-        compose.onNode(
-            hasScrollToNodeAction() and
-                SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange),
-        ).performScrollToNode(hasText(text(resource)))
-        compose.onNodeWithText(text(resource)).assertIsDisplayed()
     }
 
     private fun navigateBack() {

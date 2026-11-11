@@ -40,12 +40,12 @@ import com.ljyh.mei.data.repository.BiliFavoritesSync
 import com.ljyh.mei.data.repository.BiliFavFolder
 import com.ljyh.mei.data.repository.BiliRepository
 import com.ljyh.mei.data.repository.biliFavPlaylistId
-import com.ljyh.mei.ui.glass.GlassCard
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosListRow
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
+import io.github.neoruaa.glasmio.ui.GlasmioCard
+import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalPlayerConnection
@@ -139,7 +139,7 @@ fun BiliAccountHomeScreen(
     val syncing by viewModel.syncing.collectAsState()
     val synced by viewModel.syncedPlaylists.collectAsState()
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = "我的账号",
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),
@@ -149,7 +149,7 @@ fun BiliAccountHomeScreen(
             // 未登录（或会话刚被清除）：显示登录引导，不做自动跳转，
             // 否则账号信息流首次发射前的空窗会误跳登录页再闪回。
             item(key = "account-login-gate") {
-                GlassCard(
+                GlasmioCard(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { Screen.BiliLogin.navigate(navController) },
                 ) {
@@ -169,7 +169,7 @@ fun BiliAccountHomeScreen(
             }
         } else {
             item(key = "account-hero") {
-                GlassCard {
+                GlasmioCard {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -251,8 +251,8 @@ fun BiliAccountHomeScreen(
                 is Resource.Success -> {
                     val syncedIds = synced.map { it.id }.toSet()
                     items(folderResult.data, key = { it.id }) { folder ->
-                        IosGroupedList {
-                            IosListRow(
+                        GlasmioGroupedList {
+                            GlasmioListRow(
                                 title = folder.title.ifBlank { "收藏夹" },
                                 subtitle = "${folder.mediaCount} 个内容" +
                                     if (biliFavPlaylistId(folder.id) in syncedIds) " · 已同步" else "",

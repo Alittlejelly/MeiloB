@@ -20,11 +20,11 @@ import com.ljyh.mei.R
 import com.ljyh.mei.constants.LibraryDefaultPageKey
 import com.ljyh.mei.constants.LibraryStyle
 import com.ljyh.mei.constants.LibraryStyleKey
-import com.ljyh.mei.ui.component.GlobalProfileAvatarButton
-import com.ljyh.mei.ui.glass.IosListRow
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
+import com.ljyh.mei.ui.component.globalProfileHeaderAction
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.navigation.LibraryPage
@@ -34,7 +34,8 @@ import com.ljyh.mei.utils.dataStore
 import com.ljyh.mei.utils.toEnum
 
 internal fun resolveLibraryDefaultPage(value: String, style: LibraryStyle): LibraryPage =
-    LibraryPage.entries.firstOrNull { it.name == value } ?: LibraryPage.Favorites
+    LibraryPage.entries.firstOrNull { it.name == value && it in LibraryPage.biliPages }
+        ?: LibraryPage.Favorites
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,11 +76,11 @@ fun LibraryScreen(
 
 @Composable
 private fun LibraryCategoryList(isNavigationTab: Boolean) {
-    val categories = LibraryPage.entries
+    val categories = LibraryPage.biliPages
     val navController = LocalNavController.current
     val colors = LocalGlassColors.current
     val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = stringResource(R.string.app_tab_library),
         bottomPadding = insets.calculateBottomPadding(),
         horizontalContentPadding = 6.dp,
@@ -87,11 +88,11 @@ private fun LibraryCategoryList(isNavigationTab: Boolean) {
         verticalArrangement = Arrangement.spacedBy(0.dp),
         backgroundColor = if (colors.isDark) colors.groupedBackground else Color.White,
         onNavigateBack = if (isNavigationTab) null else ({ navController.navigateUp() }),
-        actions = { if (isNavigationTab) GlobalProfileAvatarButton() },
+        actions = { if (isNavigationTab) listOf(globalProfileHeaderAction()) else emptyList() },
     ) {
         categories.forEachIndexed { index, page ->
             item(key = "library-category:${page.name}") {
-                IosListRow(
+                GlasmioListRow(
                     title = stringResource(page.titleRes),
                     leading = { SfIcon(page.symbol, null, tint = colors.accent) },
                     showTopSeparator = index > 0,

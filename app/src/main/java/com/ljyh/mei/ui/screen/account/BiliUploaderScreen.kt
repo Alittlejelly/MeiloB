@@ -60,11 +60,11 @@ import com.ljyh.mei.di.repository.ColorRepository
 import com.ljyh.mei.playback.queue.ListQueue
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.ljyh.mei.ui.component.playlist.rememberCoverBackground
-import com.ljyh.mei.ui.glass.GlassButton
-import com.ljyh.mei.ui.glass.IosPinnedPage
-import com.ljyh.mei.ui.glass.IosTypography
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
+import io.github.neoruaa.glasmio.ui.GlasmioButton
+import com.ljyh.mei.ui.navigation.MeiloXPinnedPage
+import io.github.neoruaa.glasmio.core.IosTypography
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalPlayerConnection
@@ -197,6 +197,7 @@ fun BiliUploaderScreen(
 
     val scrollState = rememberLazyListState()
     val videos = (uiState.videos as? Resource.Success)?.data.orEmpty()
+    val biliGridColumns = rememberBiliGridColumns()
 
     fun playAll(startIndex: Int) {
         val connection = playerConnection ?: return
@@ -232,7 +233,7 @@ fun BiliUploaderScreen(
             }
         }
 
-        IosPinnedPage(
+        MeiloXPinnedPage(
             title = uploaderName,
             bottomPadding = bottomPadding,
             collapseProgress = collapseProgress,
@@ -306,7 +307,7 @@ fun BiliUploaderScreen(
                                 )
                             }
                             Spacer(Modifier.height(18.dp))
-                            GlassButton(
+                            GlasmioButton(
                                 onClick = { playAll(0) },
                                 enabled = videos.isNotEmpty(),
                                 modifier = Modifier.fillMaxWidth(),
@@ -393,22 +394,12 @@ fun BiliUploaderScreen(
                 }
                 when (val result = uiState.videos) {
                     is Resource.Success -> {
-                        itemsIndexed(
-                            videos,
-                            key = { _, video -> video.aid },
-                            contentType = { _, _ -> "uploader-row" },
-                        ) { index, video ->
-                            BiliTrackRow(video = video, onClick = { playAll(index) })
-                            if (index < videos.lastIndex) {
-                                HorizontalDivider(
-                                    color = colors.separator,
-                                    modifier = Modifier.padding(horizontal = 16.dp),
-                                )
-                            }
-                            if (index == videos.lastIndex && uiState.fullList) {
-                                LaunchedEffect(video.aid) { viewModel.loadMore() }
-                            }
-                        }
+                        biliVideoGridItems(
+                            videos = videos,
+                            columns = biliGridColumns,
+                            dividerColor = colors.separator,
+                            onReachEnd = if (uiState.fullList) { { viewModel.loadMore() } } else null,
+                        ) { index, _ -> playAll(index) }
                         if (uiState.loadingMore) {
                             item(key = "uploader-loading") {
                                 Text(

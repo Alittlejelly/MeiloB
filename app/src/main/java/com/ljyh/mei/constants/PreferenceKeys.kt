@@ -23,6 +23,19 @@ val UserIdKey = stringPreferencesKey("userId")
 val UserNicknameKey = stringPreferencesKey("userNickname")
 val UserAvatarUrlKey = stringPreferencesKey("userAvatarUrl")
 val UserPhotoKey = stringPreferencesKey("userPhoto")
+val ShowLyricsKey = booleanPreferencesKey("showLyrics")
+val LyricVisualStyleKey = stringPreferencesKey("lyrics.visualStyle")
+val LyricTranslationEnabledKey = booleanPreferencesKey("lyrics.translationEnabled")
+val LyricRomanizationEnabledKey = booleanPreferencesKey("lyrics.romanizationEnabled")
+val LyricGlowEnabledKey = booleanPreferencesKey("lyrics.glowEnabled")
+val LyricLiftEnabledKey = booleanPreferencesKey("lyrics.liftEnabled")
+val LyricLongToneEnabledKey = booleanPreferencesKey("lyrics.longToneEnabled")
+val LyricAutoFollowEnabledKey = booleanPreferencesKey("lyrics.autoFollowEnabled")
+val SystemLyricsEnabledKey = booleanPreferencesKey("lyrics.systemEnabled")
+val BluetoothLyricsEnabledKey = booleanPreferencesKey("lyrics.bluetoothEnabled")
+val FloatingLyricsTranslationKey = booleanPreferencesKey("floatingLyrics.showsTranslation")
+val FloatingLyricsNextLineKey = booleanPreferencesKey("floatingLyrics.showsNextLine")
+val FloatingLyricsFontScaleKey = floatPreferencesKey("floatingLyrics.fontScale")
 
 
 val CookieKey = stringPreferencesKey("cookie")
@@ -39,7 +52,7 @@ val CoverStyleKey = stringPreferencesKey("coverStyle")
 val DynamicThemeKey = booleanPreferencesKey("dynamicTheme")
 const val DefaultAccentColorArgb = 0xFFFF3B30L
 val AccentColorKey = longPreferencesKey("accentColor")
-const val DefaultInterfaceLetterSpacing = 0.7f
+const val DefaultInterfaceLetterSpacing = 0.4f
 const val MaxInterfaceLetterSpacing = 1.4f
 val InterfaceLetterSpacingKey = floatPreferencesKey("interfaceLetterSpacing")
 val PlayerActionKey = stringPreferencesKey("playerBottomAction")
@@ -52,6 +65,7 @@ val AccompanimentLyricTextBoldKey = booleanPreferencesKey("accompanimentLyricTex
 
 val LoopPlaybackKey = booleanPreferencesKey("loopPlayback")
 val AllowConcurrentPlaybackKey = booleanPreferencesKey("playback.allowConcurrentPlayback")
+val AudioOutputModeKey = stringPreferencesKey("playback.audioOutputMode")
 val PreviousPlaybackKey = booleanPreferencesKey("previousPlayback")
 val NoAudioSourceKey = booleanPreferencesKey("noAudioSource")
 val IsShuffleModeKey = booleanPreferencesKey("shuffleMode")
@@ -106,6 +120,7 @@ val BottomFloatingContentExtraSpacingKey = intPreferencesKey("appearance.bottomF
 const val DefaultBottomFloatingContentExtraSpacing = 8
 const val MaxBottomFloatingContentExtraSpacing = 64
 val LiquidGlassEnabledKey = booleanPreferencesKey("appearance.liquidGlassEnabled")
+val GlassHdrEffectsKey = booleanPreferencesKey("appearance.glassHdrEffects")
 val ReduceTransparencyKey = booleanPreferencesKey("appearance.reduceTransparency")
 val ColorfulDetailBackgroundsKey = booleanPreferencesKey("appearance.colorfulDetailBackgrounds")
 val PredictiveBackAnimationEnabledKey = booleanPreferencesKey("appearance.predictiveBackAnimationEnabled")
@@ -129,7 +144,6 @@ val PodcastsEnabledKey = booleanPreferencesKey("content.podcastsEnabled")
 val DownloadsEnabledKey = booleanPreferencesKey("content.downloadsEnabled")
 val CloudMusicEnabledKey = booleanPreferencesKey("content.cloudMusicEnabled")
 val ListeningHistoryEnabledKey = booleanPreferencesKey("content.listeningHistoryEnabled")
-val FindMusicTabEnabledKey = booleanPreferencesKey("navigation.findMusicTabEnabled")
 val LibraryTabEnabledKey = booleanPreferencesKey("navigation.libraryTabEnabled")
 val PodcastsTabEnabledKey = booleanPreferencesKey("navigation.podcastsTabEnabled")
 val DownloadsTabEnabledKey = booleanPreferencesKey("navigation.downloadsTabEnabled")
@@ -139,6 +153,7 @@ val NavigationTabOrderKey = stringPreferencesKey("navigation.tabOrder")
 val AppAppearanceKey = stringPreferencesKey("application.appearance")
 val LastSelectedTabKey = stringPreferencesKey("navigation.lastSelectedTab")
 val RecognizeClipboardLinksKey = booleanPreferencesKey("application.recognizeClipboardLinks")
+val BetaUpdatesEnabledKey = booleanPreferencesKey("application.betaUpdatesEnabled")
 val QqTimeoutKey = stringPreferencesKey("qq_timeout")
 
 enum class QqTimeout(val seconds: Int, val label: String) {
@@ -161,6 +176,8 @@ enum class PlayerStyle {
 
 enum class AppAppearance { System, Light, Dark }
 
+enum class AudioOutputMode { AudioTrack, AAudio, OpenSLES, UsbBitPerfect }
+
 enum class AutoMixMode { Smart, Fixed }
 enum class AutoMixFadeCurve { EqualPower, Smooth, Linear }
 
@@ -180,6 +197,8 @@ enum class LyricTextAlignment {
     Center,
     Right
 }
+
+enum class LyricVisualStyle { AppleMusic, EVA, TextPV, Skyline }
 
 
 enum class MusicQuality(val text: String, val explanation: String, val labelRes: Int) {
@@ -211,14 +230,39 @@ enum class DownloadQuality(val text: String, val label: String, val description:
 }
 
 enum class LyricTextSize(val text: Int) {
+    Size16(16),
+    Size17(17),
     Size18(18),
+    Size19(19),
     Size20(20),
+    Size21(21),
     Size22(22),
+    Size23(23),
     Size24(24),
+    Size25(25),
     Size26(26),
+    Size27(27),
     Size28(28),
+    Size29(29),
     Size30(30),
-    Size32(32)
+    Size31(31),
+    Size32(32),
+    Size33(33),
+    Size34(34),
+    Size35(35),
+    Size36(36),
+    Size37(37),
+    Size38(38),
+    Size39(39),
+    Size40(40),
+    Size41(41),
+    Size42(42),
+    Size43(43),
+    Size44(44),
+    Size45(45),
+    Size46(46),
+    Size47(47),
+    Size48(48)
 }
 
 enum class ProgressBarStyle(val label: String) {
@@ -232,6 +276,10 @@ enum class TabletAnimationStyle(val label: String) {
     ZOOM("缩放"),
     FLIP_3D("3D翻转")
 }
+
+val FlymeStatusBarLyricsEnabledKey = booleanPreferencesKey("lyrics.flymeStatusBarEnabled")
+val PrivateFmModeKey = stringPreferencesKey("privateFm.mode")
+val PrivateFmSceneKey = stringPreferencesKey("privateFm.scene")
 
 // ---- Bilibili 会话 ----
 val BiliSessdataKey = stringPreferencesKey("bili_sessdata")

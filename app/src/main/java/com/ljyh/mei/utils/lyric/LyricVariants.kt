@@ -5,6 +5,8 @@ import com.ljyh.mei.ui.model.LyricSource
 import com.ljyh.mei.ui.model.LyricSourceData
 import com.ljyh.mei.ui.model.LyricVariant
 import com.mocharealm.accompanist.lyrics.core.model.SyncedLyrics
+import com.mocharealm.accompanist.lyrics.core.model.karaoke.KaraokeLine
+import com.mocharealm.accompanist.lyrics.core.model.synced.SyncedLine
 
 /** Keep word and line versions separate without changing automatic source priority. */
 internal fun buildLyricVariants(
@@ -48,13 +50,18 @@ internal fun buildLyricVariants(
             }
         }
     }
+    sources.filterIsInstance<LyricSourceData.Kugou>().firstOrNull()?.let { source ->
+        source.lyric.takeIf(String::isNotBlank)?.let { lrc ->
+            addVersion(LyricSource.Kugou, false) { LRCParser.parse(lrc, null) }
+        }
+    }
 }
 
 internal fun lyricVariantOf(data: LyricData): LyricVariant? = when (data.source) {
     LyricSource.AM -> LyricVariant.AppleMusic
     LyricSource.NetEaseCloudMusic -> if (data.isVerbatim) LyricVariant.NeteaseYrc else LyricVariant.NeteaseLrc
     LyricSource.QQMusic -> if (data.isVerbatim) LyricVariant.QqQrc else LyricVariant.QqLrc
-    LyricSource.Empty, LyricSource.Loading -> null
+    LyricSource.Kugou, LyricSource.Empty, LyricSource.Loading -> null
 }
 
 internal fun lyricVariantPreference(source: LyricSource?, stored: String?): LyricVariant? =
@@ -62,3 +69,11 @@ internal fun lyricVariantPreference(source: LyricSource?, stored: String?): Lyri
 
 internal fun LyricData.matchesLyricPreference(source: LyricSource?, variant: LyricVariant?): Boolean =
     (source == null || this.source == source) && (variant == null || lyricVariantOf(this) == variant)
+
+internal fun lyricPreview(data: LyricData): String = data.lyricLine.lines.asSequence().map { line ->
+    when (line) {
+        is KaraokeLine -> line.syllables.joinToString("") { it.content }
+        is SyncedLine -> line.content
+        else -> ""
+    }.trim()
+}.firstOrNull(String::isNotBlank).orEmpty().take(160)

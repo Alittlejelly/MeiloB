@@ -29,27 +29,33 @@ import com.ljyh.mei.ui.component.player.overlay.PlayerOverlayHandler
 import com.ljyh.mei.ui.component.player.overlay.rememberOverlayHandler
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
 import com.ljyh.mei.ui.component.player.state.rememberPlayerStateContainer
-import com.ljyh.mei.ui.component.sheet.BottomSheetState
+import io.github.neoruaa.glasmio.scaffold.GlasmioBottomSheetState
+import io.github.neoruaa.glasmio.ui.GlasmioSheetGroupedListStyle
+import io.github.neoruaa.glasmio.ui.LocalGlasmioSheetGroupedListStyle
 import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerConnection
-import com.ljyh.mei.ui.glass.LocalBlurBackdrop
-import com.ljyh.mei.ui.glass.LocalGlassBackdrop
-import com.ljyh.mei.ui.glass.LocalGroupedListBackgroundAlpha
-import com.ljyh.mei.ui.glass.SheetGroupedListBackgroundAlpha
-import com.ljyh.mei.ui.glass.rememberRasterizedPlayerBackdrop
+import io.github.neoruaa.glasmio.glass.LocalBlurBackdrop
+import io.github.neoruaa.glasmio.glass.LocalGlassBackdrop
+import io.github.neoruaa.glasmio.glass.rememberRasterizedBackdrop
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import androidx.compose.runtime.key
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ljyh.mei.R
+import com.ljyh.mei.playback.PrivateFmMode
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.ui.screen.playlist.PlaylistViewModel
-import com.kyant.backdrop.backdrops.rememberCombinedBackdrop
-import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.rememberCombinedBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.rememberLayerBackdrop
 
 internal val LocalPlayerArtwork = staticCompositionLocalOf<Pair<String, androidx.compose.ui.graphics.painter.Painter>?> { null }
+
+internal val LocalPlayerRoamingModeLabel = staticCompositionLocalOf<String?> { null }
 
 internal val LocalPlayerBackgroundReadyChanged = staticCompositionLocalOf<(Boolean) -> Unit> { {} }
 
@@ -57,7 +63,7 @@ internal val LocalPlayerBackgroundReadyChanged = staticCompositionLocalOf<(Boole
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BottomSheetPlayer(
-    state: BottomSheetState,
+    state: GlasmioBottomSheetState,
     modifier: Modifier = Modifier,
     compactMiniPlayerProgress: State<Float>,
     miniPlayerVerticalOffset: () -> Dp,
@@ -79,9 +85,9 @@ fun BottomSheetPlayer(
     // separate source so sheets can sample it without changing that visual z-order.
     val playerCoverBackdrop = rememberLayerBackdrop()
     val playerBackdrop = rememberCombinedBackdrop(
-        rememberRasterizedPlayerBackdrop(playerBackgroundBackdrop),
-        rememberRasterizedPlayerBackdrop(playerContentBackdrop),
-        rememberRasterizedPlayerBackdrop(playerCoverBackdrop),
+        rememberRasterizedBackdrop(playerBackgroundBackdrop),
+        rememberRasterizedBackdrop(playerContentBackdrop),
+        rememberRasterizedBackdrop(playerCoverBackdrop),
     )
 
     // 获取播放器样式
@@ -94,6 +100,20 @@ fun BottomSheetPlayer(
         playerConnection = playerConnection,
         progressUpdatesEnabled = progressUpdatesEnabled,
     )
+    val roamingMode by playerConnection.privateFmMode.collectAsStateWithLifecycle()
+    val roamingScene by playerConnection.privateFmScene.collectAsStateWithLifecycle()
+    val roamingModeLabel = if (stateContainer.isFMMode.value &&
+        playerConnection.service.queueManager.similarFmSourceIds == null
+    ) {
+        when (roamingMode) {
+            PrivateFmMode.DEFAULT -> stringResource(R.string.private_fm_default_mode)
+            PrivateFmMode.FAMILIAR -> stringResource(R.string.private_fm_familiar_mode)
+            PrivateFmMode.EXPLORE -> stringResource(R.string.private_fm_explore_mode)
+            PrivateFmMode.SCENE -> roamingScene?.let {
+                stringResource(R.string.private_fm_named_scene_mode, it.title)
+            } ?: stringResource(R.string.private_fm_scene_mode)
+        }
+    } else null
 
     // 创建弹窗处理器
     val overlayHandler = rememberOverlayHandler(
@@ -117,10 +137,12 @@ fun BottomSheetPlayer(
     }
     val sheetLayers = rememberPlayerSheetLayers(state)
 
+
     // 单入口、双实现 - 根据样式渲染不同的播放器
     CompositionLocalProvider(
         LocalPlayerSheet provides sheetLayers,
         LocalPlayerArtwork provides artwork,
+        LocalPlayerRoamingModeLabel provides roamingModeLabel,
         LocalPlayerBackgroundReadyChanged provides onBackgroundReadyChanged,
         LocalGlassBackdrop provides playerBackdrop,
         LocalBlurBackdrop provides playerBackdrop,
@@ -177,9 +199,9 @@ fun BottomSheetPlayer(
 
     // 公共的弹窗处理层
     CompositionLocalProvider(
-        LocalGlassBackdrop provides playerBackdrop,
-        LocalBlurBackdrop provides playerBackdrop,
-        LocalGroupedListBackgroundAlpha provides SheetGroupedListBackgroundAlpha,
+        LocalGlassBackdrop provides if (state.isCollapsed) collapsedBackdrop else playerBackdrop,
+        LocalBlurBackdrop provides if (state.isCollapsed) collapsedBackdrop else playerBackdrop,
+        LocalGlasmioSheetGroupedListStyle provides GlasmioSheetGroupedListStyle.ToolbarTint,
     ) {
         CommonOverlayHandler(
             overlayHandler = overlayHandler,

@@ -1,17 +1,11 @@
 package com.ljyh.mei.ui.screen.log
 
-import androidx.compose.foundation.background
+import com.ljyh.mei.ui.navigation.meiloxHeaderAction
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
@@ -24,10 +18,16 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
-import com.ljyh.mei.ui.glass.GlassIconButton
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import com.ljyh.mei.ui.navigation.MeiloXPinnedPage
+import com.ljyh.mei.ui.navigation.MeiloXPageHeaders
+import com.ljyh.mei.ui.navigation.MeiloXPageEntry
+import com.ljyh.mei.ui.navigation.MeiRoute
+import io.github.neoruaa.glasmio.scaffold.GlasmioNavigationScaffold
+import io.github.neoruaa.glasmio.scaffold.navigation.GlasmioNavHeaderMotion
+import androidx.compose.ui.platform.LocalDensity
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import androidx.compose.foundation.layout.asPaddingValues
 import java.io.File
 import java.text.SimpleDateFormat
@@ -49,16 +49,18 @@ fun LogScreen(
     val secondaryTextColor = colors.secondaryContent
     val logBackgroundColor = colors.elevatedBackground
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = "日志收集",
         onNavigateBack = navController::popBackStack,
         bottomPadding = LocalPlayerAwareWindowInsets.current
             .asPaddingValues()
             .calculateBottomPadding(),
         actions = {
-            GlassIconButton(onClick = viewModel::clearAllLogs) {
-                SfIcon("trash", "Clear All")
-            }
+            listOf(meiloxHeaderAction(
+                key = "logs.clear",
+                contentDescription = "Clear All",
+                onClick = viewModel::clearAllLogs,
+            ) { SfIcon("trash", null) })
         },
     ) {
             items(fileList) { file ->
@@ -79,12 +81,11 @@ fun LogScreen(
             content = content!!,
             fileName = "日志详情",
             onDismiss = { viewModel.closeContent() },
-            onShare = {
-                val currentFile = fileList.find { it.readText() == content }
-                if (currentFile != null) {
-                    viewModel.shareCurrentFile()
-                }
-            },
+            // 之前这里为了"找回"当前文件，对每个文件都做一次 readText() 再和 content 比较：
+            // 日志动辄几 MB，这一步在主线程同步读盘，点分享会卡死十几秒甚至 OOM；
+            // 而且内容对不上（比如被截断）时 currentFile 为 null，直接什么都不做。
+            // 打开文件时 ViewModel 已经记下了 currentSelectedFile，这里直接用。
+            onShare = viewModel::shareCurrentFile,
             logBackgroundColor = logBackgroundColor
         )
     }
@@ -152,6 +153,15 @@ fun LogDetailDialog(
     onShare: () -> Unit,
     logBackgroundColor: Color
 ) {
+    val entryKey = remember { MeiRoute("log-detail-dialog") }
+    val headers = remember { MeiloXPageHeaders() }
+    val headerMotion = remember(entryKey) { GlasmioNavHeaderMotion(entryKey.route) }
+    val scrollState = rememberScrollState()
+    val blurDistancePx = with(LocalDensity.current) { 56.dp.toPx() }
+    val scrollProgress by remember(scrollState, blurDistancePx) {
+        derivedStateOf { (scrollState.value / blurDistancePx).coerceIn(0f, 1f) }
+    }
+    SideEffect { headers.retain(setOf(entryKey.route)) }
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -160,47 +170,34 @@ fun LogDetailDialog(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                TopAppBar(
-                    title = { Text(fileName, style = MaterialTheme.typography.titleSmall) },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                "Close",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = onShare) {
-                            Icon(
-                                Icons.Default.Share,
-                                "Share",
-                                tint = MaterialTheme.colorScheme.onSurface
+            GlasmioNavigationScaffold(
+                motion = headerMotion,
+                header = { headers.entry(it).spec },
+            ) {
+                MeiloXPageEntry(entryKey, headers) {
+                    MeiloXPinnedPage(
+                        title = fileName,
+                        onNavigateBack = onDismiss,
+                        backgroundColor = logBackgroundColor,
+                        topBarBlurProgress = scrollProgress,
+                        actions = {
+                            listOf(meiloxHeaderAction(
+                                key = "log-detail.share",
+                                contentDescription = "Share",
+                                onClick = onShare,
+                            ) { SfIcon("square.and.arrow.up", null) })
+                        },
+                    ) { padding ->
+                        Box(
+                            Modifier.fillMaxSize().verticalScroll(scrollState).padding(padding),
+                        ) {
+                            Text(
+                                text = content,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
                             )
                         }
                     }
-                )
-
-                // 日志内容滚动区域
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                        .background(logBackgroundColor)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text(
-                        text = content,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(8.dp)
-                    )
                 }
             }
         }

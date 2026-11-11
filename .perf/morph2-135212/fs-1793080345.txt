@@ -1,0 +1,809 @@
+Applications Graphics Acceleration Info:
+Uptime: 88943209 Realtime: 1880518182
+
+** Graphics info for pid 31533 [com.netease.cloudmusic] **
+
+Stats since: 88929982754929ns
+Total frames rendered: 1336
+Janky frames: 10 (0.75%)
+Janky frames (legacy): 472 (35.33%)
+50th percentile: 11ms
+90th percentile: 77ms
+95th percentile: 85ms
+99th percentile: 101ms
+Number Missed Vsync: 8
+Number High input latency: 2651
+Number Slow UI thread: 10
+Number Slow bitmap uploads: 0
+Number Slow issue draw commands: 10
+Number Frame deadline missed: 10
+Number Frame deadline missed (legacy): 11
+HISTOGRAM: 5ms=0 6ms=0 7ms=0 8ms=20 9ms=86 10ms=248 11ms=328 12ms=152 13ms=52 14ms=42 15ms=16 16ms=22 17ms=18 18ms=14 19ms=18 20ms=8 21ms=8 22ms=2 23ms=6 24ms=8 25ms=4 26ms=2 27ms=6 28ms=4 29ms=6 30ms=6 31ms=2 32ms=4 34ms=2 36ms=0 38ms=2 40ms=0 42ms=0 44ms=2 46ms=2 48ms=8 53ms=4 57ms=14 61ms=16 65ms=10 69ms=22 73ms=38 77ms=26 81ms=30 85ms=20 89ms=16 93ms=18 97ms=6 101ms=10 105ms=4 109ms=4 113ms=0 117ms=0 121ms=0 125ms=0 129ms=0 133ms=0 150ms=0 200ms=0 250ms=0 300ms=0 350ms=0 400ms=0 450ms=0 500ms=0 550ms=0 600ms=0 650ms=0 700ms=0 750ms=0 800ms=0 850ms=0 900ms=0 950ms=0 1000ms=0 1050ms=0 1100ms=0 1150ms=0 1200ms=0 1250ms=0 1300ms=0 1350ms=0 1400ms=0 1450ms=0 1500ms=0 1550ms=0 1600ms=0 1650ms=0 1700ms=0 1750ms=0 1800ms=0 1850ms=0 1900ms=0 1950ms=0 2000ms=0 2050ms=0 2100ms=0 2150ms=0 2200ms=0 2250ms=0 2300ms=0 2350ms=0 2400ms=0 2450ms=0 2500ms=0 2550ms=0 2600ms=0 2650ms=0 2700ms=0 2750ms=0 2800ms=0 2850ms=0 2900ms=0 2950ms=0 3000ms=0 3050ms=0 3100ms=0 3150ms=0 3200ms=0 3250ms=0 3300ms=0 3350ms=0 3400ms=0 3450ms=0 3500ms=0 3550ms=0 3600ms=0 3650ms=0 3700ms=0 3750ms=0 3800ms=0 3850ms=0 3900ms=0 3950ms=0 4000ms=0 4050ms=0 4100ms=0 4150ms=0 4200ms=0 4250ms=0 4300ms=0 4350ms=0 4400ms=0 4450ms=0 4500ms=0 4550ms=0 4600ms=0 4650ms=0 4700ms=0 4750ms=0 4800ms=0 4850ms=0 4900ms=0 4950ms=0
+50th gpu percentile: 3ms
+90th gpu percentile: 4ms
+95th gpu percentile: 5ms
+99th gpu percentile: 8ms
+GPU HISTOGRAM: 1ms=16 2ms=320 3ms=704 4ms=208 5ms=38 6ms=24 7ms=12 8ms=6 9ms=4 10ms=2 11ms=2 12ms=2 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 4950ms=0
+
+Pipeline=Skia (OpenGL)
+Memory policy:
+  Max surface area: 2527200
+  Max resource usage: 363.92MB (x48)
+  Background retention: 50% (altUiHidden = true)
+  GPU Context timeout: 10
+Contexts: 1 (stopped = 0)
+CPU Caches:
+  Glyph Cache: 686.00 KB (1 entry)
+  Glyph Count: 156 
+Total CPU memory usage:
+  702469 bytes, 686.00 KB (0.00 bytes is purgeable)
+GPU Caches:
+  SW Path Mask:
+    Texture: 60.59 MB (603 entries)
+  Other:
+    Other: 74.16 KB (1 entry)
+    Buffer Object: 2.94 KB (6 entries)
+    StencilAttachment: 7.94 MB (7 entries)
+  Image:
+    Texture: 9.23 MB (22 entries)
+  Scratch:
+    Texture: 5.12 MB (38 entries)
+    Buffer Object: 78.00 KB (2 entries)
+    RenderTarget: 89.33 MB (298 entries)
+Total GPU memory usage:
+  180739216 bytes, 172.37 MB (117.13 MB is purgeable)
+Pipeline Cache: inactiveDetail dimensions: 
+RenderTarget:				65536		{128x128}	16
+RenderTarget:				262144		{256x256}	7
+StencilAttachment:				65536		{128x128}	1
+RenderTarget:				65536		{256x256}	38
+RenderTarget:				262144		{1024x256}	25
+Buffer Object:				49152		{0x0}	1
+Texture:				2097152		{2048x1024}	1
+RenderTarget:				147456		{192x192}	9
+Texture:				256000		{320x200}	19
+RenderTarget:				16384		{128x128}	30
+RenderTarget:				1638400		{640x640}	2
+StencilAttachment:				262144		{512x128}	1
+Texture:				4665600		{1440x810}	1
+Texture:				128		{128x1}	1
+RenderTarget:				32768		{256x128}	27
+RenderTarget:				16384		{64x64}	4
+StencilAttachment:				1048576		{512x512}	1
+StencilAttachment:				2097152		{512x1024}	1
+Buffer Object:				30720		{0x0}	1
+RenderTarget:				131072		{512x256}	30
+StencilAttachment:				524288		{512x256}	1
+RenderTarget:				1671168		{1088x384}	5
+StencilAttachment:				131072		{256x128}	1
+StencilAttachment:				4194304		{1024x1024}	1
+RenderTarget:				3145728		{1536x512}	2
+RenderTarget:				1048576		{1024x256}	4
+RenderTarget:				819200		{640x320}	1
+RenderTarget:				540672		{704x192}	3
+RenderTarget:				360448		{704x128}	1
+RenderTarget:				786432		{768x256}	1
+RenderTarget:				3768320		{1472x640}	1
+RenderTarget:				524288		{1024x128}	7
+RenderTarget:				884736		{576x384}	2
+RenderTarget:				327680		{640x128}	2
+Texture:				147456		{256x144}	1
+Texture:				74043		{433x171}	7
+Texture:				78966		{642x123}	6
+Texture:				81270		{645x126}	6
+Texture:				293260		{860x341}	6
+Texture:				77440		{640x121}	12
+Texture:				77924		{644x121}	6
+Texture:				81250		{650x125}	6
+Texture:				79704		{648x123}	6
+Texture:				78650		{650x121}	6
+Texture:				86355		{505x171}	1
+Texture:				99250		{794x125}	1
+Texture:				97416		{792x123}	1
+Texture:				96074		{794x121}	1
+Texture:				71410		{386x185}	5
+Texture:				91827		{537x171}	5
+Texture:				89910		{555x162}	5
+Texture:				87374		{553x158}	5
+Texture:				87690		{555x158}	5
+Texture:				107250		{858x125}	5
+Texture:				105288		{856x123}	5
+Texture:				103818		{858x121}	5
+Texture:				83349		{441x189}	1
+Texture:				96615		{565x171}	1
+Texture:				109725		{665x165}	1
+Texture:				108069		{663x163}	1
+Texture:				107065		{665x161}	1
+Texture:				114250		{914x125}	1
+Texture:				112176		{912x123}	1
+Texture:				110594		{914x121}	1
+Texture:				89961		{471x191}	3
+Texture:				99180		{580x171}	3
+Texture:				122694		{726x169}	2
+Texture:				119460		{724x165}	2
+Texture:				119790		{726x165}	2
+Texture:				118000		{944x125}	3
+Texture:				115866		{942x123}	3
+Texture:				114224		{944x121}	3
+Texture:				93504		{487x192}	3
+Texture:				100548		{588x171}	3
+Texture:				127933		{757x169}	3
+Texture:				126085		{755x167}	3
+Texture:				124905		{757x165}	3
+Texture:				120000		{960x125}	3
+Texture:				117834		{958x123}	3
+Texture:				116160		{960x121}	3
+Texture:				95040		{495x192}	8
+Texture:				101232		{592x171}	9
+Texture:				131410		{773x170}	8
+Texture:				129528		{771x168}	8
+Texture:				128318		{773x166}	8
+Texture:				121000		{968x125}	9
+Texture:				118818		{966x123}	9
+Texture:				117128		{968x121}	9
+Texture:				95616		{498x192}	1
+Texture:				101403		{593x171}	3
+Texture:				132430		{779x170}	1
+Texture:				130536		{777x168}	1
+Texture:				129314		{779x166}	1
+Texture:				121250		{970x125}	3
+Texture:				119064		{968x123}	3
+Texture:				117370		{970x121}	13
+Texture:				131095		{785x167}	5
+Texture:				133172		{788x169}	5
+Texture:				96886		{502x193}	5
+Texture:				129195		{783x165}	10
+Texture:				129855		{787x165}	5
+Texture:				119556		{972x123}	5
+Texture:				122850		{975x126}	5
+Texture:				405790		{1190x341}	5
+Texture:				117854		{974x121}	5
+Texture:				74772		{402x186}	3
+Texture:				93195		{545x171}	3
+Texture:				95256		{588x162}	3
+Texture:				93760		{586x160}	3
+Texture:				92904		{588x158}	3
+Texture:				109250		{874x125}	3
+Texture:				107256		{872x123}	3
+Texture:				105754		{874x121}	3
+Texture:				84987		{497x171}	2
+Texture:				97250		{778x125}	2
+Texture:				95448		{776x123}	2
+Texture:				94138		{778x121}	2
+Texture:				79686		{466x171}	2
+Texture:				89500		{716x125}	2
+Texture:				87822		{714x123}	2
+Texture:				86636		{716x121}	2
+Texture:				76608		{448x171}	1
+Texture:				85000		{680x125}	1
+Texture:				83394		{678x123}	1
+Texture:				82280		{680x121}	1
+Texture:				75069		{439x171}	2
+Texture:				82750		{662x125}	2
+Texture:				81180		{660x123}	2
+Texture:				80102		{662x121}	2
+Texture:				74385		{435x171}	2
+Texture:				81750		{654x125}	2
+Texture:				80196		{652x123}	2
+Texture:				79134		{654x121}	2
+Texture:				73872		{432x171}	4
+Texture:				81000		{648x125}	4
+Texture:				79458		{646x123}	4
+Texture:				78408		{648x121}	4
+Texture:				84303		{493x171}	3
+Texture:				96250		{770x125}	3
+Texture:				94464		{768x123}	3
+Texture:				93170		{770x121}	3
+Texture:				85050		{450x189}	2
+Texture:				97299		{569x171}	2
+Texture:				113544		{684x166}	2
+Texture:				111848		{682x164}	2
+Texture:				110808		{684x162}	2
+Texture:				115250		{922x125}	2
+Texture:				113160		{920x123}	2
+Texture:				111562		{922x121}	2
+Texture:				122525		{725x169}	1
+Texture:				119295		{723x165}	1
+Texture:				119625		{725x165}	1
+Texture:				92928		{484x192}	1
+Texture:				100206		{586x171}	1
+Texture:				127088		{752x169}	1
+Texture:				125250		{750x167}	1
+Texture:				124080		{752x165}	1
+Texture:				119500		{956x125}	1
+Texture:				117342		{954x123}	1
+Texture:				115676		{956x121}	1
+Texture:				94464		{492x192}	2
+Texture:				100890		{590x171}	2
+Texture:				130390		{767x170}	2
+Texture:				128520		{765x168}	2
+Texture:				127322		{767x166}	2
+Texture:				120500		{964x125}	2
+Texture:				118326		{962x123}	2
+Texture:				116644		{964x121}	2
+Texture:				95232		{496x192}	1
+Texture:				131920		{776x170}	1
+Texture:				130032		{774x168}	1
+Texture:				128816		{776x166}	1
+Texture:				86868		{508x171}	2
+Texture:				67606		{439x154}	2
+Texture:				66424		{437x152}	2
+Texture:				65850		{439x150}	2
+Texture:				100000		{800x125}	2
+Texture:				98154		{798x123}	2
+Texture:				96800		{800x121}	2
+Texture:				81909		{479x171}	2
+Texture:				92750		{742x125}	2
+Texture:				91020		{740x123}	2
+Texture:				89782		{742x121}	2
+Texture:				77976		{456x171}	2
+Texture:				87000		{696x125}	2
+Texture:				85362		{694x123}	2
+Texture:				84216		{696x121}	2
+Texture:				75753		{443x171}	2
+Texture:				83750		{670x125}	2
+Texture:				82164		{668x123}	2
+Texture:				81070		{670x121}	2
+Texture:				74556		{436x171}	1
+Texture:				82000		{656x125}	1
+Texture:				80442		{654x123}	1
+Texture:				79376		{656x121}	1
+Texture:				80840		{430x188}	3
+Texture:				95589		{559x171}	4
+Texture:				106095		{643x165}	3
+Texture:				104483		{641x163}	3
+Texture:				103523		{643x161}	3
+Texture:				112750		{902x125}	4
+Texture:				110700		{900x123}	4
+Texture:				109142		{902x121}	4
+Texture:				88350		{465x190}	1
+Texture:				98667		{577x171}	1
+Texture:				119952		{714x168}	1
+Texture:				118192		{712x166}	1
+Texture:				117096		{714x164}	1
+Texture:				117250		{938x125}	1
+Texture:				115128		{936x123}	1
+Texture:				113498		{938x121}	1
+Texture:				91871		{481x191}	1
+Texture:				99864		{584x171}	1
+Texture:				125160		{745x168}	1
+Texture:				123338		{743x166}	1
+Texture:				122180		{745x164}	1
+Texture:				119000		{952x125}	1
+Texture:				116850		{950x123}	1
+Texture:				115192		{952x121}	1
+Texture:				95424		{497x192}	2
+Texture:				132090		{777x170}	2
+Texture:				130200		{775x168}	2
+Texture:				128982		{777x166}	2
+RenderTarget:				32768		{256x32}	2
+RenderTarget:				12124160		{1280x2368}	1
+Texture:				69184		{376x184}	1
+Texture:				90972		{532x171}	1
+Texture:				85600		{535x160}	1
+Texture:				84214		{533x158}	1
+Texture:				83460		{535x156}	1
+Texture:				106000		{848x125}	1
+Texture:				104058		{846x123}	1
+Texture:				102608		{848x121}	1
+Texture:				8192		{64x128}	2
+RenderTarget:				131072		{256x128}	5
+Texture:				83448		{488x171}	1
+Texture:				95000		{760x125}	1
+Texture:				93234		{758x123}	1
+Texture:				91960		{760x121}	1
+Texture:				77292		{452x171}	1
+Texture:				86000		{688x125}	1
+Texture:				84378		{686x123}	1
+Texture:				83248		{688x121}	1
+Texture:				75411		{441x171}	1
+Texture:				83250		{666x125}	1
+Texture:				81672		{664x123}	1
+Texture:				80586		{666x121}	1
+Texture:				131072		{512x256}	8
+Texture:				87020		{458x190}	1
+Texture:				97983		{573x171}	1
+Texture:				116900		{700x167}	1
+Texture:				115170		{698x165}	1
+Texture:				114100		{700x163}	1
+Texture:				116250		{930x125}	1
+Texture:				114144		{928x123}	1
+Texture:				112530		{930x121}	1
+Texture:				90916		{476x191}	1
+Texture:				99522		{582x171}	1
+Texture:				123648		{736x168}	1
+Texture:				121844		{734x166}	1
+Texture:				120704		{736x164}	1
+Texture:				118500		{948x125}	1
+Texture:				116358		{946x123}	1
+Texture:				114708		{948x121}	1
+RenderTarget:				65536		{512x32}	2
+RenderTarget:				262144		{1024x64}	2
+RenderTarget:				196608		{768x64}	2
+RenderTarget:				2048		{16x32}	1
+Texture:				80712		{472x171}	1
+Texture:				91000		{728x125}	1
+Texture:				89298		{726x123}	1
+Texture:				88088		{728x121}	1
+Texture:				74727		{437x171}	1
+Texture:				82250		{658x125}	1
+Texture:				80688		{656x123}	1
+Texture:				79618		{658x121}	1
+Texture:				74214		{434x171}	2
+Texture:				81500		{652x125}	2
+Texture:				79950		{650x123}	2
+Texture:				78892		{652x121}	2
+Texture:				75582		{442x171}	1
+Texture:				83500		{668x125}	1
+Texture:				81918		{666x123}	1
+Texture:				80828		{668x121}	1
+Texture:				82080		{480x171}	1
+Texture:				93000		{744x125}	1
+Texture:				91266		{742x123}	1
+Texture:				90024		{744x121}	1
+RenderTarget:				262144		{512x128}	4
+Texture:				32768		{512x64}	2
+RenderTarget:				638976		{832x192}	6
+RenderTarget:				1179648		{1152x256}	1
+RenderTarget:				1572864		{1536x256}	1
+RenderTarget:				786432		{1024x192}	3
+RenderTarget:				1048576		{512x512}	1
+RenderTarget:				1228800		{960x320}	1
+RenderTarget:				2097152		{1024x512}	1
+Texture:				393216		{1536x256}	1
+Texture:				16384		{128x128}	3
+Texture:				4096		{64x64}	2
+Texture:				65536		{256x256}	2
+Texture:				80652		{429x188}	1
+RenderTarget:				131072		{512x64}	2
+RenderTarget:				16384		{128x32}	1
+Texture:				105765		{641x165}	1
+Texture:				104157		{639x163}	1
+Texture:				103201		{641x161}	1
+Texture:				262144		{1024x256}	2
+Texture:				524288		{1024x512}	1
+Texture:				32768		{256x128}	2
+Texture:				2048		{64x32}	1
+RenderTarget:				196608		{256x192}	5
+RenderTarget:				4096		{32x32}	1
+RenderTarget:				98304		{192x128}	5
+RenderTarget:				8192		{64x32}	1
+RenderTarget:				1048576		{1024x1024}	1
+Texture:				78660		{460x171}	1
+Texture:				88000		{704x125}	1
+Texture:				86346		{702x123}	1
+Texture:				85184		{704x121}	1
+Texture:				4096		{32x128}	1
+Texture:				76095		{445x171}	1
+Texture:				84250		{674x125}	1
+Texture:				82656		{672x123}	1
+Texture:				81554		{674x121}	1
+RenderTarget:				32768		{64x128}	2
+Texture:				16384		{512x32}	2
+RenderTarget:				8192		{32x64}	1
+RenderTarget:				2048		{32x16}	1
+RenderTarget:				524288		{512x1024}	1
+RenderTarget:				589824		{576x256}	4
+RenderTarget:				98304		{128x192}	4
+RenderTarget:				442368		{576x192}	4
+Texture:				4096		{128x32}	1
+Texture:				2048		{16x128}	1
+RenderTarget:				262144		{512x512}	1
+RenderTarget:				294912		{576x128}	1
+RenderTarget:				983040		{768x320}	1
+RenderTarget:				409600		{320x320}	1
+RenderTarget:				393216		{512x192}	1
+Buffer Object:				180		{0x0}	1
+Buffer Object:				1920		{0x0}	1
+Texture:				64		{8x8}	1
+Texture:				131072		{1024x128}	2
+RenderTarget:				32768		{128x64}	2
+RenderTarget:				8192		{128x16}	1
+RenderTarget:				4096		{16x64}	1
+RenderTarget:				1024		{16x16}	1
+RenderTarget:				524288		{512x256}	1
+RenderTarget:				65536		{256x64}	2
+Buffer Object:				186		{0x0}	1
+Buffer Object:				264		{0x0}	1
+RenderTarget:				131072		{128x256}	1
+Texture:				65536		{512x128}	2
+Texture:				8192		{512x16}	1
+RenderTarget:				65536		{512x128}	1
+Buffer Object:				192		{0x0}	1
+Buffer Object:				272		{0x0}	1
+
+GraphicBufferAllocator buffers:
+            Handle |         Size |     W (Stride) x H | Layers |   Format |      Usage | Requestor
+0xb4000077ae4e64e0 |  9945.00 KiB | 1080 (1088) x 2340 |      1 |        1 | 0x10000900 | VRI[MainActivity]#0(BLAST Consumer)0
+0xb4000077ae4e6f90 |  9945.00 KiB | 1080 (1088) x 2340 |      1 |        1 | 0x10000900 | VRI[MainActivity]#0(BLAST Consumer)0
+0xb4000077ae4e79b0 |  9945.00 KiB | 1080 (1088) x 2340 |      1 |        1 | 0x10000900 | VRI[MainActivity]#0(BLAST Consumer)0
+0xb4000077ae4e7bf0 |  9945.00 KiB | 1080 (1088) x 2340 |      1 |        1 | 0x10000900 | VRI[MainActivity]#0(BLAST Consumer)0
+0xb4000077ae4f68c0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae4ffd40 |  3600.00 KiB | 1280 (1280) x  720 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae509d00 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50cdf0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50e740 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50f0d0 |  4657.50 KiB | 1440 (1472) x  810 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50f550 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50f700 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50f790 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae50fe50 |    94.50 KiB |  168 ( 192) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae510000 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae5118c0 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae512b50 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae5130f0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae513960 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae513f00 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae517620 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae517ce0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae518dc0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae519240 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae5195a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae519fc0 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae5211f0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae523b90 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae52b5a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae537570 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae53aa50 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae53af60 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+0xb4000077ae53e830 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [31533]
+Total allocated by GraphicBufferAllocator (estimate): 53764.00 KB
+Imported gralloc buffers:
++ name:AHardwareBuffer pid [31533], id:66892, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66888, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66887, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66885, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66889, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66882, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66880, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66877, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [31533], id:66878, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66876, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66874, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66883, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66872, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66871, size:3600.00KiB, w/h:1280x720, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1280x720, stride:5120 bytes, size:3686400
++ name:AHardwareBuffer pid [31533], id:66891, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66870, size:4660.00KiB, w/h:1440x810, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1440x810, stride:5888 bytes, size:4771840
++ name:AHardwareBuffer pid [31533], id:66881, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66875, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66884, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66867, size:96.00KiB, w/h:168x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:168x126, stride:768 bytes, size:98304
++ name:AHardwareBuffer pid [31533], id:66869, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:VRI[MainActivity]#0(BLAST Consumer)0, id:66862, size:10072.00KiB, w/h:1080x2340, usage: 0x10000900, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x8810000, compressed: true
+	planes: R/G/B/A:	 w/h:1080x2340, stride:4352 bytes, size:10313728
++ name:AHardwareBuffer pid [31533], id:66866, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [31533], id:66864, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [31533], id:66868, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:VRI[MainActivity]#0(BLAST Consumer)0, id:66863, size:10072.00KiB, w/h:1080x2340, usage: 0x10000900, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x8810000, compressed: true
+	planes: R/G/B/A:	 w/h:1080x2340, stride:4352 bytes, size:10313728
++ name:VRI[MainActivity]#0(BLAST Consumer)0, id:66861, size:10072.00KiB, w/h:1080x2340, usage: 0x10000900, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x8810000, compressed: true
+	planes: R/G/B/A:	 w/h:1080x2340, stride:4352 bytes, size:10313728
++ name:AHardwareBuffer pid [31533], id:66890, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66879, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [31533], id:66873, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [31533], id:66865, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [31533], id:66886, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:VRI[MainActivity]#0(BLAST Consumer)0, id:66860, size:10072.00KiB, w/h:1080x2340, usage: 0x10000900, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x8810000, compressed: true
+	planes: R/G/B/A:	 w/h:1080x2340, stride:4352 bytes, size:10313728
+Total imported by gralloc: 54328.00KiB
+
+Profile data in ms:
+
+	com.neoruaa.meilox/com.ljyh.mei.MainActivity/android.view.ViewRootImpl@44a2e3 (visibility=0)
+	Draw	Prepare	Process	Execute
+	3.26	0.16	3.90	3.26
+	3.45	0.18	3.97	3.23
+	3.09	0.16	3.97	3.20
+	3.37	0.17	4.17	2.57
+	7.22	0.27	4.73	2.54
+	3.61	0.20	5.82	2.64
+	3.55	0.21	6.13	2.15
+	3.93	0.21	4.96	2.65
+	3.30	0.20	6.00	2.13
+	3.20	0.19	4.77	2.48
+	2.91	0.18	4.85	2.44
+	3.85	0.24	5.46	2.74
+	3.50	0.17	4.06	2.83
+	3.68	0.21	5.26	2.38
+	3.69	0.22	4.89	2.70
+	3.49	0.23	5.53	2.07
+	3.93	0.23	5.21	2.64
+	3.91	0.22	4.96	2.62
+	3.18	0.21	5.62	2.39
+	3.18	0.19	4.41	2.69
+	3.47	0.22	5.02	2.59
+	3.64	0.23	5.65	2.47
+	3.68	0.23	5.14	2.57
+	3.40	0.21	4.80	2.69
+	5.47	0.24	4.97	2.74
+	3.50	0.21	4.66	2.86
+	3.37	0.20	4.83	2.68
+	3.43	0.29	5.26	2.50
+	3.68	0.21	5.05	2.58
+	3.31	0.21	4.70	2.73
+	3.51	0.21	4.98	2.66
+	3.53	0.21	4.94	2.59
+	3.42	0.20	4.78	2.66
+	4.60	0.23	4.87	2.74
+	3.47	0.21	4.72	2.80
+	3.98	0.22	4.89	2.76
+	4.50	0.22	4.81	2.91
+	22.26	0.23	5.51	2.06
+	26.86	0.20	5.12	2.39
+	40.16	0.64	10.04	1.77
+	50.00	0.34	10.01	2.44
+	50.00	0.35	10.78	1.83
+	50.00	0.33	10.55	1.74
+	48.07	0.26	11.61	1.88
+	50.00	0.26	11.12	1.82
+	50.00	0.27	12.98	1.88
+	50.00	0.27	11.80	1.93
+	47.29	0.25	10.81	2.52
+	50.00	0.56	14.36	1.62
+	50.00	0.23	5.42	3.00
+	14.98	0.19	5.33	3.56
+	2.91	0.19	4.83	3.66
+	3.88	0.22	5.52	3.30
+	6.08	0.27	5.85	3.01
+	3.38	0.24	5.88	2.58
+	2.79	0.21	4.98	3.52
+	2.76	0.21	5.64	2.83
+	2.82	0.20	5.25	2.33
+	2.79	0.21	5.50	2.08
+	2.81	0.22	5.83	2.11
+	2.92	0.20	5.05	2.51
+	2.74	0.21	6.17	1.54
+	3.45	0.22	5.01	2.75
+	4.49	0.20	5.01	2.65
+	3.68	0.25	5.03	2.63
+	3.09	0.18	5.05	2.48
+	3.51	0.19	5.21	2.52
+	2.89	0.18	4.58	2.71
+	2.88	0.18	5.26	2.34
+	3.28	0.19	5.17	2.48
+	2.88	0.18	4.82	2.62
+	3.65	0.18	5.19	2.63
+	3.34	0.18	5.17	2.53
+	2.90	0.18	4.88	2.59
+	7.40	0.22	5.47	2.36
+	3.50	0.23	5.98	2.39
+	3.26	0.21	5.80	2.51
+	3.20	0.24	5.04	2.56
+	3.17	0.19	5.04	2.52
+	3.06	0.19	5.16	2.39
+	2.99	0.20	5.41	2.34
+	3.04	0.18	4.92	2.09
+	2.83	0.18	4.91	2.02
+	2.99	0.19	5.45	1.97
+	3.34	0.19	4.83	2.23
+	2.86	0.18	4.82	2.03
+	2.96	0.24	5.70	1.78
+	3.08	0.18	5.03	2.05
+	2.90	0.18	5.12	1.96
+	3.17	0.20	5.51	1.92
+	3.00	0.19	5.24	1.93
+	2.91	0.19	4.94	2.09
+	2.80	0.19	5.49	1.69
+	3.54	0.20	5.55	1.98
+	3.02	0.21	5.17	2.00
+	5.69	0.23	7.12	1.36
+	14.11	0.22	5.60	1.66
+	10.09	0.22	5.38	1.79
+	34.79	0.54	10.33	1.62
+	50.00	0.27	10.40	1.54
+	50.00	0.35	9.35	1.69
+	50.00	0.28	7.34	1.93
+	50.00	0.33	9.18	1.60
+	50.00	0.32	10.62	1.39
+	50.00	0.29	10.19	1.35
+	50.00	0.30	10.43	1.37
+	50.00	0.28	9.04	1.47
+	50.00	0.60	10.38	1.49
+	47.67	0.20	5.25	1.12
+	10.46	0.16	4.59	1.43
+	2.26	0.17	4.44	1.54
+	6.50	0.19	5.81	0.91
+	2.97	0.19	5.44	0.91
+	4.06	0.21	4.78	1.43
+	2.36	0.18	4.66	1.14
+	2.55	0.18	4.70	1.34
+	4.44	0.20	5.25	2.07
+	3.94	0.18	5.19	2.52
+	3.11	0.17	3.84	1.96
+	3.31	0.17	3.99	0.00
+
+Window: com.neoruaa.meilox/com.ljyh.mei.MainActivity
+Stats since: 88929982753627ns
+Total frames rendered: 1340
+Janky frames: 10 (0.75%)
+Janky frames (legacy): 472 (35.22%)
+50th percentile: 11ms
+90th percentile: 77ms
+95th percentile: 85ms
+99th percentile: 101ms
+Number Missed Vsync: 8
+Number High input latency: 2659
+Number Slow UI thread: 10
+Number Slow bitmap uploads: 0
+Number Slow issue draw commands: 10
+Number Frame deadline missed: 10
+Number Frame deadline missed (legacy): 11
+HISTOGRAM: 5ms=0 6ms=0 7ms=0 8ms=20 9ms=88 10ms=248 11ms=330 12ms=152 13ms=52 14ms=42 15ms=16 16ms=22 17ms=18 18ms=14 19ms=18 20ms=8 21ms=8 22ms=2 23ms=6 24ms=8 25ms=4 26ms=2 27ms=6 28ms=4 29ms=6 30ms=6 31ms=2 32ms=4 34ms=2 36ms=0 38ms=2 40ms=0 42ms=0 44ms=2 46ms=2 48ms=8 53ms=4 57ms=14 61ms=16 65ms=10 69ms=22 73ms=38 77ms=26 81ms=30 85ms=20 89ms=16 93ms=18 97ms=6 101ms=10 105ms=4 109ms=4 113ms=0 117ms=0 121ms=0 125ms=0 129ms=0 133ms=0 150ms=0 200ms=0 250ms=0 300ms=0 350ms=0 400ms=0 450ms=0 500ms=0 550ms=0 600ms=0 650ms=0 700ms=0 750ms=0 800ms=0 850ms=0 900ms=0 950ms=0 1000ms=0 1050ms=0 1100ms=0 1150ms=0 1200ms=0 1250ms=0 1300ms=0 1350ms=0 1400ms=0 1450ms=0 1500ms=0 1550ms=0 1600ms=0 1650ms=0 1700ms=0 1750ms=0 1800ms=0 1850ms=0 1900ms=0 1950ms=0 2000ms=0 2050ms=0 2100ms=0 2150ms=0 2200ms=0 2250ms=0 2300ms=0 2350ms=0 2400ms=0 2450ms=0 2500ms=0 2550ms=0 2600ms=0 2650ms=0 2700ms=0 2750ms=0 2800ms=0 2850ms=0 2900ms=0 2950ms=0 3000ms=0 3050ms=0 3100ms=0 3150ms=0 3200ms=0 3250ms=0 3300ms=0 3350ms=0 3400ms=0 3450ms=0 3500ms=0 3550ms=0 3600ms=0 3650ms=0 3700ms=0 3750ms=0 3800ms=0 3850ms=0 3900ms=0 3950ms=0 4000ms=0 4050ms=0 4100ms=0 4150ms=0 4200ms=0 4250ms=0 4300ms=0 4350ms=0 4400ms=0 4450ms=0 4500ms=0 4550ms=0 4600ms=0 4650ms=0 4700ms=0 4750ms=0 4800ms=0 4850ms=0 4900ms=0 4950ms=0
+50th gpu percentile: 3ms
+90th gpu percentile: 4ms
+95th gpu percentile: 5ms
+99th gpu percentile: 8ms
+GPU HISTOGRAM: 1ms=16 2ms=322 3ms=704 4ms=208 5ms=38 6ms=24 7ms=12 8ms=6 9ms=4 10ms=2 11ms=2 12ms=2 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 4950ms=0
+
+
+RenderLite trim renderNode error: 0
+
+---PROFILEDATA---
+Flags,FrameTimelineVsyncId,IntendedVsync,Vsync,InputEventId,HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,FrameDeadline,FrameStartTime,FrameInterval,WorkloadTarget,AnimationTime,SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,DequeueBufferDuration,QueueBufferDuration,GpuCompleted,SwapBuffersCompleted,DisplayPresentTime,CommandSubmissionCompleted,
+32,39659282,88941292198513,88941292198513,0,88941292796331,88941292798883,88941294377112,88941294489560,88943076215137,88941292737997,11121189,16222223,88941292198513,88941295461122,88941295486956,88941295651487,88941299550706,88941302809143,7500,181927,88941302809143,88941299943518,88941324533570,88941299550706,
+32,39659290,88941303323492,88941303323492,0,88941303869456,88941303871747,88941305578570,88941305698518,88943098457167,88941303814091,11120841,16222223,88941303323492,88941306777581,88941306806487,88941306986018,88941310952476,88941314183414,8645,171511,88941314183414,88941311333206,88941335649612,88941310952476,
+32,39659298,88941314439769,88941314439769,0,88941314923258,88941314925341,88941316447685,88941316555028,88943120698756,88941314873831,11120748,16222223,88941314439769,88941317528778,88941317554195,88941317719143,88941321689299,88941324885810,8698,196927,88941324885810,88941322145445,88941346792164,88941321689299,
+32,39659306,88941325560472,88941325560472,0,88941326160706,88941326162893,88941327800341,88941327911956,88943142940209,88941326087424,11120705,16222223,88941325560472,88941328930237,88941328957528,88941329122633,88941333289976,88941335856695,8490,239271,88941335856695,88941333813726,88941357905028,88941333289976,
+32,39659314,88941336681052,88941336681052,0,88941337288622,88941337291278,88941342169508,88941342304143,88943165181263,88941337227945,11120349,16222223,88941336681052,88941343904872,88941343959039,88941344233674,88941348966695,88941351505914,12187,178646,88941351505914,88941349409872,88941369039716,88941348966695,
+32,39659322,88941347798036,88941347798036,0,88941348317008,88941348319351,88941350124455,88941350247268,88943187422313,88941348262841,11120701,16222223,88941347798036,88941351407528,88941351432424,88941351632685,88941357448570,88941360087112,6146,230625,88941360087112,88941357946330,88941380148414,88941357448570,
+32,39659330,88941358924322,88941358924322,0,88941359392580,88941359394820,88941361069716,88941361183205,88943209664084,88941359337685,11121070,16222223,88941358924322,88941362472841,88941362507893,88941362714508,88941368844820,88941370994924,10417,270468,88941370994924,88941369462685,88941391258674,88941368844820,
+32,39659338,88941370049582,88941370049582,0,88941371332737,88941371335133,88941372773362,88941372881539,88943231906656,88941371284247,11121502,16222223,88941370049582,88941373981591,88941374018414,88941374226955,88941379188883,88941381838362,10677,214011,88941381838362,88941379674560,88941402381278,88941379188883,
+32,39659346,88941381176985,88941381176985,0,88941381775549,88941381778049,88941383328153,88941383441799,88943254149655,88941381717945,11121497,16222223,88941381176985,88941384478830,88941384506903,88941384706695,88941390709299,88941392838830,10312,219531,88941392838830,88941391310758,88941413505549,88941390709299,
+32,39659354,88941392298742,88941392298742,0,88941392933258,88941392935914,88941394492580,88941394593778,88943276393022,88941392869976,11121870,16222223,88941392298742,88941395501539,88941395531226,88941395720810,88941400492112,88941402972164,10625,199532,88941402972164,88941400942789,88941424627789,88941400492112,
+32,39659362,88941403422650,88941403422650,0,88941403907737,88941403909612,88941405332580,88941405434143,88943298636871,88941403851487,11121979,16222223,88941403422650,88941406335705,88941406362737,88941406545549,88941411393205,88941413828258,9688,235209,88941413828258,88941411958987,88941435742685,88941411393205,
+32,39659370,88941414544499,88941414544499,0,88941415039976,88941415042685,88941416741122,88941416861643,88943320880900,88941414983674,11122050,16222223,88941414544499,88941418392372,88941420058466,88941420297112,88941425761643,88941428498622,16459,233594,88941428498622,88941426273153,88941446894560,88941425761643,
+32,39659378,88941425666429,88941425666429,0,88941426224143,88941426226747,88941427952685,88941428166122,88943343124758,88941426150289,11121808,16222223,88941425666429,88941429166903,88941429192112,88941429365445,88941433422060,88941436255549,6979,180416,88941436255549,88941433828205,88941458010758,88941433422060,
+32,39659386,88941436785592,88941436785592,0,88941437384143,88941437386435,88941439140028,88941439268778,88943365368091,88941437324820,11121525,16222223,88941436785592,88941440467424,88941440498414,88941440707737,88941445969560,88941448353674,9427,249271,88941448353674,88941446536070,88941469164508,88941445969560,
+32,39659394,88941447903574,88941447903574,0,88941448564195,88941448566383,88941450295497,88941450424976,88943387611326,88941448504299,11121710,16222223,88941447903574,88941451590445,88941451626435,88941451842008,88941456735549,88941459438518,9271,229062,88941459438518,88941457229612,88941480266799,88941456735549,
+32,39659402,88941459029234,88941459029234,0,88941459718310,88941459721018,88941461309299,88941461431226,88943409855007,88941459665341,11121971,16222223,88941459029234,88941462514247,88941462550237,88941462784039,88941468309143,88941470380914,11927,220000,88941470380914,88941468868362,88941491409195,88941468309143,
+32,39659410,88941470154860,88941470154860,0,88941470805393,88941470807893,88941472644768,88941472780653,88943432099690,88941470743101,11122712,16222223,88941470154860,88941474089143,88941474125966,88941474351539,88941479558987,88941482199039,11302,327604,88941482199039,88941480194508,88941502492268,88941479558987,
+32,39659418,88941481288439,88941481288439,0,88941481980185,88941481982372,88941483748987,88941483881122,88943454345684,88941481913778,11123282,16222223,88941481288439,88941485198362,88941485235653,88941485451435,88941490415862,88941493033153,15208,237344,88941493033153,88941490961487,88941513599560,88941490415862,
+32,39659426,88941492418047,88941492418047,0,88941493038362,88941493040810,88941494558883,88941494668622,88943476592806,88941492981591,11123840,16222223,88941492418047,88941495597945,88941495625133,88941495832372,88941501450237,88941503840237,9740,287500,88941503840237,88941502068205,88941524745341,88941501450237,
+32,39659434,88941503549634,88941503549634,0,88941504210862,88941504213726,88941505698466,88941505799299,88943498840148,88941504147268,11123502,16222223,88941503549634,88941506726435,88941506754299,88941506948883,88941511357216,88941514051435,11093,172656,88941514051435,88941511759455,88941535855237,88941511357216,
+32,39659442,88941514668187,88941514668187,0,88941515221695,88941515224143,88941516942737,88941517066903,88943521086774,88941515157841,11123124,16222223,88941514668187,88941518142789,88941518170497,88941518395080,88941523416487,88941526005810,9532,247969,88941526005810,88941524079716,88941546985862,88941523416487,
+32,39659450,88941525784724,88941525784724,0,88941526380549,88941526383362,88941528176383,88941528303935,88943543332986,88941526317112,11123088,16222223,88941525784724,88941529423726,88941529459768,88941529688883,88941535335497,88941537809872,11146,249687,88941537809872,88941535877580,88941558094091,88941535335497,
+32,39659458,88941536907150,88941536907150,0,88941537542737,88941537544872,88941539273049,88941539410185,88943565578763,88941537472528,11122689,16222223,88941536907150,88941540585497,88941540617164,88941540842372,88941545987372,88941548554195,9843,248958,88941548554195,88941546522633,88941569207945,88941545987372,
+32,39659466,88941548024697,88941548024697,0,88941548649091,88941548651955,88941550315653,88941550429403,88943587824277,88941548587008,11122825,16222223,88941548024697,88941551428830,88941551455393,88941551663205,88941556467216,88941559156435,9480,236562,88941559156435,88941557021122,88941580328362,88941556467216,
+32,39659474,88941559148270,88941559148270,0,88941560328205,88941560330862,88941564064143,88941564181591,88943610069647,88941560264560,11122545,16222223,88941559148270,88941564622268,88941564666487,88941564903987,88941569869195,88941572610653,13646,230521,88941572610653,88941570368101,88941591460862,88941569869195,
+32,39659482,88941570266384,88941570266384,0,88941570857841,88941570859976,88941572643622,88941572752164,88943632314577,88941570797268,11122385,16222223,88941570266384,88941573768935,88941573794716,88941574005185,88941578667528,88941581522893,9114,218958,88941581522893,88941579181435,88941602583778,88941578667528,
+32,39659490,88941581384841,88941581384841,0,88941581962685,88941581965185,88941583577164,88941583696695,88943654558956,88941581894716,11121994,16222223,88941581384841,88941584756851,88941584788414,88941584993049,88941589825028,88941592507997,10104,228438,88941592507997,88941590326435,88941613705185,88941589825028,
+32,39659498,88941592501062,88941592501062,0,88941593086330,88941593089560,88941594768622,88941594891851,88943676802540,88941593021487,11121590,16222223,88941592501062,88941595928882,88941595956799,88941596245914,88941601501695,88941603998310,11250,247708,88941603998310,88941602064403,88941624839612,88941601501695,
+32,39659506,88941603618355,88941603618355,0,88941604340289,88941604342737,88941606112789,88941606234143,88943699045331,88941604274924,11121201,16222223,88941603618355,88941607295601,88941607325028,88941607536226,88941612586747,88941615167580,10260,253698,88941615167580,88941613124143,88941635949091,88941612586747,
+32,39659514,88941614735854,88941614735854,0,88941615318778,88941615320914,88941616922945,88941617036018,88943721287365,88941615258205,11120833,16222223,88941614735854,88941618049299,88941618082476,88941618295966,88941622996435,88941625727060,10990,230156,88941625727060,88941623500914,88941647084507,88941622996435,
+32,39659522,88941625853456,88941625853456,0,88941626444924,88941626447580,88941628158622,88941628282997,88943743528878,88941626383362,11120680,16222223,88941625853456,88941629358466,88941629387893,88941629600237,88941634583726,88941637244403,9948,238489,88941637244403,88941635097737,88941658209299,88941634583726,
+32,39659530,88941636974423,88941636974423,0,88941637583987,88941637586643,88941639261226,88941639397528,88943765769694,88941637521330,11120136,16222223,88941636974423,88941640506955,88941640539924,88941640753362,88941645696747,88941648286955,10625,226511,88941648286955,88941646185862,88941669308830,88941645696747,
+32,39659538,88941648090201,88941648090201,0,88941648696174,88941648698570,88941650364976,88941650486747,88943788010221,88941648632424,11120391,16222223,88941648090201,88941651506018,88941651537112,88941651741122,88941656523101,88941659187632,9115,232708,88941659187632,88941657057320,88941680427580,88941656523101,
+32,39659546,88941659215052,88941659215052,0,88941660165810,88941660168205,88941663660757,88941663782268,88943810251206,88941660107632,11120594,16222223,88941659215052,88941663817528,88941663857164,88941664088049,88941668955862,88941671693935,10521,242500,88941671693935,88941669509872,88941691550914,88941668955862,
+32,39659554,88941670339731,88941670339731,0,88941670915445,88941670917789,88941672675810,88941672789664,88943832492820,88941670845810,11121020,16222223,88941670339731,88941673808310,88941673837007,88941674045289,88941678761903,88941681561643,9427,222604,88941681561643,88941679245862,88941702677528,88941678761903,
+32,39659562,88941681464185,88941681464185,0,88941682039299,88941682041955,88941683928049,88941684073778,88943854734949,88941681979664,11121109,16222223,88941681464185,88941685444872,88941685482268,88941685705132,88941690594247,88941693349560,15416,234792,88941693349560,88941691180289,88941713790289,88941690594247,
+32,39659570,88941692585341,88941692585341,970379774,88941694994039,88941694996695,88941695391643,88941695557476,88943876977752,88941694941330,11121694,16222223,88941692585341,88941697082268,88941697131070,88941697352320,88941702161695,88941705073205,11927,216823,88941705073205,88941702639612,88941724905185,88941702161695,
+32,39659586,88941714833229,88941714833229,429953997,88941715289664,88941717449872,88941733878882,88941734037841,88943899220741,88941715244351,11121295,16222223,88941714833229,88941737092841,88941737139976,88941737366799,88941742876695,88941744933726,17812,236302,88941744933726,88941743496174,88941769395185,88941742876695,
+32,39659593,88941725949761,88941737071056,149838962,88941747505497,88941749036591,88941751471851,88941751595810,88943921463331,88941747454455,11121295,16222223,88941737071056,88941752812685,88941752840497,88941753041018,88941758165653,88941760556851,11563,195260,88941760556851,88941758644091,88941780504091,88941758165653,
+32,39659601,88941759313646,88941759313646,222565405,88941759834351,88941761542320,88941777445132,88941777555601,88943943705860,88941759783101,11121234,16222223,88941759313646,88941799478309,88941799519924,88941800156539,88941810194403,88941811968049,15781,255521,88941811968049,88941810879768,88941836120966,88941810194403,
+32,39659609,88941770432691,88941792674295,1009103639,88941802633362,88941805071330,88941818793257,88941818905080,88943965947896,88941802593257,11120802,16222223,88941792674295,88941837839143,88941837888362,88941838227372,88941848236070,88941850671851,12239,255469,88941850671851,88941848964455,88941869474195,88941848236070,
+32,39659616,88941814910554,88941848272960,354359756,88941853711330,88941853772893,88941860764351,88941860864299,88943988189500,88941853656591,11120802,16222223,88941848272960,88941878804872,88941878844820,88941879190809,88941889975549,88941891809559,14323,261875,88941891809559,88941890683622,88941913974455,88941889975549,
+32,39659625,88941859379129,88941881618523,0,88941882735028,88941882737268,88941891422059,88941891566955,88944010429999,88941882686695,11119697,16222223,88941881618523,88941909682841,88941909731226,88941910064455,88941920616591,88941922355497,11718,244219,88941922355497,88941921240862,88941947334924,88941920616591,
+32,39659632,88941892744097,88941903863794,0,88941912896799,88941912898934,88941923519195,88941923638882,88944032669393,88941912845184,11119697,16222223,88941903863794,88941940810393,88941940857216,88941941115497,88941952723674,88941954602632,9896,239010,88941954602632,88941953452268,88941980692997,88941952723674,
+32,39659640,88941914989998,88941937230752,0,88941944957007,88941944959091,88941956779143,88941956894403,88944054909467,88941944906643,11120377,16222223,88941937230752,88941975218257,88941975264872,88941975523778,88941986638882,88941988457632,9480,204895,88941988457632,88941987262737,88942014084455,88941986638882,
+32,39659648,88941948371595,88941981736011,0,88941985809143,88941985811278,88941996701278,88941996798830,88944077151316,88941985758726,11121472,16222223,88941981736011,88942015519351,88942015575966,88942015848049,88942028826903,88942030707059,14062,210573,88942030707059,88942029470445,88942047415445,88942028826903,
+32,39659656,88941992852615,88942026217514,0,88942027483622,88942027485393,88942037396330,88942037496486,88944099394421,88942027436434,11121633,16222223,88942026217514,88942054677476,88942054721903,88942054989091,88942066792945,88942068725497,15261,286458,88942068725497,88942067539924,88942091913726,88942066792945,
+32,39659665,88942037120964,88942048243390,0,88942058708205,88942058710080,88942067669507,88942067812007,88944121638480,88942058659872,11122426,16222223,88942048243390,88942084409716,88942084443361,88942084690132,88942095503153,88942098022684,8959,197500,88942098022684,88942096412580,88942114128934,88942095503153,
+32,39659672,88942059603733,88942081848585,0,88942087417164,88942087419299,88942103721695,88942103827893,88944143883332,88942087372164,11122426,16222223,88942081848585,88942124861643,88942124899820,88942125459976,88942139821695,88942141444716,14062,207291,88942141444716,88942140331747,88942158609039,88942139821695,
+32,39659680,88942092952956,88942126318377,0,88942136588622,88942136590601,88942142526434,88942142638622,88944166127565,88942136540757,11121807,16222223,88942126318377,88942145729195,88942145767893,88942145998570,88942151423257,88942154427320,10260,197552,88942154427320,88942151897372,88942169715132,88942151423257,
+32,39659688,88942137434888,88942148556071,0,88942149817893,88942149819664,88942151150132,88942151253830,88944188370555,88942149766226,11121183,16222223,88942148556071,88942152416851,88942152443882,88942152635966,88942157966643,88942161530966,5990,196510,88942161530966,88942158425341,88942180852632,88942157966643,
+32,39659697,88942159657261,88942159657261,0,88942160165914,88942160167789,88942161666018,88942161758570,88944210610828,88942160115809,11119090,16222223,88942159657261,88942162567424,88942162592476,88942162783986,88942167611174,88942171267736,8385,278906,88942171267736,88942168175236,88942191971539,88942167611174,
+32,39659705,88942170760068,88942170760068,0,88942171261851,88942171264299,88942174496070,88942174610236,88944232848461,88942171210132,11118543,16222223,88942170760068,88942174644664,88942174682476,88942174899351,88942180417111,88942183718205,12083,227812,88942183718205,88942180928934,88942203105028,88942180417111,
+32,39659713,88942181876025,88942181876025,0,88942182335601,88942182338257,88942186578726,88942186681018,88944255084782,88942182284664,11117778,16222223,88942181876025,88942187956382,88942187991695,88942188260497,88942194110132,88942197118934,10834,164739,88942197118934,88942194733414,88942214208934,88942194110132,
+32,39659721,88942192984041,88942192984041,0,88942193523518,88942193525809,88942195245757,88942195345601,88944277320617,88942193472997,11118057,16222223,88942192984041,88942196363153,88942196390601,88942196635341,88942202513986,88942205090757,6198,232343,88942205090757,88942203082007,88942225323830,88942202513986,
+32,39659729,88942204102871,88942204102871,0,88942204547007,88942204549611,88942205813622,88942205912164,88944299557247,88942204499091,11118573,16222223,88942204102871,88942206895497,88942206919611,88942207127372,88942212103986,88942215623934,8177,214219,88942215623934,88942212600289,88942236439507,88942212103986,
+32,39659737,88942215233871,88942215233871,0,88942215709091,88942215711174,88942217088830,88942217182059,88944321795203,88942215661747,11119383,16222223,88942215233871,88942217996903,88942218023674,88942218237164,88942223877632,88942226709820,8437,218958,88942226709820,88942224468361,88942247564403,88942223877632,
+32,39659745,88942226359092,88942226359092,0,88942226813674,88942226815966,88942228222007,88942228324716,88944344033835,88942226765861,11119249,16222223,88942226359092,88942229180913,88942229207945,88942229404924,88942234658986,88942236992945,8750,189583,88942236992945,88942235094507,88942258681695,88942234658986,
+32,39659753,88942237471656,88942237471656,0,88942237931330,88942237933674,88942239307007,88942239399403,88944366272164,88942237883674,11119080,16222223,88942237471656,88942240258049,88942240282476,88942240488622,88942245993570,88942248072111,7968,199323,88942248072111,88942246489924,88942269802580,88942245993570,
+32,39659761,88942248591498,88942248591498,0,88942249053309,88942249055757,88942250444038,88942250539820,88944388509959,88942249005288,11118715,16222223,88942248591498,88942251404820,88942251433778,88942251650236,88942257477997,88942259590497,10104,217656,88942259590497,88942257988570,88942280927268,88942257477997,
+32,39659769,88942259711606,88942259711606,0,88942260253934,88942260256278,88942261705028,88942261807163,88944410747388,88942260194768,11118714,16222223,88942259711606,88942262635236,88942262661226,88942262863205,88942267912424,88942270420236,7916,187031,88942270420236,88942268464924,88942292080132,88942267912424,
+32,39659777,88942270830645,88942270830645,0,88942271318674,88942271321382,88942272691226,88942272782007,88944432984866,88942271267320,11118764,16222223,88942270830645,88942273567528,88942273593205,88942273803205,88942279972997,88942281516591,8750,273854,88942281516591,88942280626226,88942303164872,88942279972997,
+32,39659785,88942281948627,88942281948627,0,88942282524663,88942282526695,88942284255393,88942284367163,88944455222553,88942282469663,11118923,16222223,88942281948627,88942285395341,88942285428309,88942285646903,88942290660966,88942293412841,8646,193958,88942293412841,88942291199872,88942314277788,88942290660966,
+32,39659793,88942293063694,88942293063694,0,88942293603674,88942293605809,88942297031955,88942297144351,88944477461951,88942293551747,11120475,16222223,88942293063694,88942297554716,88942297586278,88942297785705,88942302795705,88942305448934,7552,209062,88942305448934,88942303282945,88942325404038,88942302795705,
+32,39659801,88942304209032,88942304209032,0,88942304773466,88942304776538,88942306636382,88942306863622,88944499702724,88942304716747,11120298,16222223,88942304209032,88942307887216,88942307919195,88942308164820,88942313198257,88942315827163,9531,179792,88942315827163,88942313641591,88942336525445,88942313198257,
+32,39659809,88942315319040,88942315319040,0,88942315838570,88942315840809,88942317388413,88942317489872,88944521943089,88942315791486,11120067,16222223,88942315319040,88942318411018,88942318438466,88942318615080,88942323663518,88942326140549,8594,253750,88942326140549,88942324185757,88942347638466,88942323663518,
+32,39659817,88942326435695,88942326435695,0,88942327324768,88942327327320,88942328812216,88942328937893,88944544183117,88942327274663,11119961,16222223,88942326435695,88942329949299,88942329979455,88942330167632,88942335373726,88942337896747,8438,201354,88942337896747,88942335839820,88942358767997,88942335373726,
+32,39659825,88942337554245,88942337554245,0,88942338051695,88942338053361,88942339392320,88942339493518,88944566422995,88942338005705,11119917,16222223,88942337554245,88942340439247,88942340467216,88942340643413,88942345221851,88942347932788,8593,186250,88942347932788,88942345683934,88942369891434,88942345221851,
+32,39659833,88942348673545,88942348673545,0,88942349153934,88942349156018,88942350526799,88942350633986,88944588662677,88942349108726,11119765,16222223,88942348673545,88942351557268,88942351584559,88942351761903,88942357019559,88942359355341,7864,215729,88942359355341,88942357518049,88942381005705,88942357019559,
+32,39659841,88942359791081,88942359791081,0,88942360365184,88942360367372,88942361965913,88942362087320,88944610902251,88942360309872,11119809,16222223,88942359791081,88942363069351,88942363101538,88942363294716,88942368468466,88942370944663,8750,181511,88942370944663,88942368905705,88942392138934,88942368468466,
+32,39659849,88942370911573,88942370911573,0,88942371375080,88942371376851,88942372739820,88942372867111,88944633141703,88942371329663,11119643,16222223,88942370911573,88942373794820,88942373821851,88942373998882,88942378816434,88942381438205,8229,187448,88942381438205,88942379316174,88942403284195,88942378816434,
+32,39659857,88942382030404,88942382030404,0,88942382467580,88942382469559,88942385544716,88942385644924,88944655381033,88942382421695,11119687,16222223,88942382030404,88942385676226,88942385709143,88942385890445,88942391080705,88942393711538,7917,206093,88942393711538,88942391579507,88942414371018,88942391080705,
+32,39659865,88942393150569,88942393150569,0,88942393722476,88942393724455,88942395391799,88942395493049,88944677620675,88942393668778,11119955,16222223,88942393150569,88942396494299,88942396524455,88942396708049,88942401873986,88942404404091,8802,180990,88942404404091,88942402348049,88942425503413,88942401873986,
+32,39659873,88942404274330,88942404274330,0,88942404787476,88942404789299,88942406128101,88942406245549,88944699861545,88942404741330,11120915,16222223,88942404274330,88942407175549,88942407202580,88942407383466,88942412261695,88942414851955,7553,177500,88942414851955,88942412711538,88942436615236,88942412261695,
+32,39659881,88942415407395,88942415407395,0,88942415871695,88942415873830,88942421159507,88942421288570,88944722103399,88942415823101,11120939,16222223,88942415407395,88942422803934,88942422852841,88942423069403,88942428537997,88942430893622,12969,187760,88942430893622,88942429016538,88942447733413,88942428537997,
+32,39659889,88942426527810,88942426527810,0,88942426989768,88942426992163,88942428719611,88942428835184,88944744345413,88942426942841,11121075,16222223,88942426527810,88942430030184,88942430056018,88942430287945,88942436271278,88942438660757,6355,199479,88942438660757,88942436759299,88942458856643,88942436271278,
+32,39659897,88942437650598,88942437650598,0,88942438110653,88942438113257,88942439582163,88942439686695,88944766587431,88942438057632,11120943,16222223,88942437650598,88942440909559,88942440939143,88942441152580,88942446953882,88942449464820,9219,183646,88942449464820,88942447408153,88942469981695,88942446953882,
+32,39659905,88942448769822,88942448769822,0,88942449288049,88942449290080,88942450725080,88942450829507,88944788829216,88942449233309,11120842,16222223,88942448769822,88942451964976,88942451993830,88942452230757,88942457266226,88942459828413,10052,193073,88942459828413,88942457720340,88942481119559,88942457266226,
+32,39659913,88942459889060,88942459889060,0,88942460499090,88942460501122,88942461967320,88942462069820,88944811070784,88942460447111,11120726,16222223,88942459889060,88942463055132,88942463085601,88942463274038,88942468309924,88942470832111,8438,187552,88942470832111,88942468768361,88942492234455,88942468309924,
+32,39659921,88942471008440,88942471008440,0,88942471486122,88942471488257,88942472965757,88942473070236,88944833312196,88942471439403,11120686,16222223,88942471008440,88942474064455,88942474092840,88942474280861,88942479444299,88942481831382,7969,191406,88942481831382,88942479893465,88942503340653,88942479444299,
+32,39659929,88942482129002,88942482129002,0,88942482580913,88942482582788,88942483930288,88942484115445,88944855553893,88942482524247,11121011,16222223,88942482129002,88942485121538,88942485155445,88942485357736,88942490762997,88942493101330,9895,194323,88942493101330,88942491231018,88942514463049,88942490762997,
+32,39659937,88942493254859,88942493254859,0,88942493772684,88942493775080,88942495210549,88942495312007,88944877796729,88942493720132,11121825,16222223,88942493254859,88942496297893,88942496323674,88942496507007,88942501423674,88942503514195,7812,193802,88942503514195,88942501866538,88942525591799,88942501423674,
+32,39659945,88942504384719,88942504384719,0,88942504834351,88942504836278,88942506170184,88942506284403,88944900040270,88942504788153,11121716,16222223,88942504384719,88942507214559,88942507247007,88942507431851,88942512341018,88942514356590,9166,206302,88942514356590,88942512807007,88942536715288,88942512341018,
+32,39659953,88942515504232,88942515504232,0,88942515982059,88942515984038,88942517407215,88942517510393,88944922283465,88942515935340,11121479,16222223,88942515504232,88942518497372,88942518529038,88942518716018,88942524166903,88942526135080,8855,207448,88942526135080,88942524690861,88942547830393,88942524166903,
+32,39659961,88942526622674,88942526622674,0,88942527201278,88942527203622,88942528917268,88942529039455,88944944526409,88942527143830,11121465,16222223,88942526622674,88942529959663,88942529988882,88942530174976,88942535008882,88942537242111,7917,176510,88942537242111,88942535452788,88942558965028,88942535008882,
+32,39659969,88942537744041,88942537744041,0,88942538189247,88942538190965,88942539533309,88942539630757,88944966769356,88942538144715,11121482,16222223,88942537744041,88942540601747,88942540631903,88942540815236,88942545634351,88942547663361,7657,195365,88942547663361,88942546109924,88942570084768,88942545634351,
+32,39659977,88942548865911,88942548865911,0,88942549365601,88942549367580,88942550735393,88942550851330,88944989012054,88942549318830,11121216,16222223,88942548865911,88942551823049,88942551850809,88942552090497,88942557794820,88942559578674,8959,225000,88942559578674,88942558324976,88942581212268,88942557794820,
+32,39659985,88942559984360,88942559984360,0,88942560615445,88942560617268,88942562051538,88942562148934,88945011254597,88942560553726,11121327,16222223,88942559984360,88942563065445,88942563092320,88942563272997,88942568301278,88942570355913,7552,190625,88942570355913,88942568775653,88942592336018,88942568301278,
+32,39659993,88942571107805,88942571107805,0,88942571583153,88942571584768,88942572943049,88942573041070,88945033497348,88942571537007,11121424,16222223,88942571107805,88942574005236,88942574032684,88942574215340,88942579339663,88942581303934,9114,180625,88942581303934,88942579827268,88942603452320,88942579339663,
+32,39660001,88942582230869,88942582230869,0,88942583022840,88942583024611,88942584383361,88942584484195,88945055740244,88942582979924,11121472,16222223,88942582230869,88942585405288,88942585432059,88942585631643,88942591139611,88942593056486,7917,208386,88942593056486,88942591690288,88942614560601,88942591139611,
+32,39660009,88942593354056,88942593354056,0,88942593832007,88942593833726,88942595291382,88942595393257,88945077983465,88942593780288,11121749,16222223,88942593354056,88942596353049,88942596383049,88942596577580,88942601817372,88942603743882,10052,227239,88942603743882,88942602334715,88942625720705,88942601817372,
+32,39660017,88942604479579,88942604479579,0,88942604975549,88942604977320,88942606344351,88942606446018,88945100227594,88942604923882,11122380,16222223,88942604479579,88942607391330,88942607420340,88942607608674,88942612548361,88942614637215,9636,196302,88942614637215,88942613009820,88942636820601,88942612548361,
+32,39660025,88942615607917,88942615607917,0,88942616101486,88942616103309,88942617397059,88942617492476,88945122472112,88942616054663,11122138,16222223,88942615607917,88942618408413,88942618432111,88942618620028,88942624105288,88942625795184,7968,207084,88942625795184,88942624631903,88942647933309,88942624105288,
+32,39660033,88942626726536,88942626726536,0,88942627320236,88942627322476,88942629042007,88942629185340,88945144717032,88942627263101,11122782,16222223,88942626726536,88942630269559,88942630300080,88942630495236,88942636043778,88942638026695,9740,189531,88942638026695,88942636626174,88942659049403,88942636043778,
+32,39660041,88942637857769,88942637857769,924856950,88942639091643,88942639093622,88942639309715,88942639451695,88945166962608,88942639048465,11122794,16222223,88942637857769,88942640876799,88942640914351,88942641122997,88942646292528,88942648293570,8854,190521,88942648293570,88942646773101,88942670188934,88942646292528,
+32,39660057,88942671217264,88942671217264,830538306,88942671646278,88942673507059,88942675570497,88942675738934,88945189207619,88942671603726,11122217,16222223,88942671217264,88942676908778,88942676942059,88942677167476,88942684282736,88942685639976,14375,201354,88942685639976,88942684796226,88942703552736,88942684282736,
+32,39660064,88942682339481,88942682339481,591656583,88942682820288,88942684699455,88942693855809,88942694008205,88945211452053,88942682768726,11122217,16222223,88942682339481,88942696448934,88942696482476,88942696702528,88942702304038,88942703966851,11302,220260,88942703966851,88942702971590,88942725792632,88942702304038,
+32,39660072,88942693461698,88942693461698,756879865,88942698519403,88942700178882,88942702211642,88942702383934,88945233696528,88942698478830,11122258,16222223,88942693461698,88942703553778,88942703582892,88942703803674,88942709184299,88942710970497,5938,186303,88942710970497,88942709681799,88942736900549,88942709184299,
+32,39660079,88942704584916,88942704584916,508939815,88942705013726,88942706535965,88942720306017,88942720403934,88945255941044,88942704978570,11122258,16222223,88942704584916,88942739372476,88942739416226,88942739954611,88942750280809,88942751903517,14948,241354,88942751903517,88942750988934,88942770295340,88942750280809,
+32,39660087,88942715707174,88942737952340,332584597,88942742140549,88942745408778,88942761096226,88942761209038,88945278185885,88942742097163,11122583,16222223,88942737952340,88942779666642,88942779720809,88942779992528,88942790397007,88942791935080,15208,227813,88942791935080,88942791047215,88942814740705,88942790397007,
+32,39660095,88942749076960,88942782443557,339271132,88942783876642,88942783916747,88942797141955,88942797241799,88945300430667,88942783838517,11122199,16222223,88942782443557,88942814511070,88942814553934,88942814899559,88942824250705,88942825937215,12812,259687,88942825937215,88942824991486,88942848130392,88942824250705,
+32,39660103,88942793556487,88942815799933,0,88942819198465,88942819200392,88942827471382,88942827583778,88945322674589,88942819149142,11121723,16222223,88942815799933,88942845101538,88942845136434,88942845413882,88942852749195,88942854676174,10834,260469,88942854676174,88942853442320,88942870341434,88942852749195,
+32,39660111,88942826922547,88942849166231,0,88942855766903,88942855768622,88942867322892,88942867427580,88945344918154,88942855717840,11121842,16222223,88942849166231,88942885527736,88942885567372,88942885895809,88942895072319,88942896671955,13177,266770,88942896671955,88942895800340,88942914823986,88942895072319,
+32,39660120,88942860265016,88942893629189,0,88942896122007,88942896124403,88942906247476,88942906349299,88945367161387,88942896062684,11121391,16222223,88942893629189,88942925390028,88942925434924,88942925752840,88942936376590,88942937770444,14010,356094,88942937770444,88942937165913,88942959303569,88942936376590,
+32,39660128,88942904762520,88942927002580,0,88942937920757,88942937922892,88942948054767,88942948152372,88945389402808,88942937869924,11120030,16222223,88942927002580,88942966572580,88942966631486,88942966920184,88942977114767,88942978468205,15834,286198,88942978468205,88942977899403,88943003772111,88942977114767,
+32,39660136,88942949220605,88942971459883,0,88942978978257,88942978980236,88942987898413,88942988062424,88945411642477,88942978922059,11119639,16222223,88942971459883,88943005554090,88943005610288,88943005913049,88943016341382,88943017713726,14063,308125,88943017713726,88943017065861,88943037130028,88943016341382,
+32,39660143,88942982575391,88943004814669,0,88943009619038,88943009620913,88943021958049,88943022080913,88945433881755,88943009571122,11119639,16222223,88943004814669,88943038480861,88943038531069,88943038813361,88943047849142,88943049314142,14479,223177,88943049314142,88943048410809,88943070488830,88943047849142,
+32,39660151,88943015917344,88943038154272,0,88943048523257,88943048525861,88943064774455,88943064873726,88945456119858,88943048469299,11118464,16222223,88943038154272,88943082853153,88943082895288,88943083491174,88943093872476,88943095362684,14896,210365,88943095362684,88943094594247,88943114976121,88943093872476,
+32,39660159,88943049279492,88943082636477,0,88943087987788,88943087989924,88943093541226,88943093663778,88945478357317,88943087936434,11118995,16222223,88943082636477,88943096952424,88943096985132,88943097187111,88943102438517,88943103561069,7865,207709,88943103561069,88943102910809,88943126079871,88943102438517,
+32,39660167,88943093748208,88943093748208,0,88943100947944,88943100949715,88943104086278,88943104177059,88945500594562,88943100897684,11118250,16222223,88943093748208,88943104205653,88943104234663,88943104399194,88943108985132,88943110414351,6250,177656,88943110414351,88943109544715,88943137194871,88943108985132,
+32,39660175,88943104866458,88943104866458,0,88943105211330,88943105212580,88943106259611,88943106343413,88945522823923,88943105181851,11111111,16222223,88943104866458,88943107123986,88943109570444,88943109739767,88943114176278,88943115712736,5260,193593,88943115712736,88943114647684,88943148341278,88943114176278,
+32,39660183,88943115823984,88943115823984,0,88943117967007,88943117968934,88943121317632,88943121412163,88945545046145,88943117929976,11111111,16222223,88943115823984,88943122326851,88943122375809,88943122568986,88943128377371,88943129288726,11302,167240,88943129288726,88943128810236,88943159442163,88943128377371,
+32,39660191,88943126970234,88943126970234,0,88943127430236,88943127432163,88943128893934,88943129009090,88945567276328,88943127385392,11119072,16222223,88943126970234,88943129943153,88943129966590,88943130159715,88943135603153,88943136508257,6823,199687,88943136508257,88943136063517,88943170568413,88943135603153,
+32,39660199,88943138232230,88943138232230,0,88943139910601,88943139912528,88943141082944,88943141178153,88945589514180,88943139869767,11118780,16222223,88943138232230,88943142291121,88943142322424,88943142528986,88943147313101,88943148745392,10886,185625,88943148745392,88943147749090,88943181678257,88943147313101,
+32,39660207,88943149349467,88943149349467,0,88943149770809,88943149772528,88943150892996,88943150977476,88945611752259,88943149730653,11119299,16222223,88943149349467,88943151706746,88943151733934,88943151913101,88943156569455,88943157710965,15469,243802,88943157710965,88943157070028,88941235558726,88943156569455,
+32,39660215,88943160470053,88943160470053,0,88943160846642,88943160848569,88943162173309,88943162266955,88945633991142,88943160800757,11119584,16222223,88943160470053,88943163020809,88943163050496,88943163230184,88943167930444,88943169271278,9844,177135,88943169271278,88943168422059,88941246674976,88943167930444,
+32,39660223,88943171590926,88943171590926,0,88943172186382,88943172188726,88943175435705,88943175590444,88945656230386,88943172135444,11119660,16222223,88943171590926,88943176027111,88943176061226,88943176263361,88943181508413,88943183582371,8282,184375,88943183582371,88943181912892,88941280062112,88943181508413,
+32,39660238,88943182715275,88943182715275,0,88943183278517,88943183280861,88943186516226,88943186621590,88945678469526,88943183221642,11119480,16222223,88943182715275,88943186657163,88943187407528,88943187590444,88943192777632,88943195296955,12917,186979,88943195296955,88943193199194,88941291166174,88943192777632,
+32,39660253,88943193828661,88943193828661,0,88943194331278,88943194333309,88943195925444,88943196038153,88945700708379,88943194277319,11119373,16222223,88943193828661,88943196935340,88943196963882,88943197133830,88943200972580,88943202930132,9896,150053,88943202930132,88943201322580,88941302282268,88943200972580,
+32,39660268,88943204950618,88943204950618,0,88943205639715,88943205641590,88943207030496,88943207140028,88943221172841,88943205593778,11119179,16222223,88943204950618,88943208261851,88943208288465,88943208461851,88943212456642,88941291564456,9531,165313,88941291564456,88943212864924,88941313416851,88943212456642,
+---PROFILEDATA---
+
+
+backgroundBlur used(0)
+
+View hierarchy:
+
+  com.neoruaa.meilox/com.ljyh.mei.MainActivity/android.view.ViewRootImpl@44a2e3
+  8 views, 15.11 kB of render nodes
+
+
+  Dynamic VRI BBQ Log.  render_draw: false  hdr_dimmer: false  blur_blend: false  hwui_window_decor: false  sync_barrier: false
+
+Total ViewRootImpl   : 1
+Total attached Views : 8
+Total RenderNode     : 15.11 kB (used) / 39.11 kB (capacity)
+

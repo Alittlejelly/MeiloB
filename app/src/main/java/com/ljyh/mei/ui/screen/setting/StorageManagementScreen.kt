@@ -1,5 +1,7 @@
 package com.ljyh.mei.ui.screen.setting
 
+import com.ljyh.mei.ui.navigation.meiloxHeaderAction
+import com.ljyh.mei.ui.component.utils.rememberAlertContent
 import android.content.Context
 import android.net.Uri
 import android.os.StatFs
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
@@ -42,16 +45,14 @@ import com.ljyh.mei.data.model.room.DownloadStatus
 import com.ljyh.mei.data.model.room.SourceType
 import com.ljyh.mei.di.AppDatabase
 import com.ljyh.mei.playback.CacheManager
-import com.ljyh.mei.ui.glass.GlassCard
-import com.ljyh.mei.ui.glass.GlassIconButton
-import com.ljyh.mei.ui.glass.IosAlertButtonRole
-import com.ljyh.mei.ui.glass.IosAlertButtonSpec
-import com.ljyh.mei.ui.glass.IosAlertDialog
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.IosPopupButton
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import io.github.neoruaa.glasmio.ui.GlasmioAlertButtonRole
+import io.github.neoruaa.glasmio.ui.GlasmioAlertButtonSpec
+import io.github.neoruaa.glasmio.ui.GlasmioAlertDialog
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.ui.GlasmioPopUpButton
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.utils.rememberPreference
@@ -240,18 +241,21 @@ fun StorageManagementScreen(viewModel: StorageManagementViewModel = hiltViewMode
     val (imageLimitMb, setImageLimitMb) = rememberPreference(ImageCacheLimitMbKey, DefaultImageCacheLimitMb)
     val (musicLimitMb, setMusicLimitMb) = rememberPreference(MusicCacheLimitMbKey, DefaultMusicCacheLimitMb)
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = stringResource(R.string.storage_management),
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),
         actions = {
-            GlassIconButton(viewModel::refresh, enabled = !state.isBusy) {
-                SfIcon(SfSymbol.ArrowClockwise, stringResource(R.string.refresh))
-            }
+            listOf(meiloxHeaderAction(
+                key = "storage.refresh",
+                contentDescription = stringResource(R.string.refresh),
+                onClick = viewModel::refresh,
+                enabled = !state.isBusy,
+            ) { SfIcon(SfSymbol.ArrowClockwise, null) })
         },
     ) {
         item {
-            GlassCard(Modifier.fillMaxWidth()) {
+            SettingsCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                     SfIcon("internaldrive.fill", null, size = 30.dp)
                     Text(stringResource(R.string.storage_managed_content), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -327,18 +331,19 @@ fun StorageManagementScreen(viewModel: StorageManagementViewModel = hiltViewMode
         }
     }
 
-    confirmation?.let { action ->
-        IosAlertDialog(
+    rememberAlertContent(confirmation)?.let { action ->
+        GlasmioAlertDialog(
+            visible = confirmation != null,
             onDismissRequest = { confirmation = null },
             title = stringResource(action.confirmationTitle),
             message = stringResource(action.confirmationMessage),
             buttons = listOf(
-                IosAlertButtonSpec(
+                GlasmioAlertButtonSpec(
                     label = stringResource(R.string.cancel),
-                    role = IosAlertButtonRole.Cancel,
+                    role = GlasmioAlertButtonRole.Cancel,
                     onClick = { confirmation = null },
                 ),
-                IosAlertButtonSpec(
+                GlasmioAlertButtonSpec(
                     label = stringResource(R.string.confirm),
                     onClick = {
                         confirmation = null
@@ -359,11 +364,14 @@ private fun StorageCacheLimitRow(
     enabled: Boolean,
     onSelected: (Int) -> Unit,
 ) {
-    GlassCard(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+    SettingsCard(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             SfIcon(systemName, null)
-            Text(stringResource(titleRes), modifier = Modifier.weight(1f).padding(horizontal = 13.dp))
-            IosPopupButton(
+            Text(stringResource(titleRes), modifier = Modifier.weight(1f).padding(horizontal = 13.dp, vertical = 14.dp))
+            GlasmioPopUpButton(
                 selected = selected,
                 items = values,
                 onSelected = onSelected,
@@ -379,7 +387,7 @@ private fun StorageCacheLimitRow(
 
 @Composable
 private fun StorageUsageRow(systemName: String, titleRes: Int, bytes: Long, context: Context) {
-    GlassCard(Modifier.fillMaxWidth()) {
+    SettingsCard(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             SfIcon(systemName, null)
             Text(stringResource(titleRes), modifier = Modifier.weight(1f).padding(horizontal = 13.dp))
@@ -390,17 +398,13 @@ private fun StorageUsageRow(systemName: String, titleRes: Int, bytes: Long, cont
 
 @Composable
 private fun StorageActionRow(systemName: String, titleRes: Int, busy: Boolean, destructive: Boolean = false, onClick: () -> Unit) {
-    GlassCard(Modifier.fillMaxWidth(), onClick = if (busy) null else onClick) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            SfIcon(systemName, null)
-            Text(
-                stringResource(titleRes),
-                modifier = Modifier.weight(1f).padding(horizontal = 13.dp),
-                color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
-            )
-            SfIcon("chevron.forward", null, size = 15.dp, tint = LocalGlassColors.current.separator)
-        }
-    }
+    GlasmioListRow(
+        title = stringResource(titleRes),
+        systemName = systemName,
+        enabled = !busy,
+        titleColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+        onClick = onClick,
+    )
 }
 
 private val StorageAction.confirmationTitle: Int get() = when (this) {

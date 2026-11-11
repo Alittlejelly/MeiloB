@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -42,10 +48,11 @@ import com.ljyh.mei.data.repository.BiliRepository
 import com.ljyh.mei.data.repository.biliFavPlaylistId
 import com.ljyh.mei.playback.queue.ListQueue
 import com.ljyh.mei.ui.component.BiliCover
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosListRow
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.LocalGlassColors
+import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
+import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.core.LocalGlassColors
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalPlayerConnection
@@ -125,6 +132,7 @@ fun BiliFavFolderScreen(
     }
 
     val uiState by viewModel.state.collectAsState()
+    val gridColumns = rememberBiliGridColumns()
 
     fun playAll(startIndex: Int) {
         val connection = playerConnection ?: return
@@ -142,7 +150,7 @@ fun BiliFavFolderScreen(
         }
     }
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = folderTitle,
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),
@@ -168,8 +176,8 @@ fun BiliFavFolderScreen(
             is Resource.Success -> {
                 if (result.data.isNotEmpty()) {
                     item(key = "play-all") {
-                        IosGroupedList {
-                            IosListRow(
+                        GlasmioGroupedList {
+                            GlasmioListRow(
                                 title = "播放全部",
                                 systemName = "play.fill",
                                 showTopSeparator = false,
@@ -178,13 +186,11 @@ fun BiliFavFolderScreen(
                         }
                     }
                 }
-                itemsIndexed(
-                    result.data,
-                    key = { _, video -> "${video.aid}_${video.cid}" },
-                    contentType = { _, _ -> "fav-row" },
-                ) { index, video ->
-                    BiliTrackRow(video = video, onClick = { playAll(index) })
-                }
+                biliVideoGridItems(
+                    videos = result.data,
+                    columns = gridColumns,
+                    key = { video -> "${video.aid}_${video.cid}" },
+                ) { index, _ -> playAll(index) }
             }
             is Resource.Error -> item(key = "folder-error") {
                 Text(
@@ -215,23 +221,32 @@ fun BiliFavFolderScreen(
 fun BiliTrackRow(
     video: BiliVideo,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    coverWidth: Dp = 130.dp,
+    horizontalPadding: Dp = 16.dp,
+    showDurationBadge: Boolean = true,
 ) {
+    // 按封面实际像素宽解码：网格列宽只有几十 dp 时，不必整张按 320px 解。
+    // 一屏二三十张封面时这一项直接决定解码内存和 GC 抖动。
+    val coverDecodeWidth = with(LocalDensity.current) { coverWidth.roundToPx() }.coerceIn(64, 512)
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(horizontal = horizontalPadding, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box {
             BiliCover(
                 imageUrl = biliThumb(video.cover).orEmpty(),
+                decodeWidth = coverDecodeWidth,
                 modifier = Modifier
-                    .width(130.dp)
+                    .width(coverWidth)
                     .aspectRatio(16f / 10f)
                     .clip(ContinuousRoundedRectangle(10.dp)),
             )
+            if (showDurationBadge) {
             Text(
                 biliDuration(video.durationMs),
                 fontSize = 10.sp,
@@ -243,6 +258,7 @@ fun BiliTrackRow(
                     .background(Color.Black.copy(alpha = 0.5f))
                     .padding(horizontal = 4.dp, vertical = 1.dp),
             )
+            }
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -269,6 +285,93 @@ fun BiliTrackRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+    }
+}
+
+/**
+ * 平板/横屏多列布局的列数（沿用上游 MeiloX 的按宽分列算法）：
+ * 约每 180dp 一列，最少 2 列、最多 4 列；竖屏手机返回 1（单列行）。
+ */
+@Composable
+fun rememberBiliGridColumns(): Int {
+    val device = rememberDeviceInfo()
+    val configuration = LocalConfiguration.current
+    return if (device.isLandscape || device.isTablet) {
+        (configuration.screenWidthDp.dp / 180.dp).toInt().coerceIn(2, 4)
+    } else {
+        1
+    }
+}
+
+/**
+ * B 站视频列表的懒加载条目：竖屏单列逐行；横屏/平板按 [columns] 分列成行，
+ * 行内单元格等宽（weight 1f），不足补位，行尾可选分隔线。
+ */
+fun LazyListScope.biliVideoGridItems(
+    videos: List<BiliVideo>,
+    columns: Int,
+    dividerColor: Color? = null,
+    key: (BiliVideo) -> Any = { it.aid },
+    onReachEnd: (() -> Unit)? = null,
+    /** 网格模式下封面宽度。列数越多单元格越窄，封面必须跟着缩，否则文字会被挤没。 */
+    gridCoverWidth: Dp = 100.dp,
+    /** 单列模式下行内左右内距；页面本身已经给过留白的调用方传 0，避免叠加成双重边距。 */
+    rowHorizontalPadding: Dp = 16.dp,
+    onItemClick: (index: Int, video: BiliVideo) -> Unit,
+) {
+    if (columns <= 1) {
+        itemsIndexed(
+            videos,
+            key = { _, video -> key(video) },
+            contentType = { _, _ -> "bili-row" },
+        ) { index, video ->
+            BiliTrackRow(
+                video = video,
+                onClick = { onItemClick(index, video) },
+                horizontalPadding = rowHorizontalPadding,
+            )
+            if (dividerColor != null && index < videos.lastIndex) {
+                HorizontalDivider(
+                    color = dividerColor,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+            if (onReachEnd != null && index == videos.lastIndex) {
+                LaunchedEffect(key(video)) { onReachEnd() }
+            }
+        }
+        return
+    }
+    val rows = videos.chunked(columns)
+    itemsIndexed(
+        rows,
+        key = { _, row -> row.joinToString("-") { key(it).toString() } },
+        contentType = { _, _ -> "bili-row-group" },
+    ) { rowIndex, row ->
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEachIndexed { slot, video ->
+                    val globalIndex = rowIndex * columns + slot
+                    BiliTrackRow(
+                        video = video,
+                        onClick = { onItemClick(globalIndex, video) },
+                        modifier = Modifier.weight(1f),
+                        coverWidth = gridCoverWidth,
+                        horizontalPadding = 0.dp,
+                    )
+                }
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+            if (dividerColor != null && rowIndex < rows.lastIndex) {
+                HorizontalDivider(color = dividerColor, modifier = Modifier.padding(top = 6.dp))
+            }
+        }
+        if (onReachEnd != null && rowIndex == rows.lastIndex) {
+            LaunchedEffect(row.first().aid) { onReachEnd() }
         }
     }
 }

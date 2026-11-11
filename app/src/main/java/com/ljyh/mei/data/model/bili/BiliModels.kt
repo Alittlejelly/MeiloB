@@ -276,7 +276,20 @@ data class BiliPlayUrl(
         @SerializedName("accept_quality") val acceptQuality: List<Int>? = null,
         @SerializedName("quality") val quality: Int = 0,
         @SerializedName("dash") val dash: Dash? = null,
+        /**
+         * 部分稿件（长视频、直播回放、转码特殊的投稿）B 站不提供 DASH，
+         * 只给渐进式 MP4：`dash` 为 null、`durl` 有一项，音轨混在视频文件里。
+         */
+        @SerializedName("durl") val durl: List<Durl>? = null,
     ) {
+        data class Durl(
+            @SerializedName("order") val order: Int = 0,
+            @SerializedName("length") val length: Long = 0,
+            @SerializedName("size") val size: Long = 0,
+            @SerializedName("url") val url: String? = null,
+            @SerializedName("backup_url") val backupUrl: List<String>? = null,
+        )
+
         data class Dash(
             @SerializedName("duration") val duration: Int = 0,
             @SerializedName("audio") val audio: List<Stream>? = null,

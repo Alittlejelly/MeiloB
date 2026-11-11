@@ -113,6 +113,14 @@ class AppleMusicArtworkMotionTest {
         finalRelease.join()
         assertEquals(0f, pull.offset, 0f)
         assertEquals(Offset.Zero, pull.onPreScroll(Offset(0f, -40f), NestedScrollSource.UserInput))
+        val historyPull = PlayerQueueTopOverscroll(scope, 68f, isAtTop = { true }) { true }
+        historyPull.onPreScroll(Offset(0f, 500f), NestedScrollSource.UserInput)
+        assertTrue("A deep first-song pull must leave room for the empty heading", historyPull.offset > 24f)
+        assertTrue(historyPull.offset < 68f)
+        val historyRelease = launch(clock) { historyPull.release() }
+        frames(120)
+        historyRelease.join()
+        assertEquals("Empty-history feedback must return to the visible header", 0f, historyPull.offset, 0f)
     }
 
     @Test fun autoplaySectionSeparatesOnlyTheDisplayedUpcomingEntries() {
@@ -296,12 +304,16 @@ class AppleMusicArtworkMotionTest {
                     assertTrue("The header must be able to reach the viewport top", contentHeight + tail >= viewport)
                     assertTrue("The tail must reserve at least one song row", tail >= rowHeight)
                     if (contentHeight + rowHeight >= viewport) assertEquals(rowHeight, tail, 0f)
+                    val collapsedTail = playerQueueTailHeight(viewport, contentHeight, rowHeight, fadeDepth, 84f,
+                        keepHeaderCollapsed = true)
+                    assertTrue("Even the final song must retain a collapsed header", contentHeight + collapsedTail >= viewport + 84f)
                 }
             }
         }
         assertEquals(56f, playerQueueTailHeight(280f, 600f, rowHeight, 0f), 0f)
         assertEquals(130f, playerQueueTailHeight(460f, 414f, rowHeight, 104f, 84f), 0f)
         assertEquals(212f, playerQueueTailHeight(460f, 248f, rowHeight, 104f, 84f), 0f)
+        assertEquals(296f, playerQueueTailHeight(460f, 248f, rowHeight, 104f, 84f, keepHeaderCollapsed = true), 0f)
         for (fadeDepth in listOf(0f, 56f, 104f, 200f)) {
             assertEquals(56f, playerQueueTailHeight(460f, 488f, rowHeight, fadeDepth, 84f), 0f)
             assertEquals(56f, playerQueueTailHeight(460f, 1000f, rowHeight, fadeDepth, 84f), 0f)
@@ -317,8 +329,14 @@ class AppleMusicArtworkMotionTest {
     }
 
     @Test fun queueSnapsBetweenThreeStatesWithoutResettingSectionScrolling() {
-        fun target(top: Float, direction: Int, hasHistory: Boolean = true, canPinUpcoming: Boolean = true) =
-            playerQueueSnapTarget(top, 84f, 600f, direction, hasHistory, canPinUpcoming)
+        fun target(
+            top: Float,
+            direction: Int,
+            hasHistory: Boolean = true,
+            canPinUpcoming: Boolean = true,
+            historyHeight: Float = 600f,
+            textTop: Float = 14.5f,
+        ) = playerQueueSnapTarget(top, 84f, 600f, direction, hasHistory, canPinUpcoming, historyHeight, textTop)
 
         assertEquals(0f, target(48f, -1)!!, 0f)
         assertEquals(0f, target(149f, -1)!!, 0f)
@@ -326,13 +344,35 @@ class AppleMusicArtworkMotionTest {
         assertEquals(600f, target(240f, -1)!!, 0f)
         assertEquals(0f, target(552f, 1)!!, 0f)
         assertEquals(-84f, target(-16f, 1)!!, 0f)
-        assertEquals(0f, target(-68f, -1)!!, 0f)
+        assertEquals(-84f, target(-68f, -1)!!, 0f)
         assertEquals(0f, target(-16f, 1, canPinUpcoming = false)!!, 0f)
         assertEquals(0f, target(48f, -1, hasHistory = false)!!, 0f)
         assertEquals(0f, target(200f, 0)!!, 0f)
         assertEquals(600f, target(400f, 0)!!, 0f)
         assertNull(target(650f, 1))
         assertNull(target(-150f, -1))
+        for (historyHeight in listOf(124f, 180f, 292f)) {
+            assertEquals(0f, target(historyHeight * 0.2f, -1, historyHeight = historyHeight)!!, 0f)
+            assertEquals(historyHeight, target(historyHeight * 0.5f, -1, historyHeight = historyHeight)!!, 0f)
+            assertEquals(0f, target(historyHeight * 0.75f, 1, historyHeight = historyHeight)!!, 0f)
+            assertEquals(historyHeight, target(historyHeight, -1, historyHeight = historyHeight)!!, 0f)
+            assertEquals(-84f, target(-16f, 1, historyHeight = historyHeight)!!, 0f)
+        }
+        assertEquals(600f, target(240f, -1, historyHeight = 900f)!!, 0f)
+        for (textTop in listOf(0f, 8f, 14.5f, 30f)) {
+            for (direction in listOf(-1, 0)) {
+                assertEquals("A partial metadata row must return to the hidden endpoint", -84f,
+                    target(-textTop - 0.5f, direction, textTop = textTop)!!, 0f)
+                assertEquals("Both lines clearing the edge must reveal the header", 0f,
+                    target(-textTop, direction, textTop = textTop)!!, 0f)
+                assertEquals(0f, target(-textTop + 0.5f, direction, textTop = textTop)!!, 0f)
+            }
+        }
+        assertEquals("Upward hiding must keep its existing behavior", -84f, target(-2f, 1)!!, 0f)
+        for (top in listOf(1f, 24f, 68f)) {
+            assertEquals("Empty history must not create another settled position", 0f,
+                target(top, -1, hasHistory = false)!!, 0f)
+        }
     }
 
     @Test fun shortHistoryFillsOnlyTheSpaceBetweenItsHeadingAndSongs() {
@@ -346,6 +386,36 @@ class AppleMusicArtworkMotionTest {
                 assertEquals(maxOf(viewport, heading + rows + gap), heading + padding + rows + gap, 0f)
             }
         }
+    }
+
+    @Test fun portraitControlGapsReachTheirMinimumBeforeArtworkShrinksBelowTheHandle() {
+        val artworkTop = 62f
+        val preferredSize = 348f
+        val preferredBounds = Rect(26f, artworkTop, 374f, artworkTop + preferredSize)
+        val cases = listOf(820f to 34f, 792f to 34f, 776f to 26f, 760f to 18f,
+            744f to 10f, 740f to 8f, 724f to 8f)
+        for ((height, expectedGap) in cases) {
+            // Reserve the measured footer, metadata, and cover-to-metadata gap.
+            val bottomBeforeCompression = height - 300f - 66f - 16f
+            val gap = appleMusicControlGap(preferredSize, artworkTop, bottomBeforeCompression, 34f, 8f)
+            assertEquals(expectedGap, gap, 0.001f)
+            val recoveredSpace = (34f - gap) * 2f
+            val bounds = appleMusicAlbumBounds(
+                preferredBounds, 400f, 26f, artworkTop,
+                bottomLimit = bottomBeforeCompression + recoveredSpace,
+            )
+            if (height >= 740f) assertEquals(preferredSize, bounds.width, 0.001f)
+            else {
+                assertEquals(8f, gap, 0f)
+                assertEquals(332f, bounds.width, 0.001f)
+            }
+            assertTrue(bounds.bottom <= bottomBeforeCompression + recoveredSpace + 0.001f)
+            for (scale in listOf(0.9f, 1f)) {
+                val visual = appleMusicArtworkFrame(bounds, header, 12f, 10f, 16f, scale, 0f)
+                assertTrue("Playing and paused covers must stay below the handle", visual.bounds.top >= artworkTop)
+            }
+        }
+        assertEquals(8f, appleMusicControlGap(preferredSize, artworkTop, 0f, 34f, 8f), 0f)
     }
 
     @Test fun enlargedAlbumMatchesTheProgressWidthWithoutMovingItsBottom() {

@@ -40,13 +40,13 @@ import com.ljyh.mei.R
 import com.ljyh.mei.constants.DevModeKey
 import com.ljyh.mei.constants.Github
 import com.ljyh.mei.constants.UpdateSourceKey
-import com.ljyh.mei.ui.glass.GlassCard
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.IosPopupButton
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import io.github.neoruaa.glasmio.ui.GlasmioCard
+import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.ui.GlasmioPopUpButton
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.screen.Screen
@@ -71,13 +71,19 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
     val updateCheckScope = rememberCoroutineScope()
     var isCheckingUpdate by remember { mutableStateOf(false) }
     var updateResult by remember { mutableStateOf<VersionUpdateResult?>(null) }
+    var updateApk by remember { mutableStateOf<VersionUpdateChecker.ApkAsset?>(null) }
 
     fun checkForUpdates() {
         if (isCheckingUpdate) return
         isCheckingUpdate = true
         updateCheckScope.launch {
             try {
-                updateResult = VersionUpdateChecker.check(BuildConfig.VERSION_NAME, updateSource)
+                val result = VersionUpdateChecker.check(BuildConfig.VERSION_NAME, updateSource)
+                updateResult = result
+                // 有新版本时顺手取 release 里挂的 APK，拿不到就让弹窗回退到「打开更新页」。
+                updateApk = if (result is VersionUpdateResult.UpdateAvailable) {
+                    VersionUpdateChecker.latestApk(updateSource)
+                } else null
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
@@ -88,7 +94,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
         }
     }
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = stringResource(R.string.settings_about),
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),
@@ -115,7 +121,9 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                 )
                 Text("MeiloB", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
+                    // about_version 是双占位符文案（版本 %1$s (%2$s)），只传一个参数会抛
+                    // MissingFormatArgumentException: %2$s —— 这就是关于页闪退的原因。
+                    stringResource(R.string.about_version, BuildConfig.VERSION_NAME, buildLabel()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -134,14 +142,14 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                     },
 //                    stringResource(R.string.about_check_updates_description),
                 ) { checkForUpdates() }
-                GlassCard(Modifier.fillMaxWidth()) {
+                GlasmioCard(Modifier.fillMaxWidth()) {
                     Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         SfIcon("icloud", null, size = 21.dp)
                         Text(
                             stringResource(R.string.about_update_source),
                             modifier = Modifier.weight(1f).padding(horizontal = 13.dp),
                         )
-                        IosPopupButton(
+                        GlasmioPopUpButton(
                             selected = updateSource,
                             items = UpdateSource.entries,
                             onSelected = { setUpdateSourceId(it.id) },
@@ -183,7 +191,11 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
 
     VersionUpdateAlert(
         result = updateResult,
-        onDismiss = { updateResult = null },
+        onDismiss = {
+            updateResult = null
+            updateApk = null
+        },
+        apk = updateApk,
     )
 }
 
@@ -199,7 +211,7 @@ private fun AboutSectionTitle(title: String) {
 
 @Composable
 private fun AboutEntry(systemName: String, title: String, subtitle: String? = null, onClick: () -> Unit) {
-    GlassCard(Modifier.fillMaxWidth(), onClick = onClick) {
+    GlasmioCard(Modifier.fillMaxWidth(), onClick = onClick) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             SfIcon(systemName, null, size = 21.dp)
             Column(Modifier.weight(1f).padding(horizontal = 13.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -212,6 +224,10 @@ private fun AboutEntry(systemName: String, title: String, subtitle: String? = nu
         }
     }
 }
+
+/** 版本号第二个占位符：CI 构建显示短 commit，本地构建退回 build 号，保证永不为空。 */
+private fun buildLabel(): String =
+    BuildConfig.BUILD_COMMIT_SHA.take(7).ifBlank { "build ${BuildConfig.BUILD_NUMBER}" }
 
 private fun openUrl(context: Context, url: String) {
     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }

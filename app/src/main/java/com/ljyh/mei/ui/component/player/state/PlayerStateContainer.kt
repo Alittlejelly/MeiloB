@@ -89,7 +89,13 @@ class PlayerStateContainer(
     lateinit var isFMMode: State<Boolean>
         internal set
 
+    internal val landscapeDetailVisible = mutableStateOf(true)
+    internal val landscapeQueueSelected = mutableStateOf(false)
+
     var controlsVisible by mutableStateOf(true)
+        internal set
+
+    var qualityMenuVisible by mutableStateOf(false)
         internal set
 
     internal fun refreshProgress() {

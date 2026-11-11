@@ -21,6 +21,7 @@ import com.ljyh.mei.ui.component.player.OverlayState
 import com.ljyh.mei.ui.component.player.PlayerViewModel
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
 import com.ljyh.mei.ui.model.MoreAction
+import com.ljyh.mei.ui.component.player.enterFloatingLyricsPip
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.ui.screen.playlist.PlaylistViewModel
 import com.ljyh.mei.ui.screen.playlist.PlaylistTrackAddOutcome
@@ -43,7 +44,7 @@ class PlayerOverlayHandler(
     val currentOverlayValue: OverlayState
         get() = _currentOverlay.value
 
-    /** Optional inline queue route supplied by the active phone layout. */
+    /** Optional inline queue route supplied by the active player layout. */
     internal var onShowPlaylist: (() -> Unit)? = null
 
     /** Open the inline queue when available, otherwise use the shared sheet. */
@@ -86,6 +87,10 @@ class PlayerOverlayHandler(
         _currentOverlay.value = OverlayState.MoreAction
     }
 
+    fun showPrivateFmScenes() {
+        _currentOverlay.value = OverlayState.PrivateFmScenes
+    }
+
     /**
      * 显示底部设置弹窗
      */
@@ -101,13 +106,22 @@ class PlayerOverlayHandler(
         artists: List<MediaMetadata.Artist>,
         cover: String,
         anchorBounds: Rect? = null,
+        viewportBounds: Rect? = null,
     ) {
         val connection = stateContainer.playerConnection
         _currentOverlay.value = OverlayState.AlbumArtist(
             album, artists, cover, anchorBounds,
             playlistTitle = connection.queueTitle.value,
             playlistId = connection.service.queueManager.playlistSource?.playlistId,
+            viewportBounds = viewportBounds,
         )
+    }
+
+    /**
+     * 显示QQ音乐选择弹窗
+     */
+    fun showQQMusicSelection(mediaMetadata: MediaMetadata) {
+        _currentOverlay.value = OverlayState.QQMusicSelection(mediaMetadata)
     }
 
     /**
@@ -142,8 +156,10 @@ class PlayerOverlayHandler(
     /**
      * 处理更多操作点击
      */
-    fun handleMoreAction(action: MoreAction) {
-        val mediaMetadata = stateContainer.mediaMetadata.value
+    fun handleMoreAction(
+        action: MoreAction,
+        mediaMetadata: MediaMetadata? = stateContainer.mediaMetadata.value,
+    ) {
         when (action) {
             MoreAction.ADD_TO_PLAYLIST -> {
                 mediaMetadata?.let {
@@ -159,8 +175,12 @@ class PlayerOverlayHandler(
                 mediaMetadata?.let {
                     dismiss()
                     requestNotificationPermission()
-                    val mediaId = stateContainer.playerConnection.player.currentMediaItem?.mediaId
-                    stateContainer.playerViewModel.downloadSong(it, context, biliMediaId = mediaId)
+                    stateContainer.playerViewModel.downloadSong(it, context)
+                }
+            }
+            MoreAction.DELETE -> {
+                mediaMetadata?.let {
+                    stateContainer.playerViewModel.deleteSongById(it.id.toString())
                 }
             }
             MoreAction.VIEW_PLAYLIST -> {
@@ -168,6 +188,10 @@ class PlayerOverlayHandler(
             }
             MoreAction.SLEEP_TIMER -> {
                 showSleepTimer()
+            }
+            MoreAction.PICTURE_IN_PICTURE -> {
+                dismiss()
+                enterFloatingLyricsPip(context, stateContainer.isPlaying.value)
             }
             MoreAction.BOTTOM_ACTION -> {
                 showBottomAction()

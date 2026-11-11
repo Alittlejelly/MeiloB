@@ -10,6 +10,7 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.CacheDataSink
 import androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
 import androidx.media3.datasource.cache.ContentMetadata
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
@@ -35,6 +36,29 @@ object CacheManager {
 
     // 锁对象，用于同步
     private val LOCK = Any()
+
+    // Foreground decks and background readers reuse connections and TLS sessions.
+    private val mediaHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request()
+                val host = request.url.host
+                val builder = request.newBuilder()
+                    .header("User-Agent", UserAgent)
+                // B 站 CDN（upos / bilivideo / hdslb）的音频流要求 Referer 与站点一致，
+                // 缺了会直接返回 4xx，播放器侧只表现为 ERROR_CODE_IO_BAD_HTTP_STATUS。
+                // 媒体请求走的是独立 client，不经过 BiliInterceptor，必须在这里补。
+                if (host.endsWith("bilibili.com") || host.endsWith("bilivideo.com") ||
+                    host.endsWith("bilivideo.cn") || host.endsWith("hdslb.com") ||
+                    host.endsWith("acgvideo.com")
+                ) {
+                    builder.header("Referer", "https://www.bilibili.com/")
+                        .header("Origin", "https://www.bilibili.com")
+                }
+                chain.proceed(builder.build())
+            }
+            .build()
+    }
 
     /**
      * 获取 SimpleCache 的单例。
@@ -67,27 +91,14 @@ object CacheManager {
 
 
     @OptIn(UnstableApi::class)
-    fun getCacheDataSourceFactory(context: Context): CacheDataSource.Factory {
+    fun getCacheDataSourceFactory(
+        context: Context,
+        cache: Cache = getSimpleCache(context),
+        fragmentSize: Long = 512 * 1024L,
+    ): CacheDataSource.Factory {
         Timber.tag("SimpleCache").d("Creating CacheDataSource instance")
-        val simpleCache = CacheManager.getSimpleCache(context)
 
-        // 1. 先配置你的 OkHttp (负责处理网络流)
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val host = chain.request().url.host
-                val builder = chain.request().newBuilder()
-                    .addHeader("User-Agent", UserAgent)
-                // B 站音视频 CDN 强制校验 Referer，缺失会返回 403。
-                if (host.endsWith("bilivideo.com") || host.endsWith("bilivideo.cn") ||
-                    host.endsWith("acgvideo.com") || host.endsWith("hdslb.com")
-                ) {
-                    builder.header("Referer", "https://www.bilibili.com/")
-                        .header("Origin", "https://www.bilibili.com")
-                }
-                chain.proceed(builder.build())
-            }
-            .build()
-        val okHttpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
+        val okHttpDataSourceFactory = OkHttpDataSource.Factory(mediaHttpClient)
 
         // 2. 【关键修复】使用 DefaultDataSource.Factory 包装 OkHttp
         // 它能自动处理 file://, http://, https://, content:// 等所有协议
@@ -95,7 +106,9 @@ object CacheManager {
 
         // 3. 将包装后的工厂设为 CacheDataSource 的上游
         return CacheDataSource.Factory()
-            .setCache(simpleCache)
+            .setCache(cache)
+            // Publish high-bitrate buffer fragments before a prepared deck pauses its loader.
+            .setCacheWriteDataSinkFactory(CacheDataSink.Factory().setCache(cache).setFragmentSize(fragmentSize))
             .setUpstreamDataSourceFactory(defaultDataSourceFactory) // 改为 defaultDataSourceFactory
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
     }

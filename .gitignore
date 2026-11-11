@@ -26,6 +26,7 @@ temp/
 /app/release
 /ncm_workspace
 /accounts
-# local agent scratch (perf captures, unpacked caches)
+/.local-research/
+
+# 临时分析目录（反编译/探针脚本）
 .dsh-tmp/
-.perf/

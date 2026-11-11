@@ -20,6 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import io.github.neoruaa.glasmio.glass.render.configureGlassDynamicRange
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -31,10 +32,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -49,6 +55,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -67,28 +74,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.State
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
@@ -98,6 +116,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.Preferences
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
@@ -115,14 +135,33 @@ import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.scene.rememberNavigationEventState
 import androidx.navigation3.scene.rememberSceneState
 import androidx.navigationevent.compose.NavigationBackHandler
-import androidx.navigation3.ui.NavDisplay
+import io.github.neoruaa.glasmio.scaffold.navigation.GlasmioNavDisplay
+import io.github.neoruaa.glasmio.scaffold.navigation.IosNavigationTransitionEffects
+import io.github.neoruaa.glasmio.scaffold.navigation.GlasmioNavHeaderMotion
+import io.github.neoruaa.glasmio.scaffold.GlasmioNavigationScaffold
+import io.github.neoruaa.glasmio.scaffold.GlasmioAdaptiveNavigationScaffold
+import io.github.neoruaa.glasmio.scaffold.GlasmioNavigationLayout
+import io.github.neoruaa.glasmio.scaffold.glasmioAdaptiveContent
+import io.github.neoruaa.glasmio.scaffold.rememberGlasmioAdaptiveNavigationState
+import io.github.neoruaa.glasmio.scaffold.GlasmioNavigationOperation
+import com.ljyh.mei.ui.navigation.MeiloXPageHeaders
+import com.ljyh.mei.ui.navigation.MeiloXPageEntry
+import com.ljyh.mei.ui.navigation.rememberMeiloXNavigationScrollState
+import com.ljyh.mei.ui.component.sheet.LocalMiniPlayerChromeMotion
+import com.ljyh.mei.ui.component.sheet.LocalMiniPlayerChromeHint
+import com.ljyh.mei.ui.component.sheet.MiniPlayerChromeHint
+import com.ljyh.mei.ui.component.sheet.MiniPlayerChromeMotion
+import com.ljyh.mei.ui.component.sheet.rememberMiniPlayerChromeMotion
+import io.github.neoruaa.glasmio.scaffold.GlasmioNavigationBarWithTrailingItem
+import io.github.neoruaa.glasmio.scaffold.glasmioNavigationScrollHint
 import androidx.navigation3.ui.NavDisplayTransitionEffects
-import androidx.navigation3.ui.defaultPopTransitionSpec
-import androidx.navigation3.ui.defaultPredictivePopTransitionSpec
-import androidx.navigation3.ui.defaultTransitionSpec
+import io.github.neoruaa.glasmio.scaffold.navigation.iosPopTransitionSpec
+import io.github.neoruaa.glasmio.scaffold.navigation.iosPredictivePopTransitionSpec
+import io.github.neoruaa.glasmio.scaffold.navigation.iosTransitionSpec
 import com.ljyh.mei.constants.AppBarHeight
 import com.ljyh.mei.constants.AppAppearance
 import com.ljyh.mei.constants.AppAppearanceKey
+import com.ljyh.mei.constants.BetaUpdatesEnabledKey
 import com.ljyh.mei.constants.DeviceIdKey
 import com.ljyh.mei.constants.DynamicThemeKey
 import com.ljyh.mei.constants.AccentColorKey
@@ -131,42 +170,58 @@ import com.ljyh.mei.constants.PodcastsEnabledKey
 import com.ljyh.mei.constants.DownloadsEnabledKey
 import com.ljyh.mei.constants.CloudMusicEnabledKey
 import com.ljyh.mei.constants.ListeningHistoryEnabledKey
-import com.ljyh.mei.constants.FindMusicTabEnabledKey
 import com.ljyh.mei.constants.LibraryTabEnabledKey
 import com.ljyh.mei.constants.PodcastsTabEnabledKey
 import com.ljyh.mei.constants.DownloadsTabEnabledKey
 import com.ljyh.mei.constants.CloudMusicTabEnabledKey
 import com.ljyh.mei.constants.ListeningHistoryTabEnabledKey
 import com.ljyh.mei.constants.NavigationTabOrderKey
-import com.ljyh.mei.constants.UpdateSourceKey
 import com.ljyh.mei.constants.KeepBottomBarExpandedKey
 import com.ljyh.mei.constants.BottomFloatingContentExtraSpacingKey
 import com.ljyh.mei.constants.BottomBarHorizontalPadding
+import com.ljyh.mei.constants.MiniPlayerInlineVerticalTravel
 import com.ljyh.mei.constants.DefaultBottomFloatingContentExtraSpacing
 import com.ljyh.mei.constants.MaxBottomFloatingContentExtraSpacing
+import com.ljyh.mei.constants.GlassHdrEffectsKey
 import com.ljyh.mei.constants.LiquidGlassEnabledKey
 import com.ljyh.mei.constants.PredictiveBackAnimationEnabledKey
 import com.ljyh.mei.constants.ReduceTransparencyKey
 import com.ljyh.mei.constants.LastSelectedTabKey
 import com.ljyh.mei.constants.PlayerKeepScreenOnKey
 import com.ljyh.mei.constants.RecognizeClipboardLinksKey
+import com.ljyh.mei.constants.LandscapeMiniPlayerHeight
+import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
+import androidx.compose.foundation.layout.widthIn
 import com.ljyh.mei.constants.MiniPlayerHeight
 import com.ljyh.mei.constants.NavigationBarHeight
 import com.ljyh.mei.constants.NavigationBarSurfaceHeight
 import com.ljyh.mei.constants.NavigationBarBottomMargin
 import com.ljyh.mei.data.model.UserData
+import com.ljyh.mei.data.model.api.GetSongDetails
+import com.ljyh.mei.data.model.melox.NeteaseMusicLink
+import com.ljyh.mei.data.model.melox.NeteaseMusicLinkParser
+import com.ljyh.mei.data.model.toMediaItem
+import com.ljyh.mei.data.network.api.ApiService
 import com.ljyh.mei.di.AppDatabase
 import com.ljyh.mei.di.repository.ColorRepository
 import com.ljyh.mei.playback.MusicService
 import com.ljyh.mei.playback.PlayerConnection
+import com.ljyh.mei.playback.queue.ListQueue
+import com.ljyh.mei.ui.component.ClipboardLinkPrompt
 import com.ljyh.mei.ui.component.IconButton
 import com.ljyh.mei.ui.component.VersionUpdateAlert
 import com.ljyh.mei.ui.component.player.BottomSheetPlayer
-import com.ljyh.mei.ui.component.sheet.rememberBottomSheetState
-import com.ljyh.mei.ui.component.sheet.BottomSheetState
+import com.ljyh.mei.ui.component.player.FloatingLyricsPipBackdrop
+import com.ljyh.mei.ui.component.player.FloatingLyricsPipScreen
+import com.ljyh.mei.ui.component.player.floatingLyricsPipParams
+import com.ljyh.mei.playback.ENABLE_FLOATING_LYRICS
+import com.ljyh.mei.playback.DISABLE_FLOATING_LYRICS
+import androidx.lifecycle.Lifecycle
+import io.github.neoruaa.glasmio.scaffold.rememberGlasmioBottomSheetState
+import io.github.neoruaa.glasmio.scaffold.GlasmioBottomSheetState
 import com.ljyh.mei.ui.component.sheet.syncPlaybackVisibility
-import com.ljyh.mei.ui.component.utils.appBarScrollBehavior
-import com.ljyh.mei.ui.component.utils.resetHeightOffset
+import io.github.neoruaa.glasmio.scaffold.rememberGlasmioAppBarScrollBehavior
+import io.github.neoruaa.glasmio.scaffold.resetHeightOffset
 import com.ljyh.mei.ui.local.LocalDatabase
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
@@ -175,26 +230,37 @@ import com.ljyh.mei.ui.local.LocalPageAppearance
 import com.ljyh.mei.ui.local.LocalColorfulPageBackgrounds
 import com.ljyh.mei.ui.component.player.LocalMiniPlayerAppearance
 import com.ljyh.mei.ui.local.LocalUserData
-import com.ljyh.mei.ui.glass.GlassBottomBar
-import com.ljyh.mei.ui.glass.BottomNavigationContact
-import com.ljyh.mei.ui.glass.LocalBottomControlContact
-import com.ljyh.mei.ui.glass.GlassIconButton
-import com.ljyh.mei.ui.glass.GlassTabItem
-import com.ljyh.mei.ui.glass.GlassSurfaceStyle
-import com.ljyh.mei.ui.glass.IosBottomSearchToolbar
-import com.ljyh.mei.ui.glass.CompactBottomControlIconSize
-import com.ljyh.mei.ui.glass.LocalGlassBackdrop
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.GlassAppearance
-import com.ljyh.mei.ui.glass.LocalGlassAppearance
-import com.ljyh.mei.ui.glass.LocalBlurBackdrop
-import com.ljyh.mei.ui.glass.defaultGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
-import com.ljyh.mei.ui.glass.rememberSharedGlassBackdrop
-import com.ljyh.mei.ui.glass.trackBackdropPosition
+import io.github.neoruaa.glasmio.ui.GlasmioNavigationBar
+import io.github.neoruaa.glasmio.glass.BottomNavigationContact
+import io.github.neoruaa.glasmio.glass.LocalBottomControlContact
+import io.github.neoruaa.glasmio.ui.GlasmioIconButton
+import io.github.neoruaa.glasmio.ui.GlasmioTabItem
+import io.github.neoruaa.glasmio.ui.GlasmioTabBar
+import io.github.neoruaa.glasmio.ui.GlasmioSidebarToolbar
+import io.github.neoruaa.glasmio.ui.GlasmioSidebarRow
+import io.github.neoruaa.glasmio.ui.GlasmioSidebarSectionHeader
+import io.github.neoruaa.glasmio.ui.GlasmioSidebarToggleIcon
+import io.github.neoruaa.glasmio.ui.GlasmioSidebarSearchField
+import com.ljyh.mei.ui.navigation.LibraryPage
+import io.github.neoruaa.glasmio.core.IosTypography
+import io.github.neoruaa.glasmio.glass.GlassSurfaceStyle
+import io.github.neoruaa.glasmio.ui.GlasmioSearchToolbar
+import io.github.neoruaa.glasmio.ui.GlasmioTextSelectionHost
+import io.github.neoruaa.glasmio.ui.GlasmioTextSelectionLabels
+import io.github.neoruaa.glasmio.ui.CompactBottomControlIconSize
+import io.github.neoruaa.glasmio.glass.LocalGlassBackdrop
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.core.GlassAppearance
+import io.github.neoruaa.glasmio.core.LocalGlassAppearance
+import io.github.neoruaa.glasmio.glass.LocalBlurBackdrop
+import io.github.neoruaa.glasmio.core.defaultGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
+import io.github.neoruaa.glasmio.glass.rememberSharedGlassBackdrop
+import io.github.neoruaa.glasmio.glass.trackBackdropPosition
 import com.ljyh.mei.ui.screen.Index
 import com.ljyh.mei.ui.screen.Screen
+import com.ljyh.mei.constants.UpdateSourceKey
 import com.ljyh.mei.ui.screen.navigationEntry
 import com.ljyh.mei.ui.navigation.MeiNavEntryViewModelStoreOwner
 import com.ljyh.mei.ui.navigation.MeiNavigator
@@ -202,24 +268,26 @@ import com.ljyh.mei.ui.navigation.MeiRoute
 import com.ljyh.mei.ui.theme.MusicTheme
 import com.ljyh.mei.ui.theme.LocalAccentSeedColor
 import com.ljyh.mei.utils.log.CrashHandler
+import com.ljyh.mei.utils.FrameStats
 import com.ljyh.mei.utils.cache.preloadImage
 import com.ljyh.mei.playback.nextPlaybackMediaItemIndex
 import com.ljyh.mei.utils.dataStore
 import com.ljyh.mei.utils.get
 import com.ljyh.mei.utils.log.FileLoggingTree
+import com.ljyh.mei.utils.netease.NeteaseUtils.getAndroidId
 import com.ljyh.mei.utils.rememberPreference
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.utils.VersionUpdateChecker
-import com.ljyh.mei.utils.UpdateSource
 import com.ljyh.mei.utils.VersionUpdateResult
-import com.kyant.backdrop.backdrops.layerBackdrop
-import com.kyant.backdrop.Backdrop
-import com.kyant.backdrop.backdrops.rememberCanvasBackdrop
-import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.layerBackdrop
+import io.github.neoruaa.glasmio.glass.render.Backdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.rememberCanvasBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.rememberLayerBackdrop
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -236,9 +304,10 @@ class MainActivity : ComponentActivity() {
     lateinit var colorRepository: ColorRepository
 
     @Inject
-    lateinit var biliRepository: com.ljyh.mei.data.repository.BiliRepository
-
+    lateinit var apiService: ApiService
     private var userData by mutableStateOf(UserData.VISITOR)
+    private var pictureInPictureMode by mutableStateOf(false)
+    private var floatingLyricsRequest: Boolean? = null
     private var musicService: MusicService? = null
 
 
@@ -247,7 +316,24 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        pictureInPictureMode = isInPictureInPictureMode
+        readFloatingLyricsIntent(intent)
         enableEdgeToEdge()
+        val contentRoot = findViewById<android.view.View>(android.R.id.content)
+        fun pageInsets(insets: WindowInsetsCompat) = retainLandscapeStatusBarSpace(
+            insets, resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE,
+        )
+        // Preserve the status bar's layout space in both final dispatch and animation
+        // frames. Its visibility flag still follows the immersive player.
+        ViewCompat.setOnApplyWindowInsetsListener(contentRoot) { _, insets -> pageInsets(insets) }
+        ViewCompat.setWindowInsetsAnimationCallback(contentRoot,
+            object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
+                override fun onProgress(
+                    insets: WindowInsetsCompat,
+                    runningAnimations: MutableList<WindowInsetsAnimationCompat>,
+                ): WindowInsetsCompat = pageInsets(insets)
+            },
+        )
         CrashHandler.init(this)
         if (BuildConfig.DEBUG) {
             // 开发模式：既输出到 Logcat，也输出到文件
@@ -257,10 +343,28 @@ class MainActivity : ComponentActivity() {
             // Release 模式：主要是植入文件记录器
             Timber.plant(FileLoggingTree(this))
         }
+        // 形变动画掉帧定位：只在明显掉帧时每秒输出一行，静止时零开销。
+        FrameStats.observe(window)
+        lifecycleScope.launch {
+            val initialPreferences = dataStore.data.first()
+            configureGlassDynamicRange(window, hdrEnabled = initialPreferences.glassHdrOutputEnabled())
+            initializeContent(initialPreferences)
+        }
+    }
+
+    @androidx.annotation.OptIn(UnstableApi::class)
+    @RequiresApi(Build.VERSION_CODES.S)
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun initializeContent(initialPreferences: Preferences) {
+        val initialHdrOutput = initialPreferences.glassHdrOutputEnabled()
         setContent {
             val context = this@MainActivity
             val lifecycleOwner = LocalLifecycleOwner.current
             val backStack = rememberNavBackStack(MeiRoute(Screen.Home.route))
+            val pageHeaders = remember { MeiloXPageHeaders() }
+            val adaptiveNavigation = rememberGlasmioAdaptiveNavigationState()
+            var sidebarQuery by rememberSaveable { mutableStateOf("") }
+            var sidebarLibraryExpanded by rememberSaveable { mutableStateOf(true) }
             val navController = remember(backStack) {
                 MeiNavigator(context = context, backStack = backStack)
             }
@@ -279,13 +383,19 @@ class MainActivity : ComponentActivity() {
             // Search chrome belongs to the search destination, including back navigation.
             val active = navController.currentRoute == Screen.Search.route
             var focusSearchOnEntry by remember { mutableStateOf(false) }
-            val bottomSearchState = remember { com.ljyh.mei.ui.local.BottomSearchState() }
             val dynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = false)
             val accentColorArgb by rememberPreference(AccentColorKey, DefaultAccentColorArgb)
             val appAppearance by rememberEnumPreference(AppAppearanceKey, AppAppearance.System)
             val (lastSelectedTab, setLastSelectedTab) = rememberPreference(LastSelectedTabKey, Index.Home.name)
+            val recognizeClipboardLinks by rememberPreference(RecognizeClipboardLinksKey, false)
             val navigationPreferences by context.dataStore.data
-                .collectAsState<Preferences, Preferences?>(initial = null)
+                .collectAsState<Preferences, Preferences?>(initial = initialPreferences)
+            LaunchedEffect(navigationPreferences?.glassHdrOutputEnabled()) {
+                if (navigationPreferences?.glassHdrOutputEnabled() != initialHdrOutput) {
+                    // Recreate material layers in the new window color space, as in the demo.
+                    recreate()
+                }
+            }
             val colorfulPageBackgrounds = navigationPreferences?.let {
                 it[com.ljyh.mei.constants.ColorfulDetailBackgroundsKey] ?: true
             } ?: false
@@ -300,20 +410,30 @@ class MainActivity : ComponentActivity() {
                 navigationPreferences?.get(PredictiveBackAnimationEnabledKey) ?: true
             val podcastsEnabled = navigationPreferences?.get(PodcastsEnabledKey) ?: true
             val downloadsEnabled = navigationPreferences?.get(DownloadsEnabledKey) ?: true
+            val cloudMusicEnabled = navigationPreferences?.get(CloudMusicEnabledKey) ?: true
             val listeningHistoryEnabled = navigationPreferences?.get(ListeningHistoryEnabledKey) ?: true
             val libraryTabEnabled = navigationPreferences?.get(LibraryTabEnabledKey) ?: true
+            val podcastsTabEnabled = navigationPreferences?.get(PodcastsTabEnabledKey) ?: false
             val downloadsTabEnabled = navigationPreferences?.get(DownloadsTabEnabledKey) ?: false
+            val cloudMusicTabEnabled = navigationPreferences?.get(CloudMusicTabEnabledKey) ?: false
             val listeningHistoryTabEnabled = navigationPreferences?.get(ListeningHistoryTabEnabledKey) ?: false
             val keepScreenOnInPlayer by rememberPreference(PlayerKeepScreenOnKey, false)
             val navigationTabOrder = navigationPreferences?.get(NavigationTabOrderKey)
                 ?: Index.DefaultOrder.joinToString(",", transform = Index::name)
             var playerConnection by remember { mutableStateOf<PlayerConnection?>(null) }
+            var playerVisibilitySynchronized by remember { mutableStateOf(false) }
+            var clipboardLink by remember { mutableStateOf<NeteaseMusicLink?>(null) }
+            var clipboardInspected by rememberSaveable { mutableStateOf(false) }
             var startupUpdateResult by remember { mutableStateOf<VersionUpdateResult?>(null) }
 
-            LaunchedEffect(navigationPreferences?.get(UpdateSourceKey)) {
+            LaunchedEffect(Unit) {
                 try {
-                    val source = UpdateSource.fromId(navigationPreferences?.get(UpdateSourceKey))
-                    val result = VersionUpdateChecker.check(BuildConfig.VERSION_NAME, source)
+                    val result = VersionUpdateChecker.check(
+                        BuildConfig.VERSION_NAME,
+                        com.ljyh.mei.utils.UpdateSource.fromId(
+                            context.dataStore.data.first()[UpdateSourceKey],
+                        ),
+                    )
                     if (result is VersionUpdateResult.UpdateAvailable) {
                         startupUpdateResult = result
                     }
@@ -333,6 +453,8 @@ class MainActivity : ComponentActivity() {
                         Timber.tag("MainActivity").d("Service Connected") // 添加日志
                         if (service is MusicService.MusicBinder) {
                             musicService = service.service
+                            service.service.attachFloatingLyricsActivity(this@MainActivity)
+                            applyFloatingLyricsRequest()
                             // 更新 State，触发 Recomposition
                             playerConnection = PlayerConnection(
                                 context,
@@ -344,6 +466,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun onServiceDisconnected(name: ComponentName?) {
+                        musicService?.detachFloatingLyricsActivity(this@MainActivity)
                         musicService = null
                         Timber.tag("MainActivity").d("Service Disconnected")
                         playerConnection?.dispose() // 假设你有 dispose 方法清理资源
@@ -351,8 +474,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // 启动并绑定服务
-                context.startService(intent)
+                // Binding creates the service; Media3 starts foreground service ownership for playback.
                 context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
                 onDispose {
@@ -425,48 +547,17 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
-            var navigationBarVisible by remember { mutableStateOf(true) }
-            val navigationBarExpanded = keepBottomBarExpanded || navigationBarVisible
-            val keepBottomBarExpandedState = rememberUpdatedState(keepBottomBarExpanded)
+            val scrollPlayerSheet = remember { mutableStateOf<GlasmioBottomSheetState?>(null) }
+            val navigationScrollAllowed = remember { mutableStateOf(false) }
+            val scrollSheet = scrollPlayerSheet.value
+            val navigationScroll = rememberMeiloXNavigationScrollState(
+                viewport = pageHeaders.entry(navController.currentRoute ?: Screen.Home.route).viewport,
+                enabled = navigationScrollAllowed.value && !active && !keepBottomBarExpanded &&
+                    (scrollSheet == null || scrollSheet.isCollapsed || scrollSheet.isDismissed),
+            )
+            val navigationBarExpanded = keepBottomBarExpanded || !navigationScroll.compactTarget
             LaunchedEffect(keepBottomBarExpanded) {
-                if (keepBottomBarExpanded) navigationBarVisible = true
-            }
-            val scrollPlayerSheet = remember { mutableStateOf<BottomSheetState?>(null) }
-            val searchActiveState = rememberUpdatedState(active)
-            val nestedScrollConnection = remember {
-                object : NestedScrollConnection {
-
-                    override fun onPreScroll(
-                        available: Offset,
-                        source: NestedScrollSource
-                    ): Offset {
-                        if (keepBottomBarExpandedState.value) return Offset.Zero
-                        // Read the actual sheet state for every event. Page scrolling remains
-                        // unconsumed, but cannot move the mini player's return target mid-flight.
-                        val sheet = scrollPlayerSheet.value
-                        if (sheet != null && !sheet.isCollapsed && !sheet.isDismissed) {
-                            return Offset.Zero
-                        }
-                        val route = navController.currentRoute
-                        val handlesNavigationBar = !searchActiveState.value &&
-                            (route == null ||
-                                route in homeNavigationRoutes ||
-                                route == Screen.Search.route)
-                        if (!handlesNavigationBar) return Offset.Zero
-
-                        if (available.y < -10f) {
-                            // 向下滑
-                            navigationBarVisible = false
-                        }
-
-                        if (available.y > 10f) {
-                            // 向上滑
-                            navigationBarVisible = true
-                        }
-
-                        return Offset.Zero
-                    }
-                }
+                if (keepBottomBarExpanded) navigationScroll.expand()
             }
 
 
@@ -503,12 +594,19 @@ class MainActivity : ComponentActivity() {
                 val staticGlassBackdrop = rememberCanvasBackdrop {
                     drawRect(glassColors.groupedBackground)
                 }
-                val glassBackdrop = staticGlassBackdrop
+                // Picture-in-picture still needs a recorded cover image backdrop.
+                val pipBackdrop = rememberLayerBackdrop()
+                val glassBackdrop = if (pictureInPictureMode && playerConnection != null) {
+                    pipBackdrop
+                } else {
+                    staticGlassBackdrop
+                }
                 // Keep the base page backdrop and the bottom controls' sample
                 // layer separate. Page glass samples [glassBackdrop], while the
                 // bottom layer records the page after it has rendered. Controls
                 // then sample [bottomBackdrop] without sampling themselves.
                 val bottomBackdrop = rememberLayerBackdrop()
+                val pageContentBackdrop = rememberLayerBackdrop()
                 // Popups are hosted in a separate Android window. Wrap the recorded page layer
                 // before combining it so its sample coordinates use the popup's real screen
                 // position rather than the popup-local overshoot origin.
@@ -522,21 +620,39 @@ class MainActivity : ComponentActivity() {
                     LocalPageAppearance provides registerPageAppearance,
                     LocalColorfulPageBackgrounds provides colorfulPageBackgrounds,
                 ) {
+                    GlasmioTextSelectionHost(
+                        backdrop = bottomControlsBackdrop,
+                        labels = GlasmioTextSelectionLabels(
+                            cut = stringResource(android.R.string.cut),
+                            copy = stringResource(android.R.string.copy),
+                            paste = stringResource(android.R.string.paste),
+                            selectAll = stringResource(android.R.string.selectAll),
+                            more = stringResource(R.string.more_actions_title),
+                            expanded = stringResource(R.string.menu_expanded),
+                            collapsed = stringResource(R.string.menu_collapsed),
+                        ),
+                    ) {
                     BoxWithConstraints(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.background)
-                            .nestedScroll(nestedScrollConnection)
+                            .nestedScroll(navigationScroll.nestedScrollConnection)
                             .onSizeChanged {
                                 isMeasured = true
                             }
                     ) {
+                    val isLandscape = rememberDeviceInfo().isLandscape
+                    val miniPlayerHeight = if (isLandscape) LandscapeMiniPlayerHeight else MiniPlayerHeight
                     val focusManager = LocalFocusManager.current
+                    val keyboardController = LocalSoftwareKeyboardController.current
                     val density = LocalDensity.current
+                    val navigationLayoutDirection = LocalLayoutDirection.current
                     val windowsInsets = WindowInsets.systemBars
                     val navigationInsets = WindowInsets.navigationBars
                     val currentRoute = navController.currentRoute
-                    val handlesKeyboardInsets = active || currentRoute == Screen.Search.route
+                    val handlesKeyboardInsets = active || currentRoute == Screen.Search.route ||
+                        currentRoute?.startsWith("${Screen.PrivateConversation.route}/") == true ||
+                        currentRoute?.startsWith("${Screen.Comment.route}/") == true
                     DisposableEffect(handlesKeyboardInsets) {
                         val previousMode = window.attributes.softInputMode
                         if (handlesKeyboardInsets) {
@@ -584,17 +700,24 @@ class MainActivity : ComponentActivity() {
                     }
 
                     val navigationItems = remember(
+                        podcastsEnabled,
                         downloadsEnabled,
+                        cloudMusicEnabled,
                         listeningHistoryEnabled,
                         libraryTabEnabled,
+                        podcastsTabEnabled,
                         downloadsTabEnabled,
+                        cloudMusicTabEnabled,
                         listeningHistoryTabEnabled,
                         navigationTabOrder,
                     ) {
                         val available = buildList {
                             add(Index.Home)
+                            // 本分叉只播放 B 站内容，「发现」页（网易云推荐流）已移除。
+                            if (podcastsEnabled && podcastsTabEnabled) add(Index.Podcasts)
                             if (libraryTabEnabled) add(Index.Library)
                             if (downloadsEnabled && downloadsTabEnabled) add(Index.Downloads)
+                            if (cloudMusicEnabled && cloudMusicTabEnabled) add(Index.Cloud)
                             if (listeningHistoryEnabled && listeningHistoryTabEnabled) add(Index.History)
                             add(Index.Settings)
                         }
@@ -624,12 +747,12 @@ class MainActivity : ComponentActivity() {
                                 navigationItems.fastAny { it.route == currentRoute } ||
                                 currentRoute == Screen.Search.route) &&
                                 !active
+                    SideEffect { navigationScrollAllowed.value = shouldAllowNavigationBar && !isLandscape }
                     // Route visibility must not reset the expanded/compact shape. This keeps a
                     // MiniNav compact while it fades out. The expanded preference overrides
                     // scrolling without changing which routes can display the navigation bar.
-                    val shouldCompactNavigationBar = !navigationBarExpanded
                     val shouldCompactMiniPlayer =
-                        shouldAllowNavigationBar && !navigationBarExpanded
+                        !isLandscape && shouldAllowNavigationBar && !navigationBarExpanded
 
 
 
@@ -637,40 +760,75 @@ class MainActivity : ComponentActivity() {
                     // Keep the anchor stable while the navigation morphs. The mini player
                     // moves inside the collapsed host with the same continuous spring.
                     val collapsedBottomReservation = when {
-                        shouldAllowNavigationBar ->
+                        active && !isLandscape -> navigationBottomMargin + searchToolbarSurfaceHeight -
+                            searchToolbarVerticalOffset + searchControlSpacing
+                        shouldAllowNavigationBar && !isLandscape ->
                             navigationBottomMargin + NavigationBarHeight - NavigationBarBottomMargin
                         else -> navigationBottomMargin
                     }
-                    val collapsedBound = collapsedBottomReservation + MiniPlayerHeight
+                    val collapsedBound = collapsedBottomReservation + miniPlayerHeight
                     val searchMiniPlayerOffset = remember(
-                        active, searchToolbarBottomPadding, navigationBottomMargin,
+                        active, searchToolbarBottomPadding, navigationBottomMargin, isLandscape,
                     ) {
                         {
-                            // The 64dp toolbar host sits at searchToolbarBottomPadding and is
-                            // nudged down 4dp; lift the mini player above its top edge so the
-                            // collapsed song bar yields to the search toolbar in both keyboard
-                            // states instead of overlapping it.
-                            if (active) -(searchToolbarBottomPadding.calculateBottomPadding() +
-                                60.dp - navigationBottomMargin).coerceAtLeast(0.dp)
+                            // Read IME padding during placement so both controls move together.
+                            if (active && !isLandscape) -(searchToolbarBottomPadding.calculateBottomPadding() -
+                                navigationBottomMargin).coerceAtLeast(0.dp)
                             else 0.dp
                         }
                     }
 
-                    val compactNavigationProgress = animateFloatAsState(
-                        targetValue = if (shouldCompactNavigationBar) 1f else 0f,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "CompactBottomNavigation",
-                    )
-                    val compactMiniPlayerProgress = animateFloatAsState(
-                        targetValue = if (shouldCompactMiniPlayer) 1f else 0f,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "CompactMiniPlayer",
-                    )
-                    val playerBottomSheetState = rememberBottomSheetState(
+                    val compactNavigationProgress = navigationScroll.compactProgress
+                    val playerBottomSheetState = rememberGlasmioBottomSheetState(
                         dismissedBound = 0.dp,
                         collapsedBound = collapsedBound,
                         expandedBound = maxHeight,
                     )
+                    LaunchedEffect(playerBottomSheetState, focusManager, keyboardController) {
+                        snapshotFlow { playerBottomSheetState.isContentVisible }.collect { visible ->
+                            if (visible) {
+                                // The player overlays the current page, so release its input focus.
+                                focusSearchOnEntry = false
+                                focusManager.clearFocus(force = true)
+                                keyboardController?.hide()
+                            }
+                        }
+                    }
+                    val miniPlayerCenterTravel = if (isLandscape) 0.dp else MiniPlayerInlineVerticalTravel
+                    val miniPlayerChromeMotion = rememberMiniPlayerChromeMotion(
+                        compact = shouldCompactMiniPlayer,
+                        sheet = playerBottomSheetState,
+                        centerTravel = miniPlayerCenterTravel,
+                    )
+                    val chromeHintProgress = navigationScroll.scrollHintProgress
+                    // UIKit's hint wrapper retains the regular accessory reservation even
+                    // while the visible accessory is inline. Include the bottom allocation.
+                    val chromeReservation = remember(playerBottomSheetState, navigationBottomMargin) {
+                        {
+                            NavigationBarSurfaceHeight + navigationBottomMargin +
+                                if (playerBottomSheetState.isDismissed) 0.dp
+                                else NavigationBarBottomMargin + MiniPlayerHeight
+                        }
+                    }
+                    val navigationHint = remember(chromeHintProgress, chromeReservation, navigationBottomMargin) {
+                        MiniPlayerChromeHint(chromeHintProgress) {
+                            NavigationBarSurfaceHeight + navigationBottomMargin - chromeReservation() / 2
+                        }
+                    }
+                    val miniPlayerHint = remember(
+                        chromeHintProgress, chromeReservation, miniPlayerChromeMotion,
+                        playerBottomSheetState, miniPlayerCenterTravel, searchMiniPlayerOffset,
+                    ) {
+                        MiniPlayerChromeHint(chromeHintProgress) {
+                            val miniAnchor = if (playerBottomSheetState.progress == 0f &&
+                                !playerBottomSheetState.isDragging
+                            ) playerBottomSheetState.value else playerBottomSheetState.collapsedBound
+                            miniAnchor -
+                                miniPlayerCenterTravel * miniPlayerChromeMotion.verticalProgress.value -
+                                searchMiniPlayerOffset() -
+                                chromeReservation() / 2
+                        }
+                    }
                     val playerBackgroundReady = remember { mutableStateOf(false) }
                     val onPlayerBackgroundReadyChanged = remember {
                         { ready: Boolean -> playerBackgroundReady.value = ready }
@@ -692,40 +850,40 @@ class MainActivity : ComponentActivity() {
                                 playerBottomSheetState.progress >= 0.99f
                         }
                     }.value
+                    val playerContentVisible by remember(playerBottomSheetState) {
+                        derivedStateOf { playerBottomSheetState.isContentVisible }
+                    }
                     val playerDismissed by remember(playerBottomSheetState) {
                         derivedStateOf { playerBottomSheetState.isDismissed }
                     }
-                    val searchResultsBottomPadding = remember(searchBottomInsets, density, playerDismissed) {
+                    val searchResultsBottomPadding = remember(searchBottomInsets, density, playerDismissed, isLandscape) {
                         searchBottomInsets.add(
-                            WindowInsets(bottom = NavigationBarHeight - NavigationBarBottomMargin +
-                                if (playerDismissed) 0.dp else MiniPlayerHeight),
+                            WindowInsets(bottom = (if (isLandscape) 0.dp else NavigationBarHeight - NavigationBarBottomMargin) +
+                                if (playerDismissed) 0.dp else miniPlayerHeight),
                         ).asPaddingValues(density)
                     }
                     val pageDarkAppearance = currentRoute?.let { pageAppearanceOverrides[it]?.second }
                     val statusBarDark = isPlayerPage || (pageDarkAppearance ?: effectiveDark)
                     val windowConfiguration = LocalConfiguration.current
-                    DisposableEffect(
-                        window, windowInsetsController, windowConfiguration,
-                        isPlayerPage, statusBarDark, effectiveDark, keepScreenOnInPlayer,
-                    ) {
+                    // Configure window layout only when its configuration or theme changes.
+                    // Player phase changes only update appearance below; repeating edge-to-edge
+                    // setup at 99% can dispatch a window traversal during the settling tail.
+                    DisposableEffect(window, windowInsetsController, windowConfiguration, effectiveDark) {
                         val transparent = android.graphics.Color.TRANSPARENT
                         enableEdgeToEdge(
-                            statusBarStyle = if (isPlayerPage) {
-                                // The expanded player renders artwork behind the status bar;
-                                // keep its foreground white regardless of the app theme.
-                                SystemBarStyle.dark(transparent)
-                            } else {
-                                SystemBarStyle.auto(transparent, transparent) { statusBarDark }
-                            },
-                            navigationBarStyle = SystemBarStyle.auto(transparent, transparent) {
-                                effectiveDark
-                            },
+                            statusBarStyle = SystemBarStyle.auto(transparent, transparent) { statusBarDark },
+                            navigationBarStyle = SystemBarStyle.auto(transparent, transparent) { effectiveDark },
                         )
-                        // Keep this explicit because the API 35+ edge-to-edge implementation can
-                        // retain the previous appearance while the bottom sheet settles.
-                        windowInsetsController.isAppearanceLightStatusBars =
-                            !statusBarDark
-                        // Even an unchanged flag dispatches window attributes and a traversal.
+                        window.navigationBarColor = transparent
+                        window.isNavigationBarContrastEnforced = false
+                        window.navigationBarDividerColor = transparent
+                        onDispose { }
+                    }
+                    DisposableEffect(windowInsetsController, statusBarDark) {
+                        windowInsetsController.isAppearanceLightStatusBars = !statusBarDark
+                        onDispose { }
+                    }
+                    DisposableEffect(window, isPlayerPage, keepScreenOnInPlayer) {
                         val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                         val wantsScreenOn = isPlayerPage && keepScreenOnInPlayer
                         val hasScreenOn = window.attributes.flags and keepScreenOnFlag != 0
@@ -733,25 +891,20 @@ class MainActivity : ComponentActivity() {
                             if (wantsScreenOn) window.addFlags(keepScreenOnFlag)
                             else window.clearFlags(keepScreenOnFlag)
                         }
-                        // Keep the navigation bar transparent instead of applying the platform
-                        // contrast scrim.
-                        window.navigationBarColor = transparent
-                        window.isNavigationBarContrastEnforced = false
-                        window.navigationBarDividerColor = transparent
                         onDispose { }
                     }
-                    val immersiveLandscapePlayer = isPlayerPage &&
+                    val immersiveLandscapePlayer = playerContentVisible &&
                         windowConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE
                     DisposableEffect(windowInsetsController, immersiveLandscapePlayer) {
                         val previousBehavior = windowInsetsController.systemBarsBehavior
                         if (immersiveLandscapePlayer) {
                             windowInsetsController.systemBarsBehavior =
                                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                            windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
+                            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
                         }
                         onDispose {
                             if (immersiveLandscapePlayer) {
-                                windowInsetsController.show(WindowInsetsCompat.Type.statusBars())
+                                windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
                                 windowInsetsController.systemBarsBehavior = previousBehavior
                             }
                         }
@@ -772,28 +925,33 @@ class MainActivity : ComponentActivity() {
 
                     val onSearch: (String) -> Unit = {
                         if (it.isNotEmpty()) {
-                            // 结果就地展示在搜索页，交给页面注册的处理器发起全站搜索。
-                            bottomSearchState.submit?.invoke(it)
                             clearSearchInput()
+                            // 第二段类型参数只做路由占位，搜索来源固定为 B 站全站。
+                            Screen.SearchResult.navigate(navController) {
+                                addPath(Uri.encode(it))
+                                addPath("1")
+                            }
                         }
                     }
+
                     LaunchedEffect(Unit) {
                         lifecycleScope.launch {
+                            getAndroidId(this@MainActivity)
                             if (dataStore.get(DeviceIdKey, "").isEmpty()) {
                                 dataStore.edit { settings ->
                                     settings[DeviceIdKey] = com.ljyh.mei.utils.getDeviceId()
                                 }
                             }
-                            // 校验本地 B 站会话，坏凭证自动清除回未登录状态。
-                            biliRepository.validateSession()
                         }
                     }
                     DisposableEffect(playerConnection, playerBottomSheetState, isMeasured) {
+                        playerVisibilitySynchronized = false
                         val player =
                             playerConnection?.player ?: return@DisposableEffect onDispose { }
                         if (!isMeasured) return@DisposableEffect onDispose { }
                         fun syncPlayerVisibility() {
                             playerBottomSheetState.syncPlaybackVisibility(player.currentMediaItem != null)
+                            playerVisibilitySynchronized = true
                         }
                         val listener = object : Player.Listener {
                             override fun onEvents(player: Player, events: Player.Events) {
@@ -810,6 +968,7 @@ class MainActivity : ComponentActivity() {
                         syncPlayerVisibility()
                         onDispose {
                             player.removeListener(listener)
+                            playerVisibilitySynchronized = false
                         }
                     }
                     val selectionToolbar = remember { com.ljyh.mei.ui.local.SelectionToolbarState() }
@@ -821,6 +980,21 @@ class MainActivity : ComponentActivity() {
                     val pageCacheActive = remember(playerBottomSheetState) {
                         derivedStateOf { playerBottomSheetState.isTransitioning }
                     }
+                    val selectedNavigationItem = navigationItems.firstOrNull { it.route == currentRoute }
+                        ?: navigationItems.firstOrNull { it.name == lastSelectedTab }
+                        ?: Index.Home
+                    val sidebarLibraryPages = remember {
+                        LibraryPage.biliPages
+                    }
+                    val selectedLibraryPage = sidebarLibraryPages.firstOrNull {
+                        currentRoute == "${Screen.LibraryCategory.route}/${it.name}"
+                    }
+                    val selectNavigationItem: (Index) -> Unit = { screen ->
+                        setLastSelectedTab(screen.name)
+                        if (currentRoute == screen.route) {
+                            navController.currentBackStackEntry?.savedStateHandle?.set("scrollToTop", true)
+                        } else navController.navigateTopLevel(screen.route)
+                    }
                     CompositionLocalProvider(
                         com.ljyh.mei.ui.local.LocalSelectionToolbar provides selectionToolbar,
                         LocalDatabase provides database,
@@ -828,6 +1002,114 @@ class MainActivity : ComponentActivity() {
                         LocalPlayerConnection provides playerConnection,
                         LocalUserData provides userData,
                     ) {
+                    GlasmioAdaptiveNavigationScaffold(
+                        state = adaptiveNavigation,
+                        layout = if (isLandscape) GlasmioNavigationLayout.TopTabs else GlasmioNavigationLayout.BottomBar,
+                        sidebarEnabled = !pictureInPictureMode && selectionToolbar.content.value == null,
+                        extendContentUnderSidebar = true,
+                        contentBackdrop = pageContentBackdrop,
+                        // 默认 320dp 在平板上偏宽，内容区被挤掉一大截；缩到 250dp。
+                        sidebarWidth = 250.dp,
+                        sidebar = {
+                            Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()
+                                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+                                GlasmioSidebarToolbar(
+                                    leading = {
+                                        Text(stringResource(R.string.app_name), style = IosTypography.headline,
+                                            modifier = Modifier.padding(horizontal = 10.dp))
+                                    },
+                                    trailing = {
+                                        GlasmioIconButton(
+                                            onClick = { adaptiveNavigation.sidebarExpanded = false },
+                                            modifier = Modifier.semantics { contentDescription = getString(R.string.hide_sidebar) },
+                                        ) { GlasmioSidebarToggleIcon() }
+                                    },
+                                )
+                                GlasmioSidebarSearchField(
+                                    query = sidebarQuery,
+                                    onQueryChange = { sidebarQuery = it },
+                                    onSearch = {
+                                        onSearch(sidebarQuery)
+                                        adaptiveNavigation.sidebarExpanded = false
+                                    },
+                                    placeholder = stringResource(R.string.search_bar_search),
+                                )
+                                Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                                    navigationItems.forEach { item ->
+                                        GlasmioSidebarRow(
+                                            title = stringResource(item.labelRes),
+                                            symbol = item.symbol,
+                                            selected = selectedLibraryPage == null && item == selectedNavigationItem,
+                                            onClick = { selectNavigationItem(item) },
+                                        )
+                                    }
+                                    GlasmioSidebarSectionHeader(
+                                        title = stringResource(R.string.app_tab_library),
+                                        expanded = sidebarLibraryExpanded,
+                                        onExpandedChange = { sidebarLibraryExpanded = it },
+                                    )
+                                    if (sidebarLibraryExpanded) sidebarLibraryPages.forEach { page ->
+                                        GlasmioSidebarRow(
+                                            title = stringResource(page.titleRes),
+                                            symbol = page.symbol,
+                                            selected = page == selectedLibraryPage,
+                                            onClick = {
+                                                if (page != selectedLibraryPage) {
+                                                    if (Index.Library in navigationItems) {
+                                                        setLastSelectedTab(Index.Library.name)
+                                                    }
+                                                    Screen.LibraryCategory.navigate(navController) { addPath(page.name) }
+                                                }
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        overlay = {
+                            if (selectionToolbar.content.value == null) AnimatedMiniPlayerLayer(
+                                motion = miniPlayerChromeMotion,
+                                hint = miniPlayerHint,
+                                centerTravel = miniPlayerCenterTravel,
+                                searchVerticalOffset = searchMiniPlayerOffset,
+                                state = playerBottomSheetState,
+                                backdrop = bottomControlsBackdrop,
+                                pageDarkAppearance = pageDarkAppearance,
+                                onBackgroundReadyChanged = onPlayerBackgroundReadyChanged,
+                            )
+                        },
+                    ) {
+                        // 导航 scaffold 的内容作用域：这里一旦每帧重组，整个页面（含网格）
+                        // 都会跟着重做，帧耗时直接上到几十上百毫秒。计数器进 MeiloPerf。
+                        SideEffect { FrameStats.countRecomposition() }
+                        if (pictureInPictureMode && playerConnection != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .layerBackdrop(pipBackdrop)
+                                    .trackBackdropPosition(pipBackdrop),
+                            ) {
+                                FloatingLyricsPipBackdrop(playerConnection = playerConnection!!)
+                            }
+                        }
+
+                        if (pictureInPictureMode && playerConnection != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer()
+                                    .layerBackdrop(bottomBackdrop)
+                                    .trackBackdropPosition(bottomBackdrop),
+                            ) {
+                                CompositionLocalProvider(
+                                    // Child glass controls sample the base page,
+                                    // never the bottom sample layer they create.
+                                    LocalGlassBackdrop provides glassBackdrop,
+                                ) {
+                                    FloatingLyricsPipScreen(playerConnection = playerConnection!!)
+                                }
+                            }
+                        } else {
                             // Page content is the backdrop source for the
                             // floating mini player and bottom controls. Its own
                             // glass controls sample the static backdrop instead
@@ -864,10 +1146,23 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 CompositionLocalProvider(
                                     LocalGlassBackdrop provides glassBackdrop,
-                                    com.ljyh.mei.ui.local.LocalBottomSearchState provides bottomSearchState,
                                 ) {
                                     val entryViewModelOwners = remember {
                                         mutableMapOf<String, MeiNavEntryViewModelStoreOwner>()
+                                    }
+                                    val headerMotion = remember {
+                                        GlasmioNavHeaderMotion((backStack.last() as MeiRoute).route) { from, to, pop ->
+                                            if (from in homeNavigationRoutes && to in homeNavigationRoutes
+                                            ) GlasmioNavigationOperation.Tab
+                                            else if (pop) GlasmioNavigationOperation.Pop
+                                            else GlasmioNavigationOperation.Push
+                                        }
+                                    }
+                                    LaunchedEffect(pageHeaders, headerMotion, backStack) {
+                                        snapshotFlow {
+                                            val frame = headerMotion.frame.value
+                                            backStack.map { (it as MeiRoute).route }.toSet() + frame.fromEntryKey + frame.toEntryKey
+                                        }.collect(pageHeaders::retain)
                                     }
                                     val viewModelEntryDecorator = remember(context) {
                                         NavEntryDecorator<NavKey>(
@@ -901,7 +1196,7 @@ class MainActivity : ComponentActivity() {
                                             ) {
                                                 // Retained entries must observe preferences loaded after recreation.
                                                 val entryNavigationItems = currentNavigationItems.value
-                                                val entryTopAppBarScrollBehavior = appBarScrollBehavior(
+                                                val entryTopAppBarScrollBehavior = rememberGlasmioAppBarScrollBehavior(
                                                     canScroll = {
                                                         !meiRoute.route.startsWith("search_result/") &&
                                                             (playerBottomSheetState.isCollapsed ||
@@ -928,9 +1223,11 @@ class MainActivity : ComponentActivity() {
                                                     navigationBarExpanded,
                                                     playerDismissed,
                                                     windowsInsets,
+                                                    isLandscape,
                                                 ) {
                                                     playerAwareWindowInsetsForRoute(
                                                         route = meiRoute.route,
+                                                        isLandscape = isLandscape,
                                                         navigationItems = entryNavigationItems,
                                                         navigationBarVisible = navigationBarExpanded,
                                                         playerDismissed = playerDismissed,
@@ -940,17 +1237,21 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                                 CompositionLocalProvider(
+                                                    com.ljyh.mei.ui.navigation.LocalMeiloXSearchTopPadding provides
+                                                        if (isLandscape && meiRoute.route == Screen.Search.route) 56.dp + com.ljyh.mei.constants.LandscapeSearchTopAdjustment else 0.dp,
                                                     LocalPlayerAwareWindowInsets provides
                                                         if (meiRoute.route == Screen.Search.route) entryPlayerAwareWindowInsets.union(imeInsets)
                                                         else entryPlayerAwareWindowInsets,
                                                 ) {
-                                                    navigationEntry(
-                                                        route = meiRoute.route,
-                                                        scrollBehavior = entryTopAppBarScrollBehavior,
-                                                        isNavigationTab = entryNavigationItems.any {
-                                                            it.route == meiRoute.route
-                                                        },
-                                                    )
+                                                    MeiloXPageEntry(meiRoute, pageHeaders) {
+                                                        navigationEntry(
+                                                            route = meiRoute.route,
+                                                            scrollBehavior = entryTopAppBarScrollBehavior,
+                                                            isNavigationTab = entryNavigationItems.any {
+                                                                it.route == meiRoute.route
+                                                            },
+                                                        )
+                                                    }
                                                 }
                                             }
                                         },
@@ -975,99 +1276,135 @@ class MainActivity : ComponentActivity() {
                                         isBackEnabled = !predictiveBackAnimationEnabled && canGoBack,
                                         onBackCompleted = { navController.popBackStack() },
                                     )
-                                    NavDisplay(
-                                        sceneState = sceneState,
-                                        // NavDisplay retains this state in remembered gesture calculations.
-                                        navigationEventState = navigationEventState,
-                                        modifier = Modifier.fillMaxSize(),
-                                        transitionSpec = {
-                                            if (usesHomeAlphaTransition()) {
-                                                homeAlphaTransition()
-                                            } else {
-                                                defaultTransitionSpec<NavKey>().invoke(this)
-                                            }
-                                        },
-                                        popTransitionSpec = {
-                                            if (usesHomeAlphaTransition()) {
-                                                homeAlphaTransition()
-                                            } else {
-                                                defaultPopTransitionSpec<NavKey>().invoke(this)
-                                            }
-                                        },
-                                        predictivePopTransitionSpec = { swipeEdge ->
-                                            if (usesHomeAlphaTransition()) {
-                                                homeAlphaTransition()
-                                            } else {
-                                                defaultPredictivePopTransitionSpec<NavKey>()
-                                                    .invoke(this, swipeEdge)
-                                            }
-                                        },
-                                        transitionEffects = remember(
-                                            navController.usesMiuixTransitionEffects,
-                                        ) {
-                                            if (navController.usesMiuixTransitionEffects) {
-                                                NavDisplayTransitionEffects(
-                                                    enableCornerClip = true,
-                                                    dimAmount = 0.5f,
-                                                    blockInputDuringTransition = false,
-                                                )
-                                            } else {
-                                                NavDisplayTransitionEffects(
-                                                    enableCornerClip = false,
-                                                    dimAmount = 0f,
-                                                    blockInputDuringTransition = false,
-                                                )
-                                            }
-                                        },
-                                    )
-                                    AnimatedVisibility(
-                                        visible = active,
-                                        enter = fadeIn(),
-                                        exit = fadeOut(),
-                                    ) {
-                                        Box(
-                                            Modifier
-                                                .fillMaxSize()
-                                                .background(
-                                                    if (query.text.isEmpty()) Color.Transparent
-                                                    else MaterialTheme.colorScheme.background,
-                                                ),
+                                    val selectedIndex = navigationItems.firstOrNull { it.route == currentRoute }
+                                        ?: navigationItems.firstOrNull { it.name == lastSelectedTab }
+                                        ?: Index.Home
+                                    val navigationTabs = navigationItems.map { item ->
+                                        GlasmioTabItem(
+                                            key = item,
+                                            label = stringResource(item.labelRes),
+                                            symbol = item.symbol,
                                         )
+                                    }
+                                    GlasmioNavigationScaffold(
+                                        motion = headerMotion,
+                                        contentBackdrop = pageContentBackdrop,
+                                        header = { pageHeaders.entry(it).spec },
+                                        topBar = if (isLandscape) ({ availableWidth ->
+                                            val header = currentRoute?.let { pageHeaders.entry(it).spec }
+                                            AnimatedVisibility(
+                                                visible = navigationPreferences != null &&
+                                                    playerVisibilitySynchronized &&
+                                                    selectionToolbar.content.value == null,
+                                                enter = fadeIn(), exit = fadeOut(),
+                                            ) {
+                                                DisposableEffect(Unit) {
+                                                    onDispose { adaptiveNavigation.tabBarBounds.value = null }
+                                                }
+                                                CompositionLocalProvider(
+                                                    LocalGlassColors provides (header?.colors ?: glassColors),
+                                                ) {
+                                                    GlasmioTabBar(
+                                                        items = navigationTabs,
+                                                        selectedKey = if (active) Index.Search else selectedIndex,
+                                                        searchKey = Index.Search,
+                                                        searchLabel = stringResource(R.string.app_tab_search),
+                                                        onSelected = selectNavigationItem,
+                                                        onSearchClick = {
+                                                            focusSearchOnEntry = true
+                                                            if (currentRoute != Screen.Search.route) navController.navigate(Screen.Search.route)
+                                                        },
+                                                        onSidebarToggle = adaptiveNavigation::toggleSidebar,
+                                                        sidebarToggleLabel = stringResource(
+                                                            if (adaptiveNavigation.sidebarExpanded) R.string.hide_sidebar else R.string.show_sidebar,
+                                                        ),
+                                                        modifier = Modifier.widthIn(max = minOf(560.dp, availableWidth))
+                                                            .onGloballyPositioned { adaptiveNavigation.tabBarBounds.value = it.boundsInWindow() },
+                                                    )
+                                                }
+                                            }
+                                        }) else null,
+                                    ) {
+                                        GlasmioNavDisplay(
+                                            sceneState = sceneState,
+                                            motion = headerMotion,
+                                            // NavDisplay retains this state in remembered gesture calculations.
+                                            navigationEventState = navigationEventState,
+                                            // The scene-state overload needs this callback for in-content swipe back.
+                                            onBack = { navController.popBackStack() },
+                                            swipeBackEnabled = !active && !playerContentVisible,
+                                            modifier = Modifier.fillMaxSize(),
+                                            transitionSpec = {
+                                                if (usesHomeAlphaTransition()) {
+                                                    homeAlphaTransition()
+                                                } else {
+                                                    iosTransitionSpec<NavKey>(navigationLayoutDirection, density.density).invoke(this)
+                                                }
+                                            },
+                                            popTransitionSpec = {
+                                                if (usesHomeAlphaTransition()) {
+                                                    homeAlphaTransition()
+                                                } else {
+                                                    iosPopTransitionSpec<NavKey>(navigationLayoutDirection, density.density).invoke(this)
+                                                }
+                                            },
+                                            predictivePopTransitionSpec = { swipeEdge ->
+                                                if (usesHomeAlphaTransition()) {
+                                                    homeAlphaTransition()
+                                                } else {
+                                                    iosPredictivePopTransitionSpec<NavKey>(navigationLayoutDirection, density.density)
+                                                        .invoke(this, swipeEdge)
+                                                }
+                                            },
+                                            transitionEffects = remember(
+                                                navController.usesMiuixTransitionEffects,
+                                            ) {
+                                                if (navController.usesMiuixTransitionEffects) {
+                                                    IosNavigationTransitionEffects
+                                                } else {
+                                                    NavDisplayTransitionEffects(
+                                                        enableCornerClip = false,
+                                                        dimAmount = 0f,
+                                                        blockInputDuringTransition = false,
+                                                    )
+                                                }
+                                            },
+                                        )
+                                        // 输入过程中不再弹出网易云的「搜索建议」列表：
+                                        // 本分叉只做 B 站全站搜索，搜索栏右侧按钮即确认搜索。
                                     }
                                 }
                             }
-                        if (selectionToolbar.content.value == null) AnimatedMiniPlayerLayer(
-                            compactProgress = compactMiniPlayerProgress,
-                            searchVerticalOffset = searchMiniPlayerOffset,
-                            state = playerBottomSheetState,
-                            backdrop = bottomControlsBackdrop,
-                            pageDarkAppearance = pageDarkAppearance,
-                            onBackgroundReadyChanged = onPlayerBackgroundReadyChanged,
-                        )
-                        // 全站搜索工具栏：占据底栏导航位置（导航栏在搜索页隐藏后露出的同一空间）。
                         AnimatedVisibility(
                             visible = active,
                             enter = fadeIn(),
                             exit = fadeOut(),
-                            modifier = Modifier.align(Alignment.BottomCenter),
+                            modifier = Modifier.align(if (isLandscape) Alignment.TopCenter else Alignment.BottomCenter),
                         ) {
                             CompositionLocalProvider(
                                 LocalGlassBackdrop provides bottomControlsBackdrop,
                             ) {
-                                IosBottomSearchToolbar(
+                                GlasmioSearchToolbar(
                                     query = query,
                                     onQueryChange = onQueryChange,
                                     onSearch = onSearch,
-                                    submitLabel = stringResource(R.string.search_bar_search),
+                                    // 搜索栏右侧的按钮改为「确认搜索」：直接以当前输入
+                                    // 打开 B 站全站搜索结果，而不是退出搜索。
+                                    onCancel = { onSearch(query.text) },
+                                    cancelLabel = stringResource(R.string.app_tab_search),
+                                    cancelIcon = "magnifyingglass",
                                     placeholder = stringResource(R.string.search_bar_search),
                                     focusRequester = searchBarFocusRequester,
                                     autoFocus = focusSearchOnEntry,
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .glasmioAdaptiveContent()
                                         .padding(horizontal = bottomNavigationHorizontalMargin)
-                                        .padding(searchToolbarBottomPadding)
-                                        // The 56dp controls are centered in a 64dp toolbar host.
-                                        .offset(y = 4.dp),
+                                        .then(if (isLandscape) Modifier
+                                            .padding(windowsInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal).asPaddingValues())
+                                            .padding(top = com.ljyh.mei.constants.LandscapeSearchTopPadding)
+                                        else Modifier.padding(searchToolbarBottomPadding)
+                                            .offset(y = searchToolbarVerticalOffset)),
                                 )
                             }
                         }
@@ -1076,26 +1413,28 @@ class MainActivity : ComponentActivity() {
                             ?: navigationItems.firstOrNull { it.name == lastSelectedTab }
                             ?: Index.Home
                         val navigationTabs = navigationItems.map { item ->
-                            GlassTabItem(
+                            GlasmioTabItem(
                                 key = item,
                                 label = stringResource(item.labelRes),
                                 symbol = item.symbol,
                             )
                         }
                         AnimatedVisibility(
-                            visible = navigationPreferences != null && shouldAllowNavigationBar &&
+                            visible = !isLandscape && navigationPreferences != null && shouldAllowNavigationBar &&
                                 selectionToolbar.content.value == null,
                             enter = fadeIn(),
                             exit = fadeOut(),
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .zIndex(2f),
+                                // Keep expanded navigation and both compact controls below the mini-player.
+                                .zIndex(0.5f),
                         ) {
                             AnimatedBottomNavigationRow(
                                 compactProgress = compactNavigationProgress,
+                                hint = navigationHint,
                                 items = navigationTabs,
                                 selectedKey = selectedIndex,
-                                onExpand = { navigationBarVisible = true },
+                                onExpand = navigationScroll::expand,
                                 onSelected = { screen ->
                                     setLastSelectedTab(screen.name)
                                     if (currentRoute == screen.route) {
@@ -1120,17 +1459,72 @@ class MainActivity : ComponentActivity() {
                         }
                         selectionToolbar.content.value?.let { toolbar ->
                             Box(Modifier.align(Alignment.BottomCenter).zIndex(3f)
-                                .fillMaxWidth().padding(horizontal = 16.dp)
+                                .fillMaxWidth().glasmioAdaptiveContent().padding(horizontal = 16.dp)
                                 .padding(bottom = bottomInset + NavigationBarBottomMargin)) {
                                 CompositionLocalProvider(LocalGlassBackdrop provides bottomControlsBackdrop) {
                                     toolbar()
                                 }
                             }
                         }
+                        LaunchedEffect(recognizeClipboardLinks) {
+                            if (recognizeClipboardLinks && !clipboardInspected) {
+                                clipboardInspected = true
+                                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val text = clipboard.primaryClip
+                                    ?.takeIf { it.itemCount > 0 }
+                                    ?.getItemAt(0)
+                                    ?.coerceToText(this@MainActivity)
+                                    ?.toString()
+                                clipboardLink = text?.let(NeteaseMusicLinkParser::parse)
+                            }
+                        }
+                        ClipboardLinkPrompt(
+                            link = clipboardLink,
+                            onDismiss = { clipboardLink = null },
+                            onOpen = { detectedLink ->
+                                clipboardLink = null
+                                when (detectedLink) {
+                                    is NeteaseMusicLink.ListenTogether -> {
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            "listen_invitation",
+                                            detectedLink.invitationText,
+                                        )
+                                        Screen.ListenTogether.navigate(navController)
+                                    }
+                                    is NeteaseMusicLink.Song -> {
+                                        lifecycleScope.launch {
+                                            runCatching {
+                                                apiService.getSongDetail(GetSongDetails(detectedLink.id.toString()))
+                                                    .songs
+                                                    .firstOrNull()
+                                                    ?: error(getString(R.string.clipboard_song_not_found))
+                                            }.onSuccess { song ->
+                                                playerConnection?.playQueue(
+                                                    ListQueue(
+                                                        id = "clipboard-${song.id}",
+                                                        title = song.name,
+                                                        items = listOf(song.id.toString() to song.toMediaItem()),
+                                                    ),
+                                                )
+                                            }.onFailure { error ->
+                                                Toast.makeText(
+                                                    this@MainActivity,
+                                                    getString(R.string.clipboard_open_failed, error.message.orEmpty()),
+                                                    Toast.LENGTH_LONG,
+                                                ).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        )
                         VersionUpdateAlert(
                             result = startupUpdateResult,
                             onDismiss = { startupUpdateResult = null },
                         )
+                        }
+                    }
+                    }
                     }
                 }
             }
@@ -1139,26 +1533,95 @@ class MainActivity : ComponentActivity() {
     }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        readFloatingLyricsIntent(intent)
+        applyFloatingLyricsRequest()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        applyFloatingLyricsRequest()
+    }
+
+    private fun readFloatingLyricsIntent(intent: Intent?) {
+        floatingLyricsRequest = when (intent?.action) {
+            ENABLE_FLOATING_LYRICS -> true
+            DISABLE_FLOATING_LYRICS -> false
+            else -> return
+        }
+        intent.action = null
+    }
+
+    private fun applyFloatingLyricsRequest() {
+        if (floatingLyricsRequest == null) return
+        window.decorView.post {
+            if (isFinishing || isDestroyed || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@post
+            val enabled = floatingLyricsRequest ?: return@post
+            val service = musicService ?: return@post
+            floatingLyricsRequest = null
+            if (enabled && !isInPictureInPictureMode) {
+                enterPictureInPictureMode(floatingLyricsPipParams(this, service.player.isPlaying))
+            } else if (!enabled) {
+                moveTaskToBack(true)
+            }
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration,
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        pictureInPictureMode = isInPictureInPictureMode
+        musicService?.updateFloatingLyricsState(this)
+    }
+    override fun onDestroy() {
+        musicService?.detachFloatingLyricsActivity(this)
+        musicService = null
+        super.onDestroy()
+    }
+
+}
+
+private fun Preferences.glassHdrOutputEnabled(): Boolean =
+    (this[GlassHdrEffectsKey] ?: false) &&
+        (this[LiquidGlassEnabledKey] ?: true) &&
+        !(this[ReduceTransparencyKey] ?: false)
+
+/** Hide the system chrome without changing the retained landscape page viewport. */
+internal fun retainLandscapeStatusBarSpace(insets: WindowInsetsCompat, landscape: Boolean): WindowInsetsCompat {
+    if (!landscape) return insets
+    val type = WindowInsetsCompat.Type.statusBars()
+    return WindowInsetsCompat.Builder(insets)
+        .setInsets(type, insets.getInsetsIgnoringVisibility(type))
+        .build()
 }
 
 private val homeNavigationRoutes = Screen.MainScreens.map { it.route }.toSet()
 private val bottomNavigationHorizontalMargin = BottomBarHorizontalPadding
+private val searchToolbarSurfaceHeight = 48.dp
+private val searchToolbarVerticalOffset = 4.dp
+private val searchControlSpacing = 8.dp
 
 private fun Scene<NavKey>.currentRoute(): String? =
     entries.lastOrNull()?.contentKey as? String
 
 @Composable
 private fun BoxScope.AnimatedMiniPlayerLayer(
-    compactProgress: State<Float>,
+    motion: MiniPlayerChromeMotion,
+    hint: MiniPlayerChromeHint,
+    centerTravel: Dp,
     searchVerticalOffset: () -> Dp,
-    state: BottomSheetState,
+    state: GlasmioBottomSheetState,
     backdrop: Backdrop,
     pageDarkAppearance: Boolean?,
     onBackgroundReadyChanged: (Boolean) -> Unit,
 ) {
-    val miniPlayerVerticalOffset = remember(compactProgress, searchVerticalOffset) {
+    val miniPlayerVerticalOffset = remember(motion, centerTravel, searchVerticalOffset) {
         {
-            (NavigationBarHeight - NavigationBarBottomMargin) * compactProgress.value +
+            centerTravel * motion.verticalProgress.value +
                 searchVerticalOffset()
         }
     }
@@ -1172,11 +1635,13 @@ private fun BoxScope.AnimatedMiniPlayerLayer(
             // sample layer while keeping page/player glass out of that source.
             LocalGlassBackdrop provides backdrop,
             LocalMiniPlayerAppearance provides pageDarkAppearance,
+            LocalMiniPlayerChromeMotion provides motion,
+            LocalMiniPlayerChromeHint provides hint,
         ) {
             BottomSheetPlayer(
                 state = state,
                 modifier = Modifier.fillMaxSize(),
-                compactMiniPlayerProgress = compactProgress,
+                compactMiniPlayerProgress = motion.contentProgress,
                 miniPlayerVerticalOffset = miniPlayerVerticalOffset,
                 onBackgroundReadyChanged = onBackgroundReadyChanged,
             )
@@ -1187,79 +1652,51 @@ private fun BoxScope.AnimatedMiniPlayerLayer(
 @Composable
 private fun AnimatedBottomNavigationRow(
     compactProgress: State<Float>,
-    items: List<GlassTabItem<Index>>,
+    hint: MiniPlayerChromeHint,
+    items: List<GlasmioTabItem<Index>>,
     selectedKey: Index,
     onExpand: () -> Unit,
     onSelected: (Index) -> Unit,
     onSearchClick: () -> Unit,
     backdrop: Backdrop,
-    playerBottomSheetState: BottomSheetState,
+    playerBottomSheetState: GlasmioBottomSheetState,
     bottomMargin: Dp,
 ) {
-    BottomNavigationContact(
+    // 探针：底栏「展开 ↔ 胶囊」的形变是滚动驱动的，之前混在无标签的日志行里，
+    // 一直被我当成"首页常态"读。这里单独打标签，日志会写成 [tabbar]。
+    LaunchedEffect(compactProgress) {
+        snapshotFlow { compactProgress.value > 0f && compactProgress.value < 1f }
+            .distinctUntilChanged()
+            .collect { morphing ->
+                if (morphing) FrameStats.enterScene("tabbar") else FrameStats.exitScene()
+            }
+    }
+    GlasmioNavigationBarWithTrailingItem(
+        items = items,
+        trailingItem = GlasmioTabItem(Index.Search, stringResource(R.string.app_tab_search), SfSymbol.Search),
+        selectedKey = selectedKey,
+        onExpand = onExpand,
+        onSelected = { item -> if (item == Index.Search) onSearchClick() else onSelected(item) },
+        compactProgress = compactProgress,
         backdrop = backdrop,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = bottomNavigationHorizontalMargin)
+            .glasmioNavigationScrollHint(hint.progress) {
+                TransformOrigin(.5f, hint.pivotFromTop().toPx() / size.height.coerceAtLeast(1f))
+            }
             .padding(bottom = bottomMargin)
             .offset {
                 val slideOffset = (bottomMargin + NavigationBarHeight) *
                     playerBottomSheetState.progress.coerceIn(0f, 1f)
-                // Compact controls shrink around the center of their expanded hosts.
-                val compactInset = (NavigationBarSurfaceHeight - MiniPlayerHeight) / 2 * compactProgress.value
-                IntOffset(x = 0, y = (slideOffset + compactInset).roundToPx())
+                IntOffset(x = 0, y = slideOffset.roundToPx())
             },
-    ) {
-        GlassBottomBar(
-            items = items,
-            selectedKey = selectedKey,
-            onExpand = onExpand,
-            onSelected = onSelected,
-            backdrop = backdrop,
-            compactProgress = compactProgress,
-            compactSize = MiniPlayerHeight,
-            modifier = Modifier.weight(1f).zIndex(1f),
-        )
-        Spacer(Modifier.size(width = 8.dp, height = 1.dp))
-        val contact = LocalBottomControlContact.current
-        Box(
-            modifier = Modifier.size(NavigationBarSurfaceHeight)
-                .then(contact?.takeIf { it.capturesLensSource.value }
-                    ?.neighborRecordingModifier ?: Modifier),
-            contentAlignment = Alignment.CenterEnd,
-        ) {
-            AnimatedHomeSearchButton(compactProgress, backdrop, onSearchClick)
-        }
-    }
-}
-
-@Composable
-private fun AnimatedHomeSearchButton(
-    compactProgress: State<Float>,
-    backdrop: Backdrop,
-    onClick: () -> Unit,
-) {
-    val progress = compactProgress.value
-    GlassIconButton(
-        onClick = onClick,
-        backdrop = backdrop,
-        style = GlassSurfaceStyle.Navigation,
-        modifier = Modifier.size(NavigationBarSurfaceHeight - 16.dp * progress),
-        morphProgress = compactProgress,
-        morphCaptureWidth = NavigationBarSurfaceHeight,
-    ) {
-        SfIcon(
-            SfSymbol.Search,
-            contentDescription = stringResource(R.string.app_tab_search),
-            tint = LocalGlassColors.current.content,
-            size = 26.dp + (CompactBottomControlIconSize - 26.dp) * progress,
-            weight = androidx.compose.ui.text.font.FontWeight.SemiBold,
-        )
-    }
+    )
 }
 
 private fun playerAwareWindowInsetsForRoute(
     route: String,
+    isLandscape: Boolean,
     navigationItems: List<Index>,
     navigationBarVisible: Boolean,
     playerDismissed: Boolean,
@@ -1270,11 +1707,11 @@ private fun playerAwareWindowInsetsForRoute(
     val allowsNavigationBar =
         navigationItems.fastAny { it.route == route } || route == Screen.Search.route
     var bottom = if (allowsNavigationBar || !playerDismissed) navigationBottomMargin else bottomInset
-    if (allowsNavigationBar && (navigationBarVisible || route == Screen.Setting.route)) {
+    if (!isLandscape && allowsNavigationBar && (navigationBarVisible || route == Screen.Setting.route)) {
         bottom += NavigationBarHeight - NavigationBarBottomMargin
     }
     if (!playerDismissed || route == Screen.Setting.route) {
-        bottom += MiniPlayerHeight
+        bottom += if (isLandscape) LandscapeMiniPlayerHeight else MiniPlayerHeight
     }
     return windowsInsets
         .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)

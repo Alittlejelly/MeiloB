@@ -45,7 +45,7 @@ import com.ljyh.mei.constants.PlayerStyle
 import com.ljyh.mei.constants.PlayerStyleKey
 import com.ljyh.mei.playback.PlayMode
 import com.ljyh.mei.playback.SleepTimerState
-import com.ljyh.mei.ui.glass.SfIcon
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalPlayerConnection
 import com.ljyh.mei.ui.model.PlayerAction
 import com.ljyh.mei.utils.TimeUtils.makeTimeString
@@ -58,7 +58,9 @@ import timber.log.Timber
 @Composable
 fun PlayerActionToolbar(
     modifier: Modifier = Modifier,
+    lyricsVisible: Boolean,
     queueVisible: Boolean = false,
+    onLyricClick: () -> Unit,
     onPlaylistClick: () -> Unit,
     onSleepTimerClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
@@ -103,24 +105,11 @@ fun PlayerActionToolbar(
         actions.forEach { action ->
             when (action) {
                 PlayerAction.PLAY_MODE -> {
-                    ShadowedIconButton(
+                    PlayerPlayModeButton(
+                        playMode = playMode,
                         pressedAlpha = pressedAlpha,
-                        onClick = { playerConnection.switchPlayMode() }
-                    ) {
-                        val systemName = when (playMode) {
-                            PlayMode.REPEAT_MODE_ONE -> "repeat.1"
-                            PlayMode.REPEAT_MODE_ALL -> "repeat"
-                            PlayMode.SHUFFLE_MODE_ALL -> "shuffle"
-                        }
-                        AnimatedContent(targetState = systemName, label = "PlayModeIcon") { target ->
-                            SfIcon(
-                                target,
-                                stringResource(com.ljyh.mei.R.string.player_action_play_mode),
-                                tint = Color.White,
-                                weight = FontWeight.Medium,
-                            )
-                        }
-                    }
+                        onClick = { playerConnection.switchPlayMode() },
+                    )
                 }
 
                 PlayerAction.QUEUE -> {
@@ -132,6 +121,16 @@ fun PlayerActionToolbar(
                         iconWeight = FontWeight.SemiBold,
                         pressedAlpha = pressedAlpha,
                         onClick = onPlaylistClick
+                    )
+                }
+
+                PlayerAction.LYRICS -> {
+                    PlayerPageActionButton(
+                        systemName = if (lyricsVisible) "quote.bubble.fill" else action.systemName,
+                        contentDescription = stringResource(action.labelRes),
+                        isSelected = lyricsVisible,
+                        pressedAlpha = pressedAlpha,
+                        onClick = onLyricClick
                     )
                 }
 
@@ -237,7 +236,35 @@ fun PlayerActionToolbar(
 }
 
 @Composable
-private fun PlayerPageActionButton(
+internal fun PlayerPlayModeButton(
+    playMode: PlayMode,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    pressedAlpha: Float = 0.3f,
+) {
+    ShadowedIconButton(
+        modifier = modifier,
+        pressedAlpha = pressedAlpha,
+        onClick = onClick,
+    ) {
+        val systemName = when (playMode) {
+            PlayMode.REPEAT_MODE_ONE -> "repeat.1"
+            PlayMode.REPEAT_MODE_ALL -> "repeat"
+            PlayMode.SHUFFLE_MODE_ALL -> "shuffle"
+        }
+        AnimatedContent(targetState = systemName, label = "PlayModeIcon") { target ->
+            SfIcon(
+                target,
+                stringResource(com.ljyh.mei.R.string.player_action_play_mode),
+                tint = Color.White,
+                weight = FontWeight.Medium,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun PlayerPageActionButton(
     systemName: String,
     contentDescription: String,
     isSelected: Boolean,
@@ -245,29 +272,34 @@ private fun PlayerPageActionButton(
     iconSize: Dp = 24.dp,
     iconWeight: FontWeight = FontWeight.Medium,
     pressedAlpha: Float = 0.3f,
+    enabled: Boolean = true,
+    showSelectedBackground: Boolean = true,
+    modifier: Modifier = Modifier,
 ) {
+    val selectedBackground = isSelected && showSelectedBackground
     ShadowedIconButton(
-        modifier = Modifier.semantics { selected = isSelected },
+        modifier = modifier.semantics { selected = isSelected },
         onClick = onClick,
+        enabled = enabled,
         pressedAlpha = pressedAlpha,
-        dimOnPress = !isSelected,
+        dimOnPress = !selectedBackground,
     ) {
         Box(
             modifier = Modifier
                 .size(36.dp)
                 .then(
-                    if (isSelected) Modifier.graphicsLayer {
+                    if (selectedBackground) Modifier.graphicsLayer {
                         // Keep the glyph cutout inside the button background.
                         compositingStrategy = CompositingStrategy.Offscreen
                     } else Modifier
                 )
-                .background(if (isSelected) Color.White else Color.Transparent, CircleShape),
+                .background(if (selectedBackground) Color.White else Color.Transparent, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             SfIcon(
                 systemName = systemName,
                 contentDescription = contentDescription,
-                modifier = if (isSelected) Modifier.graphicsLayer {
+                modifier = if (selectedBackground) Modifier.graphicsLayer {
                     blendMode = BlendMode.DstOut
                     compositingStrategy = CompositingStrategy.Offscreen
                 } else Modifier,

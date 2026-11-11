@@ -73,7 +73,7 @@ fun BiliArchive.toBiliVideo(): BiliVideo = BiliVideo(
     aid = aid,
     bvid = bvid,
     cid = cid,
-    title = title.orEmpty(),
+    title = title.decodeBiliText(),
     uploader = uploaderName,
     uploaderMid = uploaderMid,
     cover = biliHttpsUrl(pic),
@@ -87,7 +87,7 @@ fun BiliVideoDetail.Data.toBiliVideo(): BiliVideo = BiliVideo(
     aid = aid,
     bvid = bvid,
     cid = cid,
-    title = title.orEmpty(),
+    title = title.decodeBiliText(),
     uploader = owner?.name,
     uploaderMid = owner?.mid ?: 0,
     cover = biliHttpsUrl(pic),
@@ -101,7 +101,7 @@ fun BiliFavResourceList.Data.Media.toBiliVideo(): BiliVideo = BiliVideo(
     aid = id,
     bvid = bvid,
     cid = cid,
-    title = title.orEmpty(),
+    title = title.decodeBiliText(),
     uploader = upper?.name,
     uploaderMid = upper?.mid ?: 0,
     cover = biliHttpsUrl(cover),
@@ -115,7 +115,7 @@ fun BiliSearchAll.Data.Block.Item.toBiliVideo(): BiliVideo = BiliVideo(
     bvid = bvid,
     // 搜索结果不返回 cid，播放前需要先拉取视频详情。
     cid = 0,
-    title = title.orEmpty().replace(Regex("</?em[^>]*>"), ""),
+    title = title.orEmpty().replace(Regex("</?em[^>]*>"), "").decodeBiliText(),
     uploader = author,
     uploaderMid = mid,
     cover = biliHttpsUrl(pic?.takeIf { it.startsWith("http") || it.startsWith("//") }),
@@ -123,6 +123,19 @@ fun BiliSearchAll.Data.Block.Item.toBiliVideo(): BiliVideo = BiliVideo(
     playCount = play,
     danmakuCount = danmaku,
 )
+
+/**
+ * B 站接口返回的标题常带 HTML 实体（`&#8226;`、`&amp;`、`&quot;` 等），
+ * 直接显示会变成 `（●&#8226;` 这种原始字符。这里统一按 HTML 反转义。
+ * 只处理含 `&` 的字符串，热路径上没有额外开销。
+ */
+fun String?.decodeBiliText(): String {
+    val raw = this.orEmpty()
+    if (raw.indexOf('&') < 0) return raw
+    return runCatching {
+        android.text.Html.fromHtml(raw, android.text.Html.FROM_HTML_MODE_LEGACY).toString()
+    }.getOrDefault(raw)
+}
 
 fun parseBiliDuration(raw: String?): Long {
     val parts = raw?.trim()?.split(":")?.map { it.toLongOrNull() ?: 0L } ?: return 0

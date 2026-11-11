@@ -1,0 +1,1279 @@
+﻿Cmdline: /system/bin/simpleperf record -p 18643 --duration 4 -f 1000 -e cpu-clock --call-graph fp -o cap-selftest2.data
+Arch: arm64
+Event: cpu-clock (type 1, config 0)
+Samples: 258
+Error Callchains: 14, 5.426357%
+Event count: 258000000
+
+Children  Self   Sample  Command                 Pid    Tid    Shared Object                                                                                         Symbol
+38.76%    1.94%  5       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       art_jni_trampoline
+       |
+       -- art_jni_trampoline
+          |
+          |--66.00%-- android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)
+          |    |
+          |    |--98.48%-- android::GraphicBufferAllocator::dump(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, bool) const
+          |    |           android::Gralloc4Mapper::dumpBuffers(bool) const
+          |    |    |
+          |    |    |--84.62%-- android::hardware::graphics::mapper::V4_0::BsMapper::dumpBuffers(std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)>)
+          |    |    |    |
+          |    |    |    |--98.18%-- vendor::qti::hardware::display::mapper::V4_0::implementation::QtiMapper::dumpBuffers(std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)>)
+          |    |    |    |    |
+          |    |    |    |    |--37.04%-- std::__1::__function::__func<android::hardware::graphics::mapper::V4_0::BsMapper::dumpBuffer(void*, std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)>)::'lambda'(auto const&, auto const&), void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)>::operator()(android::hardware::graphics::mapper::V4_0::Error&&, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)
+          |    |    |    |    |           android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::operator=(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)
+          |    |    |    |    |           void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&, unsigned long)
+          |    |    |    |    |           android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::operator=(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&)
+          |    |    |    |    |           void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&, unsigned long)
+          |    |    |    |    |           android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump::operator=(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&)
+          |    |    |    |    |    |
+          |    |    |    |    |    |--85.00%-- android::hardware::hidl_vec<unsigned char>::operator=(android::hardware::hidl_vec<unsigned char> const&)
+          |    |    |    |    |    |           void android::hardware::hidl_vec<unsigned char>::copyFrom<android::hardware::hidl_vec<unsigned char> >(android::hardware::hidl_vec<unsigned char> const&, unsigned long)
+          |    |    |    |    |    |    |--88.24%-- [hit in function]
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |     --11.76%-- operator new(unsigned long)
+          |    |    |    |    |    |                malloc
+          |    |    |    |    |    |                scudo_malloc
+          |    |    |    |    |    |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |    |
+          |    |    |    |    |     --15.00%-- android::hardware::hidl_string::operator=(android::hardware::hidl_string const&)
+          |    |    |    |    |         |
+          |    |    |    |    |         |--66.67%-- __memmove_aarch64_simd
+          |    |    |    |    |         |
+          |    |    |    |    |          --33.33%-- android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+          |    |    |    |    |
+          |    |    |    |    |--27.78%-- vendor::qti::hardware::display::mapper::V4_0::implementation::QtiMapper::DumpBufferMetadata(private_handle_t const*, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump*)
+          |    |    |    |    |    |--6.67%-- [hit in function]
+          |    |    |    |    |    |
+          |    |    |    |    |    |--46.67%-- gralloc::BufferManager::GetMetadata(private_handle_t*, long, android::hardware::hidl_vec<unsigned char>*)
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- void std::__1::vector<aidl::android::hardware::graphics::common::PlaneLayoutComponent, std::__1::allocator<aidl::android::hardware::graphics::common::PlaneLayoutComponent> >::__push_back_slow_path<aidl::android::hardware::graphics::common::PlaneLayoutComponent const&>(aidl::android::hardware::graphics::common::PlaneLayoutComponent const&)
+          |    |    |    |    |    |    |           std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+          |    |    |    |    |    |    |           malloc
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- android::gralloc4::encodePixelFormatFourCC(unsigned int, android::hardware::hidl_vec<unsigned char>*)
+          |    |    |    |    |    |    |           android::gralloc4::encodeMetadataType(android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&, android::gralloc4::OutputHidlVec*)
+          |    |    |    |    |    |    |           __memmove_aarch64_simd
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- @plt
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- __strlen_aarch64
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- android::gralloc4::encodePlaneLayouts(std::__1::vector<aidl::android::hardware::graphics::common::PlaneLayout, std::__1::allocator<aidl::android::hardware::graphics::common::PlaneLayout> > const&, android::hardware::hidl_vec<unsigned char>*)
+          |    |    |    |    |    |    |           android::gralloc4::OutputHidlVec::encode(unsigned char const*, unsigned long)
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--14.29%-- android::gralloc4::encodeLayerCount(unsigned long, android::hardware::hidl_vec<unsigned char>*)
+          |    |    |    |    |    |    |           android::gralloc4::encodeMetadataType(android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&, android::gralloc4::OutputHidlVec*)
+          |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |     --14.29%-- __memmove_aarch64_simd
+          |    |    |    |    |    |
+          |    |    |    |    |    |--20.00%-- android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+          |    |    |    |    |    |           malloc
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--66.67%-- scudo_malloc
+          |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |    |    |    |
+          |    |    |    |    |    |    |    |--50.00%-- __aarch64_ldadd4_rel
+          |    |    |    |    |    |    |    |
+          |    |    |    |    |    |    |     --50.00%-- scudo::HybridMutex::unlock()
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |     --33.33%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |    |
+          |    |    |    |    |    |--6.67%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |    |    |    |          scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |    |    |    |    |          scudo::HybridMutex::tryLock()
+          |    |    |    |    |    |
+          |    |    |    |    |    |--6.67%-- android::gralloc4::encodeProtectedContent(unsigned long, android::hardware::hidl_vec<unsigned char>*)
+          |    |    |    |    |    |
+          |    |    |    |    |    |--6.67%-- android::hardware::hidl_string::operator=(android::hardware::hidl_string const&)
+          |    |    |    |    |    |
+          |    |    |    |    |     --6.67%-- operator new(unsigned long)
+          |    |    |    |    |               malloc
+          |    |    |    |    |               scudo_malloc
+          |    |    |    |    |
+          |    |    |    |    |--12.96%-- android::hardware::hidl_string::~hidl_string()
+          |    |    |    |    |    |--14.29%-- [hit in function]
+          |    |    |    |    |    |
+          |    |    |    |    |     --85.71%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |    |    |         |--50.00%-- [hit in function]
+          |    |    |    |    |         |
+          |    |    |    |    |          --50.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |    |    |    |              |--66.67%-- [hit in function]
+          |    |    |    |    |              |
+          |    |    |    |    |               --33.33%-- scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::drain(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long)
+          |    |    |    |    |                          scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned int)
+          |    |    |    |    |                          scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocksImpl(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned int*, unsigned int, bool)
+          |    |    |    |    |
+          |    |    |    |    |--9.26%-- void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&, unsigned long)
+          |    |    |    |    |    |--40.00%-- [hit in function]
+          |    |    |    |    |    |
+          |    |    |    |    |    |--40.00%-- android::hardware::hidl_string::operator=(android::hardware::hidl_string const&)
+          |    |    |    |    |    |           android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+          |    |    |    |    |    |           malloc
+          |    |    |    |    |    |           scudo_malloc
+          |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |    |--50.00%-- __aarch64_cas4_acq
+          |    |    |    |    |    |    |
+          |    |    |    |    |    |     --50.00%-- scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::refill(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long, unsigned short)
+          |    |    |    |    |    |                scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::popBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned short)
+          |    |    |    |    |    |                __aarch64_ldadd4_rel
+          |    |    |    |    |    |
+          |    |    |    |    |     --20.00%-- operator new(unsigned long)
+          |    |    |    |    |                malloc
+          |    |    |    |    |                scudo_malloc
+          |    |    |    |    |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |
+          |    |    |    |    |--9.26%-- __memset_aarch64
+          |    |    |    |    |
+          |    |    |    |     --3.70%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |    |               scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |    |    |         |--50.00%-- [hit in function]
+          |    |    |    |         |
+          |    |    |    |          --50.00%-- scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)
+          |    |    |    |                     void scudo::releaseFreeMemoryToOS<scudo::RegionReleaseRecorder<scudo::MemMapLinux>, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long)>(scudo::PageReleaseContext&, scudo::RegionReleaseRecorder<scudo::MemMapLinux>&, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long))
+          |    |    |    |                     madvise
+          |    |    |    |
+          |    |    |     --1.82%-- free
+          |    |    |
+          |    |    |--9.23%-- android::Gralloc4Mapper::bufferDumpHelper(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, std::__1::basic_ostringstream<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*, bool) const
+          |    |    |    |--16.67%-- [hit in function]
+          |    |    |    |
+          |    |    |    |--66.67%-- int android::Gralloc4Mapper::metadataDumpHelper<unsigned long>(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, unsigned long*), unsigned long*) const
+          |    |    |    |    |
+          |    |    |    |    |--50.00%-- android::gralloc4::decodeInterlaced(android::hardware::hidl_vec<unsigned char> const&, aidl::android::hardware::graphics::common::ExtendableType*)
+          |    |    |    |    |           android::gralloc4::validateMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&)
+          |    |    |    |    |    |
+          |    |    |    |    |    |--50.00%-- @plt
+          |    |    |    |    |    |
+          |    |    |    |    |     --50.00%-- android::gralloc4::decodeMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType*)
+          |    |    |    |    |
+          |    |    |    |    |--25.00%-- android::gralloc4::decodeHeight(android::hardware::hidl_vec<unsigned char> const&, unsigned long*)
+          |    |    |    |    |           android::gralloc4::validateMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&)
+          |    |    |    |    |           android::gralloc4::decodeMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType*)
+          |    |    |    |    |           void std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__assign_trivial[abi:nn220000]<unsigned char const*, unsigned char const*>(unsigned char const*, unsigned char const*, unsigned long)
+          |    |    |    |    |           std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__grow_by(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+          |    |    |    |    |           operator new(unsigned long)
+          |    |    |    |    |           malloc
+          |    |    |    |    |           scudo_malloc
+          |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |    |    |
+          |    |    |    |     --25.00%-- int android::Gralloc4Mapper::metadataDumpHelper<unsigned int>(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, unsigned int*), unsigned int*) const::'lambda'(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&)::operator()(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&) const
+          |    |    |    |                android::hardware::hidl_string::c_str() const
+          |    |    |    |
+          |    |    |     --16.67%-- int android::Gralloc4Mapper::metadataDumpHelper<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*), std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*) const
+          |    |    |                android::gralloc4::decodeName(android::hardware::hidl_vec<unsigned char> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+          |    |    |                __strcmp_aarch64
+          |    |    |
+          |    |     --6.15%-- android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::~hidl_vec()
+          |    |               android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::~hidl_vec()
+          |    |         |
+          |    |         |--50.00%-- android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump::~MetadataDump()
+          |    |         |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |         |    |--50.00%-- [hit in function]
+          |    |         |    |
+          |    |         |     --50.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |         |                scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)
+          |    |         |                void scudo::releaseFreeMemoryToOS<scudo::RegionReleaseRecorder<scudo::MemMapLinux>, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long)>(scudo::PageReleaseContext&, scudo::RegionReleaseRecorder<scudo::MemMapLinux>&, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long))
+          |    |         |                madvise
+          |    |         |
+          |    |         |--25.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |         |
+          |    |          --25.00%-- free
+          |    |
+          |     --1.52%-- dprintf
+          |               vdprintf
+          |               write
+          |
+          |--11.00%-- art::JniDecodeReferenceResult(_jobject*, art::Thread*)
+          |    |--54.55%-- [hit in function]
+          |    |
+          |    |--36.36%-- void art::StackVisitor::WalkStack<(art::StackVisitor::CountTransitions)0, false>(bool)
+          |    |    |--75.00%-- [hit in function]
+          |    |    |
+          |    |     --25.00%-- art::Thread::GetCurrentMethod(unsigned int*, bool, bool) const::$_0::operator()(art::StackVisitor const*) const (.__uniq.112444171608964125319761912539055931073)
+          |    |                art::StackVisitor::GetDexPc(bool) const
+          |    |
+          |     --9.09%-- __strcmp_aarch64
+          |
+          |--7.00%-- android::android_util_Log_isLoggable(_JNIEnv*, _jobject*, _jstring*, int) (.__uniq.157499305217579457627359472493280248164)
+          |    |
+          |    |--57.14%-- art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+          |    |    |--25.00%-- [hit in function]
+          |    |    |
+          |    |    |--50.00%-- art::(anonymous namespace)::ScopedCheck::Check(art::ScopedObjectAccess&, bool, char const*, art::(anonymous namespace)::JniValueType*) (.__uniq.99033978352804627313491551960229047428)
+          |    |    |    |--50.00%-- [hit in function]
+          |    |    |    |
+          |    |    |     --50.00%-- art::Thread::IsJniTransitionReference(_jobject*) const
+          |    |    |                void art::StackVisitor::WalkStack<(art::StackVisitor::CountTransitions)0, false>(bool)
+          |    |    |                art::JniTransitionReferenceVisitor<true>::VisitFrame()
+          |    |    |
+          |    |     --25.00%-- art::JNI<true>::GetStringUTFChars(_JNIEnv*, _jstring*, unsigned char*)
+          |    |
+          |    |--28.57%-- __android_log_is_loggable
+          |    |    |
+          |    |    |--50.00%-- SystemProperties::AreaSerial()
+          |    |    |
+          |    |     --50.00%-- __android_log_level(char const*, unsigned long) (.__uniq.322530350400203086403630799066394170300.llvm.16888644053959982276)
+          |    |                SystemProperties::AreaSerial()
+          |    |
+          |     --14.29%-- operator delete(void*)
+          |
+          |--6.00%-- android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (.__uniq.190462215528616872930035678816392364378)
+          |    |
+          |    |--66.67%-- __epoll_pwait
+          |    |
+          |     --33.33%-- android::Looper::pollOnce(int, int*, int*, void**)
+          |         |--50.00%-- [hit in function]
+          |         |
+          |          --50.00%-- @plt
+          |
+          |--1.00%-- _jclass* art::JNIEnvExt::AddLocalReference<_jclass*>(art::ObjPtr<art::mirror::Object>)
+          |          art::jni::LocalReferenceTable::Add(art::ObjPtr<art::mirror::Object>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+          |
+          |--1.00%-- art::Thread_currentThread(_JNIEnv*, _jclass*) (.__uniq.300150332875289415499171563183413458937)
+          |          art::jni::LocalReferenceTable::Add(art::ObjPtr<art::mirror::Object>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+          |
+          |--1.00%-- NativeConverter_openConverter(_JNIEnv*, _jclass*, _jstring*)
+          |          art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+          |          art::(anonymous namespace)::ScopedCheck::Check(art::ScopedObjectAccess&, bool, char const*, art::(anonymous namespace)::JniValueType*) (.__uniq.99033978352804627313491551960229047428)
+          |          art::Thread::IsJniTransitionReference(_jobject*) const
+          |          art::JniTransitionReferenceVisitor<true>::VisitFrame()
+          |
+          |--1.00%-- art::Unsafe_getReferenceVolatile(_JNIEnv*, _jobject*, _jobject*, long) (.__uniq.319429422067363160645159987129209045680)
+          |
+           --1.00%-- __memset_aarch64
+25.58%    0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libhwui.so                                                                              android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)
+       [skipped in brief callgraph mode]
+25.19%    0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::Gralloc4Mapper::dumpBuffers(bool) const
+       [skipped in brief callgraph mode]
+25.19%    0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::GraphicBufferAllocator::dump(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, bool) const
+       [skipped in brief callgraph mode]
+21.32%    0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/android.hardware.graphics.mapper@4.0.so                                                 android::hardware::graphics::mapper::V4_0::BsMapper::dumpBuffers(std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)>)
+       [skipped in brief callgraph mode]
+20.93%    0.00%  0       com.netease.cloudmusic  18643  18643  /vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-qti-display.so                             vendor::qti::hardware::display::mapper::V4_0::implementation::QtiMapper::dumpBuffers(std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)>)
+       [skipped in brief callgraph mode]
+13.18%    0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __start_thread
+       |
+       -- __start_thread
+          |
+           -- __pthread_start(void*) (.__uniq.67847048707805468364044055584648682506)
+              libutil_thread_trampoline(void*) (.__uniq.226528677032898775202282855395389835431)
+              android::Thread::_threadLoop(void*)
+              android::uirenderer::renderthread::RenderThread::threadLoop()
+              std::__1::__function::__func<decltype(fp()) android::uirenderer::WorkQueue::runSync<android::uirenderer::renderthread::RenderProxy::setStopped(bool)::$_0>(android::uirenderer::renderthread::RenderProxy::setStopped(bool)::$_0&&)::'lambda'(), void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+               |
+               |--94.12%-- std::__1::__packaged_task_func<android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)::$_0, std::__1::allocator<android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)::$_0>, void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+               |           android::uirenderer::renderthread::RenderThread::dumpGraphicsMemory(int, bool)
+               |           android::uirenderer::renderthread::CacheManager::dumpMemoryUsage(android::String8&, android::uirenderer::RenderState const*)
+               |    |
+               |    |--93.75%-- GrDirectContext::dumpMemoryStatistics(SkTraceMemoryDump*) const
+               |    |           GrResourceCache::dumpMemoryStatistics(SkTraceMemoryDump*) const
+               |    |    |--10.00%-- [hit in function]
+               |    |    |
+               |    |    |--63.33%-- GrGLTexture::dumpMemoryStatistics(SkTraceMemoryDump*) const
+               |    |    |    |--5.26%-- [hit in function]
+               |    |    |    |
+               |    |    |    |--84.21%-- GrGpuResource::dumpMemoryStatisticsPriv(SkTraceMemoryDump*, SkString const&, char const*, unsigned long) const
+               |    |    |    |    |
+               |    |    |    |    |--56.25%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpNumericValue(char const*, char const*, char const*, unsigned long)
+               |    |    |    |    |    |
+               |    |    |    |    |    |--44.44%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::processElement()
+               |    |    |    |    |    |    |--25.00%-- [hit in function]
+               |    |    |    |    |    |    |
+               |    |    |    |    |    |    |--50.00%-- std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+               |    |    |    |    |    |    |           std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__deallocate_node(std::__1::__hash_node_base<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>*)
+               |    |    |    |    |    |    |    |
+               |    |    |    |    |    |    |    |--50.00%-- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+               |    |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+               |    |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+               |    |    |    |    |    |    |    |
+               |    |    |    |    |    |    |     --50.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+               |    |    |    |    |    |    |
+               |    |    |    |    |    |     --25.00%-- std::__1::__hash_iterator<std::__1::__hash_node<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, void*>*> std::__1::__hash_table<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::find<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+               |    |    |    |    |    |                bool std::__1::operator==[abi:ne220000]<char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+               |    |    |    |    |    |
+               |    |    |    |    |    |--33.33%-- std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__emplace_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+               |    |    |    |    |    |    |--33.33%-- [hit in function]
+               |    |    |    |    |    |    |
+               |    |    |    |    |    |    |--33.33%-- operator new(unsigned long)
+               |    |    |    |    |    |    |           malloc
+               |    |    |    |    |    |    |           scudo_malloc
+               |    |    |    |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+               |    |    |    |    |    |    |
+               |    |    |    |    |    |     --33.33%-- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>* std::__1::__construct_at[abi:nn220000]<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*>(std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+               |    |    |    |    |    |                android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue::TraceValue(android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue const&)
+               |    |    |    |    |    |                std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init_copy_ctor_external(char const*, unsigned long)
+               |    |    |    |    |    |                operator new(unsigned long)
+               |    |    |    |    |    |                malloc
+               |    |    |    |    |    |                scudo_malloc
+               |    |    |    |    |    |                scudo::HybridMutex::unlock()
+               |    |    |    |    |    |
+               |    |    |    |    |    |--11.11%-- __strlen_aarch64
+               |    |    |    |    |    |
+               |    |    |    |    |     --11.11%-- std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+               |    |    |    |    |
+               |    |    |    |    |--25.00%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpDimenValue(char const*, unsigned long, int, int)
+               |    |    |    |    |
+               |    |    |    |    |--12.50%-- __memcmp_aarch64
+               |    |    |    |    |
+               |    |    |    |     --6.25%-- @plt
+               |    |    |    |
+               |    |    |    |--5.26%-- GrGLFormatToEnum(GrGLFormat) (.__uniq.22357302266292657122548399302940436886.llvm.1354642645292842022)
+               |    |    |    |
+               |    |    |     --5.26%-- GrGpuResource::getResourceName() const
+               |    |    |               SkString::insertU32(unsigned long, unsigned int)
+               |    |    |               SkString::~SkString()
+               |    |    |
+               |    |    |--16.67%-- GrGLTextureRenderTarget::dumpMemoryStatistics(SkTraceMemoryDump*) const
+               |    |    |           GrGpuResource::dumpMemoryStatisticsPriv(SkTraceMemoryDump*, SkString const&, char const*, unsigned long) const
+               |    |    |    |--20.00%-- [hit in function]
+               |    |    |    |
+               |    |    |     --80.00%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpNumericValue(char const*, char const*, char const*, unsigned long)
+               |    |    |         |
+               |    |    |         |--50.00%-- std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__emplace_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+               |    |    |         |    |
+               |    |    |         |    |--50.00%-- std::__1::__murmur2_or_cityhash<unsigned long, 64ul>::operator()[abi:ne220000](void const*, unsigned long) const
+               |    |    |         |    |
+               |    |    |         |     --50.00%-- operator new(unsigned long)
+               |    |    |         |                malloc
+               |    |    |         |                scudo_malloc
+               |    |    |         |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+               |    |    |         |
+               |    |    |         |--25.00%-- __memmove_aarch64_simd
+               |    |    |         |
+               |    |    |          --25.00%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::processElement()
+               |    |    |                     std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+               |    |    |                     std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__deallocate_node(std::__1::__hash_node_base<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>*)
+               |    |    |                     scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+               |    |    |
+               |    |    |--6.67%-- GrGpuResource::dumpMemoryStatistics(SkTraceMemoryDump*) const
+               |    |    |    |
+               |    |    |    |--50.00%-- GrGpuResource::dumpMemoryStatisticsPriv(SkTraceMemoryDump*, SkString const&, char const*, unsigned long) const
+               |    |    |    |           android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpNumericValue(char const*, char const*, char const*, unsigned long)
+               |    |    |    |           std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+               |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+               |    |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+               |    |    |    |           scudo::HybridMutex::unlock()
+               |    |    |    |
+               |    |    |     --50.00%-- GrGpuResource::getResourceName() const
+               |    |    |                @plt
+               |    |    |
+               |    |     --3.33%-- GrSurface::dimensions() const
+               |    |
+               |     --6.25%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::logOthers(android::String8&)
+               |               android::String8::appendFormat(char const*, ...)
+               |               android::String8::appendFormatV(char const*, std::__va_list)
+               |               vsnprintf
+               |               __vfprintf
+               |         |--50.00%-- [hit in function]
+               |         |
+               |          --50.00%-- __sfvwrite
+               |
+               |--2.94%-- std::__1::__packaged_task_func<android::uirenderer::renderthread::RenderProxy::dumpProfileInfo(int, int)::$_0, std::__1::allocator<android::uirenderer::renderthread::RenderProxy::dumpProfileInfo(int, int)::$_0>, void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+               |          android::uirenderer::renderthread::CanvasContext::dumpFrames(int)
+               |          android::uirenderer::JankTracker::dumpData(int, android::uirenderer::ProfileDataDescription const*, android::uirenderer::ProfileData const*)
+               |          dprintf
+               |          vdprintf
+               |          write
+               |
+                --2.94%-- std::__1::__assoc_sub_state::set_value()
+                          syscall
+13.18%    0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __pthread_start(void*) (.__uniq.67847048707805468364044055584648682506)
+       [skipped in brief callgraph mode]
+13.18%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::renderthread::RenderThread::threadLoop()
+       [skipped in brief callgraph mode]
+13.18%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__function::__func<decltype(fp()) android::uirenderer::WorkQueue::runSync<android::uirenderer::renderthread::RenderProxy::setStopped(bool)::$_0>(android::uirenderer::renderthread::RenderProxy::setStopped(bool)::$_0&&)::'lambda'(), void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+       [skipped in brief callgraph mode]
+13.18%    0.00%  0       RenderThread            18643  5460   /system/lib64/libutils.so                                                                             android::Thread::_threadLoop(void*)
+       [skipped in brief callgraph mode]
+13.18%    0.00%  0       RenderThread            18643  5460   /system/lib64/libutils.so                                                                             libutil_thread_trampoline(void*) (.__uniq.226528677032898775202282855395389835431)
+       [skipped in brief callgraph mode]
+12.40%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::renderthread::CacheManager::dumpMemoryUsage(android::String8&, android::uirenderer::RenderState const*)
+       [skipped in brief callgraph mode]
+12.40%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::renderthread::RenderThread::dumpGraphicsMemory(int, bool)
+       [skipped in brief callgraph mode]
+12.40%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__packaged_task_func<android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)::$_0, std::__1::allocator<android::uirenderer::renderthread::RenderProxy::dumpGraphicsMemory(int, bool, bool)::$_0>, void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+       [skipped in brief callgraph mode]
+11.63%    0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art_quick_to_interpreter_bridge
+       |
+       -- art_quick_to_interpreter_bridge
+          |
+           --96.67%-- artQuickToInterpreterBridge
+               |--20.69%-- [hit in function]
+               |
+                --79.31%-- ExecuteSwitchImplAsm
+                           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |--4.35%-- [hit in function]
+                    |
+                    |--65.22%-- ExecuteSwitchImplAsm
+                    |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |    |
+                    |    |--46.67%-- art_jni_trampoline
+                    |    |    |--14.29%-- [hit in function]
+                    |    |    |
+                    |    |     --85.71%-- android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (.__uniq.190462215528616872930035678816392364378)
+                    |    |         |
+                    |    |         |--66.67%-- __epoll_pwait
+                    |    |         |
+                    |    |          --33.33%-- android::Looper::pollOnce(int, int*, int*, void**)
+                    |    |              |--50.00%-- [hit in function]
+                    |    |              |
+                    |    |               --50.00%-- @plt
+                    |    |
+                    |    |--33.33%-- ExecuteSwitchImplAsm
+                    |    |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |    |    |--20.00%-- [hit in function]
+                    |    |    |
+                    |    |    |--20.00%-- art::Thread::ObserveAsyncException()
+                    |    |    |
+                    |    |    |--20.00%-- bool art::interpreter::DoCall<true>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+                    |    |    |           art::EnsureInitialized(art::Thread*, art::ShadowFrame*)
+                    |    |    |
+                    |    |    |--20.00%-- ExecuteSwitchImplAsm
+                    |    |    |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |    |    |           ExecuteSwitchImplAsm
+                    |    |    |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |    |    |           art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+                    |    |    |           art::jit::Jit::PrepareForOsr(art::ArtMethod*, unsigned int, unsigned int*)
+                    |    |    |
+                    |    |     --20.00%-- __memset_aarch64
+                    |    |
+                    |    |--6.67%-- art::mirror::Class::Implements(art::ObjPtr<art::mirror::Class>)
+                    |    |
+                    |    |--6.67%-- art::ArtMethod* art::FindMethodToCall<(art::InvokeType)4>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+                    |    |
+                    |     --6.67%-- bool art::interpreter::DoCall<false>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+                    |
+                    |--8.70%-- art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+                    |    |--50.00%-- [hit in function]
+                    |    |
+                    |     --50.00%-- art::jit::Jit::PrepareForOsr(art::ArtMethod*, unsigned int, unsigned int*)
+                    |
+                    |--8.70%-- art::interpreter::GetFieldInfo(art::Thread*, art::ShadowFrame&, unsigned short const*, bool, bool, art::mirror::Class**, bool*, art::MemberOffset*) (.__uniq.113072803961313432437294106468273961305)
+                    |
+                    |--4.35%-- bool art::interpreter::DoCall<false>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+                    |
+                    |--4.35%-- NterpGetMethod
+                    |          art::ClassLinker::FindResolvedMethod(art::ObjPtr<art::mirror::Class>, art::ObjPtr<art::mirror::DexCache>, art::ObjPtr<art::mirror::ClassLoader>, unsigned int)
+                    |          art::mirror::Class::FindClassMethod(art::ObjPtr<art::mirror::DexCache>, unsigned int, art::PointerSize)
+                    |
+                     --4.35%-- art::ArtMethod* art::FindMethodToCall<(art::InvokeType)1>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+                               NterpGetMethod
+11.63%    1.16%  3       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrResourceCache::dumpMemoryStatistics(SkTraceMemoryDump*) const
+       [skipped in brief callgraph mode]
+11.63%    0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrDirectContext::dumpMemoryStatistics(SkTraceMemoryDump*) const
+       [skipped in brief callgraph mode]
+11.24%    2.33%  6       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 artQuickToInterpreterBridge
+       [skipped in brief callgraph mode]
+8.91%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+       [skipped in brief callgraph mode]
+8.91%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 ExecuteSwitchImplAsm
+       [skipped in brief callgraph mode]
+8.53%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGpuResource::dumpMemoryStatisticsPriv(SkTraceMemoryDump*, SkString const&, char const*, unsigned long) const
+       |
+       -- GrGpuResource::dumpMemoryStatisticsPriv(SkTraceMemoryDump*, SkString const&, char const*, unsigned long) const
+          |
+          |--63.64%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpNumericValue(char const*, char const*, char const*, unsigned long)
+          |    |
+          |    |--35.71%-- std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__emplace_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+          |    |    |--20.00%-- [hit in function]
+          |    |    |
+          |    |    |--40.00%-- operator new(unsigned long)
+          |    |    |           malloc
+          |    |    |           scudo_malloc
+          |    |    |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |    |    |
+          |    |    |--20.00%-- std::__1::__murmur2_or_cityhash<unsigned long, 64ul>::operator()[abi:ne220000](void const*, unsigned long) const
+          |    |    |
+          |    |     --20.00%-- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>* std::__1::__construct_at[abi:nn220000]<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*>(std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+          |    |                android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue::TraceValue(android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue const&)
+          |    |                std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init_copy_ctor_external(char const*, unsigned long)
+          |    |                operator new(unsigned long)
+          |    |                malloc
+          |    |                scudo_malloc
+          |    |                scudo::HybridMutex::unlock()
+          |    |
+          |    |--35.71%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::processElement()
+          |    |    |--20.00%-- [hit in function]
+          |    |    |
+          |    |    |--60.00%-- std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+          |    |    |           std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__deallocate_node(std::__1::__hash_node_base<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>*)
+          |    |    |    |
+          |    |    |    |--66.67%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |    |
+          |    |    |     --33.33%-- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+          |    |    |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |    |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |    |
+          |    |     --20.00%-- std::__1::__hash_iterator<std::__1::__hash_node<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, void*>*> std::__1::__hash_table<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::find<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+          |    |                bool std::__1::operator==[abi:ne220000]<char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+          |    |
+          |    |--7.14%-- __memmove_aarch64_simd
+          |    |
+          |    |--7.14%-- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+          |    |          scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |    |          scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+          |    |          scudo::HybridMutex::unlock()
+          |    |
+          |    |--7.14%-- __strlen_aarch64
+          |    |
+          |     --7.14%-- std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+          |
+          |--18.18%-- android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpDimenValue(char const*, unsigned long, int, int)
+          |
+          |--9.09%-- __memcmp_aarch64
+          |
+           --4.55%-- @plt
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/android.hardware.graphics.mapper@4.0.so                                                 std::__1::__function::__func<android::hardware::graphics::mapper::V4_0::BsMapper::dumpBuffer(void*, std::__1::function<void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)>)::'lambda'(auto const&, auto const&), void (android::hardware::graphics::mapper::V4_0::Error, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)>::operator()(android::hardware::graphics::mapper::V4_0::Error&&, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&)
+       [skipped in brief callgraph mode]
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump::operator=(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&)
+       [skipped in brief callgraph mode]
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::operator=(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&)
+       [skipped in brief callgraph mode]
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::operator=(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&)
+       [skipped in brief callgraph mode]
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump> const&, unsigned long)
+       [skipped in brief callgraph mode]
+7.75%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&, unsigned long)
+       [skipped in brief callgraph mode]
+7.36%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGLTexture::dumpMemoryStatistics(SkTraceMemoryDump*) const
+       [skipped in brief callgraph mode]
+6.59%     5.81%  15      com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                void android::hardware::hidl_vec<unsigned char>::copyFrom<android::hardware::hidl_vec<unsigned char> >(android::hardware::hidl_vec<unsigned char> const&, unsigned long)
+       [skipped in brief callgraph mode]
+6.59%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::hidl_vec<unsigned char>::operator=(android::hardware::hidl_vec<unsigned char> const&)
+       [skipped in brief callgraph mode]
+5.81%     0.39%  1       com.netease.cloudmusic  18643  18643  /vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-qti-display.so                             vendor::qti::hardware::display::mapper::V4_0::implementation::QtiMapper::DumpBufferMetadata(private_handle_t const*, android::hardware::graphics::mapper::V4_0::IMapper::BufferDump*)
+       [skipped in brief callgraph mode]
+5.43%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpNumericValue(char const*, char const*, char const*, unsigned long)
+       [skipped in brief callgraph mode]
+5.04%     1.94%  5       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+       |
+       -- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+          |
+           --61.54%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+               |--50.00%-- [hit in function]
+               |
+               |--25.00%-- scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)
+               |           void scudo::releaseFreeMemoryToOS<scudo::RegionReleaseRecorder<scudo::MemMapLinux>, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long)>(scudo::PageReleaseContext&, scudo::RegionReleaseRecorder<scudo::MemMapLinux>&, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long))
+               |           madvise
+               |
+               |--12.50%-- scudo::HybridMutex::tryLock()
+               |
+                --12.50%-- scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::drain(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long)
+                           scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned int)
+                           scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocksImpl(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned int*, unsigned int, bool)
+4.65%     2.71%  7       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::JniDecodeReferenceResult(_jobject*, art::Thread*)
+       [skipped in brief callgraph mode]
+4.26%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        malloc
+       |
+       -- malloc
+          |
+          |--81.82%-- scudo_malloc
+          |    |--11.11%-- [hit in function]
+          |    |
+          |     --88.89%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |         |--50.00%-- [hit in function]
+          |         |
+          |         |--12.50%-- __aarch64_ldadd4_rel
+          |         |
+          |         |--12.50%-- __aarch64_cas4_acq
+          |         |
+          |         |--12.50%-- scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::refill(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long, unsigned short)
+          |         |           scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::popBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned short)
+          |         |           __aarch64_ldadd4_rel
+          |         |
+          |          --12.50%-- scudo::HybridMutex::unlock()
+          |
+           --9.09%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+3.88%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+71f27b2]
+       |
+       -- base.vdex[+71f27b2]
+          |
+          |--30.00%-- art_jni_trampoline
+          |    |--33.33%-- [hit in function]
+          |    |
+          |    |--33.33%-- _jclass* art::JNIEnvExt::AddLocalReference<_jclass*>(art::ObjPtr<art::mirror::Object>)
+          |    |           art::jni::LocalReferenceTable::Add(art::ObjPtr<art::mirror::Object>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+          |    |
+          |     --33.33%-- art::JniDecodeReferenceResult(_jobject*, art::Thread*)
+          |                __strcmp_aarch64
+          |
+          |--10.00%-- art_quick_to_interpreter_bridge
+          |           artQuickToInterpreterBridge
+          |           ExecuteSwitchImplAsm
+          |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |           bool art::interpreter::DoCall<false>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+          |
+          |--10.00%-- kotlin.coroutines.CoroutineContext$Element$DefaultImpls.get
+          |
+          |--10.00%-- kotlinx.coroutines.internal.ThreadContextKt.threadContextElements
+          |
+          |--10.00%-- kotlin.coroutines.CoroutineContext$Element$DefaultImpls.fold
+          |
+          |--10.00%-- java.lang.Class.isAssignableFrom
+          |
+          |--10.00%-- kotlinx.coroutines.JobSupport.invokeOnCompletionInternal$kotlinx_coroutines_core
+          |
+           --10.00%-- java.lang.Integer.valueOf
+3.49%     3.49%  9       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        write
+3.49%     0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        dprintf
+       |
+       -- dprintf
+          |
+           -- vdprintf
+              write
+3.49%     1.94%  5       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+       [skipped in brief callgraph mode]
+3.49%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo_malloc
+       [skipped in brief callgraph mode]
+3.49%     0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        vdprintf
+       [skipped in brief callgraph mode]
+3.10%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::ProfileData::dump(int) const
+       |
+       -- android::uirenderer::ProfileData::dump(int) const
+          |
+          |--62.50%-- android::uirenderer::ProfileData::histogramForEach(std::__1::function<void (android::uirenderer::ProfileData::HistogramEntry)> const&) const
+          |           dprintf
+          |           vdprintf
+          |           write
+          |
+          |--25.00%-- android::uirenderer::ProfileData::histogramGPUForEach(std::__1::function<void (android::uirenderer::ProfileData::HistogramEntry)> const&) const
+          |           dprintf
+          |           vdprintf
+          |           write
+          |
+           --12.50%-- dprintf
+                      vdprintf
+                      write
+3.10%     1.55%  4       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+       [skipped in brief callgraph mode]
+3.10%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libandroid_runtime.so                                                                   android::android_util_Log_isLoggable(_JNIEnv*, _jobject*, _jstring*, int) (.__uniq.157499305217579457627359472493280248164)
+       [skipped in brief callgraph mode]
+2.71%     2.71%  7       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __memset_aarch64
+2.71%     0.00%  0       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 art_quick_to_interpreter_bridge
+       |
+       -- art_quick_to_interpreter_bridge
+          |
+           -- artQuickToInterpreterBridge
+               |--14.29%-- [hit in function]
+               |
+                --85.71%-- ExecuteSwitchImplAsm
+                           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                    |--16.67%-- [hit in function]
+                    |
+                     --83.33%-- ExecuteSwitchImplAsm
+                                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                                ExecuteSwitchImplAsm
+                                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                                ExecuteSwitchImplAsm
+                                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                         |
+                         |--40.00%-- art::ArtMethod* art::FindMethodToCall<(art::InvokeType)4>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+                         |           NterpGetMethod
+                         |    |--50.00%-- [hit in function]
+                         |    |
+                         |     --50.00%-- art::ClassLinker::FindResolvedMethod(art::ObjPtr<art::mirror::Class>, art::ObjPtr<art::mirror::DexCache>, art::ObjPtr<art::mirror::ClassLoader>, unsigned int)
+                         |
+                         |--40.00%-- ExecuteSwitchImplAsm
+                         |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+                         |    |
+                         |    |--50.00%-- NterpGetMethod
+                         |    |
+                         |     --50.00%-- art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+                         |
+                          --20.00%-- NterpGetMethod
+2.71%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art_quick_generic_jni_trampoline
+       |
+       -- art_quick_generic_jni_trampoline
+          |
+          |--71.43%-- artQuickGenericJniTrampoline
+          |    |--80.00%-- [hit in function]
+          |    |
+          |     --20.00%-- art::jit::Jit::MaybeEnqueueCompilation(art::ArtMethod*, art::Thread*)
+          |
+          |--14.29%-- android::uptimeMillis()
+          |           systemTime
+          |           __kernel_clock_gettime
+          |
+           --14.29%-- getuid
+2.71%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/framework/framework.jar                                                                       framework.jar[+750702]
+       |
+       -- framework.jar[+750702]
+          |
+           -- art_quick_to_interpreter_bridge
+              artQuickToInterpreterBridge
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+              art_jni_trampoline
+               |--14.29%-- [hit in function]
+               |
+                --85.71%-- android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (.__uniq.190462215528616872930035678816392364378)
+                    |
+                    |--66.67%-- __epoll_pwait
+                    |
+                     --33.33%-- android::Looper::pollOnce(int, int*, int*, void**)
+                         |--50.00%-- [hit in function]
+                         |
+                          --50.00%-- @plt
+2.71%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 artQuickToInterpreterBridge
+       [skipped in brief callgraph mode]
+2.71%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libhidlbase.so                                                       android::hardware::hidl_string::~hidl_string()
+       [skipped in brief callgraph mode]
+2.71%     0.00%  0       com.netease.cloudmusic  18643  18643  /vendor/lib64/libgralloccore.so                                                                       gralloc::BufferManager::GetMetadata(private_handle_t*, long, android::hardware::hidl_vec<unsigned char>*)
+       [skipped in brief callgraph mode]
+2.33%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+       [skipped in brief callgraph mode]
+2.33%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::Gralloc4Mapper::bufferDumpHelper(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, std::__1::basic_ostringstream<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*, bool) const
+       [skipped in brief callgraph mode]
+2.33%     0.00%  0       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 ExecuteSwitchImplAsm
+       [skipped in brief callgraph mode]
+2.33%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libandroid_runtime.so                                                                   android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (.__uniq.190462215528616872930035678816392364378)
+       [skipped in brief callgraph mode]
+1.94%     1.16%  3       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 void art::StackVisitor::WalkStack<(art::StackVisitor::CountTransitions)0, false>(bool)
+       |
+       -- void art::StackVisitor::WalkStack<(art::StackVisitor::CountTransitions)0, false>(bool)
+          |
+          |--20.00%-- art::JniTransitionReferenceVisitor<true>::VisitFrame()
+          |
+           --20.00%-- art::Thread::GetCurrentMethod(unsigned int*, bool, bool) const::$_0::operator()(art::StackVisitor const*) const (.__uniq.112444171608964125319761912539055931073)
+                      art::StackVisitor::GetDexPc(bool) const
+1.94%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+       |
+       -- art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+          |
+          |--60.00%-- art::(anonymous namespace)::ScopedCheck::Check(art::ScopedObjectAccess&, bool, char const*, art::(anonymous namespace)::JniValueType*) (.__uniq.99033978352804627313491551960229047428)
+          |    |--33.33%-- [hit in function]
+          |    |
+          |     --66.67%-- art::Thread::IsJniTransitionReference(_jobject*) const
+          |         |
+          |         |--50.00%-- art::JniTransitionReferenceVisitor<true>::VisitFrame()
+          |         |
+          |          --50.00%-- void art::StackVisitor::WalkStack<(art::StackVisitor::CountTransitions)0, false>(bool)
+          |                     art::JniTransitionReferenceVisitor<true>::VisitFrame()
+          |
+           --20.00%-- art::JNI<true>::GetStringUTFChars(_JNIEnv*, _jstring*, unsigned char*)
+1.94%     0.00%  0       ExoPlayer:Playb         18643  5610   /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+4ed8ca5]
+       |
+       -- base.vdex[+4ed8ca5]
+          |
+           -- art_quick_to_interpreter_bridge
+              artQuickToInterpreterBridge
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+               |
+               |--40.00%-- art::ArtMethod* art::FindMethodToCall<(art::InvokeType)4>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+               |           NterpGetMethod
+               |    |--50.00%-- [hit in function]
+               |    |
+               |     --50.00%-- art::ClassLinker::FindResolvedMethod(art::ObjPtr<art::mirror::Class>, art::ObjPtr<art::mirror::DexCache>, art::ObjPtr<art::mirror::ClassLoader>, unsigned int)
+               |
+               |--40.00%-- ExecuteSwitchImplAsm
+               |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+               |    |
+               |    |--50.00%-- NterpGetMethod
+               |    |
+               |     --50.00%-- art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+               |
+                --20.00%-- NterpGetMethod
+1.94%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libhidlbase.so                                                       android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+       |
+       -- android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+          |
+           -- malloc
+               |
+               |--80.00%-- scudo_malloc
+               |           scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+               |    |
+               |    |--25.00%-- __aarch64_ldadd4_rel
+               |    |
+               |    |--25.00%-- __aarch64_cas4_acq
+               |    |
+               |    |--25.00%-- scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::refill(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long, unsigned short)
+               |    |           scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::popBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned short)
+               |    |           __aarch64_ldadd4_rel
+               |    |
+               |     --25.00%-- scudo::HybridMutex::unlock()
+               |
+                --20.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+1.94%     1.55%  4       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 artQuickGenericJniTrampoline
+       [skipped in brief callgraph mode]
+1.94%     0.78%  2       com.netease.cloudmusic  18643  18643  /vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-qti-display.so                             void android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::copyFrom<android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> >(android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump> const&, unsigned long)
+       [skipped in brief callgraph mode]
+1.94%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::skiapipeline::SkiaMemoryTracer::processElement()
+       [skipped in brief callgraph mode]
+1.94%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__emplace_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+       [skipped in brief callgraph mode]
+1.94%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGLTextureRenderTarget::dumpMemoryStatistics(SkTraceMemoryDump*) const
+       [skipped in brief callgraph mode]
+1.94%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::ProfileData::histogramForEach(std::__1::function<void (android::uirenderer::ProfileData::HistogramEntry)> const&) const
+       [skipped in brief callgraph mode]
+1.55%     1.55%  4       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::skiapipeline::SkiaMemoryTracer::dumpDimenValue(char const*, unsigned long, int, int)
+1.55%     1.55%  4       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __epoll_pwait
+1.55%     1.55%  4       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __memmove_aarch64_simd
+1.55%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+71f2509]
+       |
+       -- base.vdex[+71f2509]
+          |
+          |--50.00%-- art_quick_to_interpreter_bridge
+          |           artQuickToInterpreterBridge
+          |    |--50.00%-- [hit in function]
+          |    |
+          |     --50.00%-- ExecuteSwitchImplAsm
+          |                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |                ExecuteSwitchImplAsm
+          |                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |                ExecuteSwitchImplAsm
+          |                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |                ExecuteSwitchImplAsm
+          |                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |                ExecuteSwitchImplAsm
+          |                void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |                art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+          |                art::jit::Jit::PrepareForOsr(art::ArtMethod*, unsigned int, unsigned int*)
+          |
+          |--25.00%-- kotlinx.coroutines.selects.SelectImplementation.cleanup
+          |
+           --25.00%-- kotlinx.coroutines.selects.SelectImplementation.doSelectSuspend
+1.55%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+7327c19]
+       |
+       -- base.vdex[+7327c19]
+          |
+          |--50.00%-- art_jni_trampoline
+          |    |--50.00%-- [hit in function]
+          |    |
+          |     --50.00%-- art::JniDecodeReferenceResult(_jobject*, art::Thread*)
+          |
+          |--25.00%-- java.lang.Class.isInstance
+          |
+           --25.00%-- java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl.get
+1.55%     1.16%  3       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 NterpGetMethod
+       [skipped in brief callgraph mode]
+1.55%     0.78%  2       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+       [skipped in brief callgraph mode]
+1.55%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::clear()
+       [skipped in brief callgraph mode]
+1.55%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::BufferDump>::~hidl_vec()
+       [skipped in brief callgraph mode]
+1.55%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::hidl_vec<android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump>::~hidl_vec()
+       [skipped in brief callgraph mode]
+1.55%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                int android::Gralloc4Mapper::metadataDumpHelper<unsigned long>(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, unsigned long*), unsigned long*) const
+       [skipped in brief callgraph mode]
+1.16%     1.16%  3       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        SystemProperties::AreaSerial()
+1.16%     1.16%  3       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        getuid
+1.16%     1.16%  3       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Class.isAssignableFrom
+1.16%     1.16%  3       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.Arrays.hashCode
+1.16%     0.00%  0       ExoPlayer:Playb         18643  5610   [JIT app cache]                                                                                       art_jni_trampoline
+       |
+       -- art_jni_trampoline
+          |
+          |--66.67%-- android_media_AudioTrack_write_native_bytes(_JNIEnv*, _jobject*, _jobject*, int, int, int, unsigned char) (.__uniq.279269071604805156910448079721512049920)
+          |           android::AudioTrack::write(void const*, unsigned long, bool)
+          |    |--50.00%-- [hit in function]
+          |    |
+          |     --50.00%-- android::audiotrackstub::AudioTrackImpl::isLongTimeZeroData(void const*, int, android::AudioTrack const*)
+          |                __android_log_print
+          |                android::base::SetLogger(std::__1::function<void (android::base::LogId, android::base::LogSeverity, char const*, char const*, unsigned int, char const*)>&&)::$_0::__invoke(__android_log_message const*)
+          |                void android::base::SplitByLogdChunks<void (android::base::LogId, android::base::LogSeverity, char const*, char const*)>(android::base::LogId, android::base::LogSeverity, char const*, char const*, unsigned int, char const*, void  const(&)(android::base::LogId, android::base::LogSeverity, char const*, char const*))
+          |                __android_log_logd_logger_with_timestamp
+          |                writev
+          |
+           --33.33%-- android::android_util_Log_isLoggable(_JNIEnv*, _jobject*, _jstring*, int) (.__uniq.157499305217579457627359472493280248164)
+                      art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+1.16%     0.00%  0       RenderThread            18643  5460   /system/lib64/libc++.so                                                                               operator new(unsigned long)
+       |
+       -- operator new(unsigned long)
+          |
+           -- malloc
+              scudo_malloc
+               |
+               |--66.67%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+               |
+                --33.33%-- scudo::HybridMutex::unlock()
+1.16%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libc++.so                                                                               operator new(unsigned long)
+       |
+       -- operator new(unsigned long)
+          |
+           -- malloc
+              scudo_malloc
+              scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+1.16%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      android::gralloc4::validateMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&)
+       |
+       -- android::gralloc4::validateMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&)
+          |
+          |--66.67%-- android::gralloc4::decodeMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType*)
+          |    |--50.00%-- [hit in function]
+          |    |
+          |     --50.00%-- void std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__assign_trivial[abi:nn220000]<unsigned char const*, unsigned char const*>(unsigned char const*, unsigned char const*, unsigned long)
+          |                std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__grow_by(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+          |                operator new(unsigned long)
+          |                malloc
+          |                scudo_malloc
+          |                scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+          |
+           --33.33%-- @plt
+1.16%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::(anonymous namespace)::ScopedCheck::Check(art::ScopedObjectAccess&, bool, char const*, art::(anonymous namespace)::JniValueType*) (.__uniq.99033978352804627313491551960229047428)
+       [skipped in brief callgraph mode]
+1.16%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+       [skipped in brief callgraph mode]
+1.16%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libhidlbase.so                                                       android::hardware::hidl_string::operator=(android::hardware::hidl_string const&)
+       [skipped in brief callgraph mode]
+1.16%     0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        malloc
+       [skipped in brief callgraph mode]
+1.16%     0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo_malloc
+       [skipped in brief callgraph mode]
+1.16%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__hash_table<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::__unordered_map_hasher<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::__unordered_map_equal<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue> > >::__deallocate_node(std::__1::__hash_node_base<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, void*>*>*)
+       [skipped in brief callgraph mode]
+1.16%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libhidlbase.so                                                                          android::hardware::hidl_string::operator=(android::hardware::hidl_string const&)
+       [skipped in brief callgraph mode]
+1.16%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/liblog.so                                                                               __android_log_is_loggable
+       [skipped in brief callgraph mode]
+0.78%     0.78%  2       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __memcmp_aarch64
+0.78%     0.78%  2       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+0.78%     0.78%  2       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::HybridMutex::unlock()
+0.78%     0.78%  2       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              @plt
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::JniTransitionReferenceVisitor<true>::VisitFrame()
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::interpreter::GetFieldInfo(art::Thread*, art::ShadowFrame&, unsigned short const*, bool, bool, art::mirror::Class**, bool*, art::MemberOffset*) (.__uniq.113072803961313432437294106468273961305)
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::jit::Jit::PrepareForOsr(art::ArtMethod*, unsigned int, unsigned int*)
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::jni::LocalReferenceTable::Add(art::ObjPtr<art::mirror::Object>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 bool art::interpreter::DoCall<false>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __aarch64_ldadd4_rel
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __strcmp_aarch64
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        free
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        madvise
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       android.os.Handler.handleCallback
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       android.os.perfdebug.MessageMonitorImpl.checkMsg
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.ArrayList.add
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl.accessCheck
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlin.coroutines.CoroutineContext$Element$DefaultImpls.get
+0.78%     0.78%  2       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.JobSupport.getState$kotlinx_coroutines_core
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGpuResource::getResourceName() const
+       |
+       -- GrGpuResource::getResourceName() const
+          |
+          |--50.00%-- SkString::insertU32(unsigned long, unsigned int)
+          |           SkString::~SkString()
+          |
+           --50.00%-- @plt
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+       |
+       -- std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>::~pair()
+          |
+           -- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+              scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+               |--50.00%-- [hit in function]
+               |
+                --50.00%-- scudo::HybridMutex::unlock()
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libc++.so                                                            operator new(unsigned long)
+       |
+       -- operator new(unsigned long)
+          |
+           -- malloc
+              scudo_malloc
+               |--50.00%-- [hit in function]
+               |
+                --50.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool)
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::encodeMetadataType(android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&, android::gralloc4::OutputHidlVec*)
+       |
+       -- android::gralloc4::encodeMetadataType(android::hardware::graphics::mapper::V4_0::IMapper::MetadataType const&, android::gralloc4::OutputHidlVec*)
+          |
+          |--50.00%-- __memmove_aarch64_simd
+          |
+           --50.00%-- scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::deallocate(void*, unsigned char, unsigned long, unsigned long)
+                      scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+71f1e93]
+       |
+       -- base.vdex[+71f1e93]
+          |
+          |--50.00%-- kotlinx.coroutines.selects.SelectClause1Impl.<init>
+          |
+           --50.00%-- kotlinx.coroutines.channels.BufferedChannel.getOnReceiveCatching
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+73282f2]
+       |
+       -- base.vdex[+73282f2]
+          |
+          |--50.00%-- art_quick_to_interpreter_bridge
+          |           artQuickToInterpreterBridge
+          |           ExecuteSwitchImplAsm
+          |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |           ExecuteSwitchImplAsm
+          |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |           ExecuteSwitchImplAsm
+          |           void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+          |           art::Thread::ObserveAsyncException()
+          |
+           --50.00%-- kotlinx.coroutines.selects.SelectImplementation$ClauseData.tryRegisterAsWaiter
+0.78%     0.39%  1       ExoPlayer:Playb         18643  5610   /system/lib64/libaudioclient.so                                                                       android::AudioTrack::write(void const*, unsigned long, bool)
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __vfprintf
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::Allocator<scudo::AndroidNormalConfig, &(scudo_malloc_postinit)>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long)
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 NterpGetMethod
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      android::gralloc4::decodeMetadataType(android::gralloc4::InputHidlVec*, android::hardware::graphics::mapper::V4_0::IMapper::MetadataType*)
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libutils.so                                                                             android::Looper::pollOnce(int, int*, int*, void**)
+       [skipped in brief callgraph mode]
+0.78%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libutils.so                                                                             android::uptimeMillis()
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 art::ArtMethod* art::FindMethodToCall<(art::InvokeType)4>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       ExoPlayer:Playb         18643  5610   /system/lib64/libandroid_runtime.so                                                                   android_media_AudioTrack_write_native_bytes(_JNIEnv*, _jobject*, _jobject*, int, int, int, unsigned char) (.__uniq.279269071604805156910448079721512049920)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        vsnprintf
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGpuResource::dumpMemoryStatistics(SkTraceMemoryDump*) const
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::ProfileData::histogramGPUForEach(std::__1::function<void (android::uirenderer::ProfileData::HistogramEntry)> const&) const
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::skiapipeline::SkiaMemoryTracer::logOthers(android::String8&)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libutils.so                                                                             android::String8::appendFormat(char const*, ...)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       RenderThread            18643  5460   /system/lib64/libutils.so                                                                             android::String8::appendFormatV(char const*, std::__va_list)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::Thread::IsJniTransitionReference(_jobject*) const
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        void scudo::releaseFreeMemoryToOS<scudo::RegionReleaseRecorder<scudo::MemMapLinux>, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long)>(scudo::PageReleaseContext&, scudo::RegionReleaseRecorder<scudo::MemMapLinux>&, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::releaseToOSMaybe(scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned long, scudo::ReleaseToOS)::'lambda'(unsigned long))
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      android::gralloc4::decodeInterlaced(android::hardware::hidl_vec<unsigned char> const&, aidl::android::hardware::graphics::common::ExtendableType*)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/liblog.so                                                                               __android_log_level(char const*, unsigned long) (.__uniq.322530350400203086403630799066394170300.llvm.16888644053959982276)
+       [skipped in brief callgraph mode]
+0.78%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump::~MetadataDump()
+       [skipped in brief callgraph mode]
+0.39%     0.39%  1       DefaultDispatch         18643  5488   /apex/com.android.runtime/lib64/bionic/libc.so                                                        syscall
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 art::(anonymous namespace)::CheckJNI::GetStringCharsInternal(char const*, _JNIEnv*, _jstring*, unsigned char*, bool, bool) (.__uniq.99033978352804627313491551960229047428)
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 art::ClassLinker::FindResolvedMethod(art::ObjPtr<art::mirror::Class>, art::ObjPtr<art::mirror::DexCache>, art::ObjPtr<art::mirror::ClassLoader>, unsigned int)
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libart.so                                                                 art::jit::Jit::MaybeDoOnStackReplacement(art::Thread*, art::ArtMethod*, unsigned int, int, art::JValue*)
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   /apex/com.android.runtime/lib64/bionic/libc.so                                                        writev
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   [JIT app cache]                                                                                       android.media.AudioTrack.getPlaybackHeadPosition
+0.39%     0.39%  1       ExoPlayer:Playb         18643  5610   [JIT app cache]                                                                                       android.os.MessageStack.heapSweep
+0.39%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __memmove_aarch64_simd
+0.39%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __sfvwrite
+0.39%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        __strlen_aarch64
+0.39%     0.39%  1       RenderThread            18643  5460   /apex/com.android.runtime/lib64/bionic/libc.so                                                        syscall
+0.39%     0.39%  1       RenderThread            18643  5460   /system/lib64/libc++.so                                                                               std::__1::__murmur2_or_cityhash<unsigned long, 64ul>::operator()[abi:ne220000](void const*, unsigned long) const
+0.39%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrGLFormatToEnum(GrGLFormat) (.__uniq.22357302266292657122548399302940436886.llvm.1354642645292842022)
+0.39%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              GrSurface::dimensions() const
+0.39%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              SkString::~SkString()
+0.39%     0.39%  1       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              bool std::__1::operator==[abi:ne220000]<char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+0.39%     0.39%  1       binder:18643_1          18643  5426   /apex/com.android.art/lib64/libart.so                                                                 art::Thread_currentThread(_JNIEnv*, _jclass*) (.__uniq.300150332875289415499171563183413458937)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::ArtMethod* art::FindMethodToCall<(art::InvokeType)4>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::EnsureInitialized(art::Thread*, art::ShadowFrame*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::JNI<true>::GetStringUTFChars(_JNIEnv*, _jstring*, unsigned char*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::StackVisitor::GetDexPc(bool) const
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::Thread::ObserveAsyncException()
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::Unsafe_getReferenceVolatile(_JNIEnv*, _jobject*, _jobject*, long) (.__uniq.319429422067363160645159987129209045680)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::jit::Jit::MaybeEnqueueCompilation(art::ArtMethod*, art::Thread*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::mirror::Class::FindClassMethod(art::ObjPtr<art::mirror::DexCache>, unsigned int, art::PointerSize)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::mirror::Class::Implements(art::ObjPtr<art::mirror::Class>)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libc++.so                                                                 operator delete(void*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __aarch64_cas4_acq
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        __strlen_aarch64
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::HybridMutex::tryLock()
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::HybridMutex::unlock()
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocksImpl(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::RegionInfo*, unsigned int*, unsigned int, bool)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        write
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libc++.so                                                            @plt
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::OutputHidlVec::encode(unsigned char const*, unsigned long)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::encodeProtectedContent(unsigned long, android::hardware::hidl_vec<unsigned char>*)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libc++.so                                                                               @plt
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libhidlbase.so                                                                          @plt
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libhidlbase.so                                                                          android::hardware::hidl_string::c_str() const
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  /system/lib64/libhidlbase.so                                                                          android::hardware::hidl_string::copyFrom(char const*, unsigned long)
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       android.app.AppCompatCallbacks.isChangeEnabled
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       android.os.Handler.sendMessageAtTime
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       android.os.MessageHeap.siftUp
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       com.android.internal.compat.CompatibilityRules.isChangeEnabled
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       com.android.internal.util.FastPrintWriter.println
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.io.FileOutputStream.write
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Class.getComponentType
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Class.isInstance
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Integer.<init>
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Integer.equals
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.Integer.valueOf
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.String.equals
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.lang.String.length
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.ArrayList.<init>
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.Collections$SynchronizedCollection.add
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.concurrent.atomic.AtomicReferenceArray.set
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl.compareAndSet
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl.get
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       jdk.internal.misc.Unsafe.getReferenceAcquire
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlin.coroutines.CoroutineContext$Element$DefaultImpls.fold
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlin.coroutines.jvm.internal.DebugProbesKt.probeCoroutineSuspended
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlin.jvm.internal.Intrinsics.checkNotNullParameter
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.AbstractCoroutine.isActive
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.CancelHandler$UserSupplied.<init>
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.CancellableContinuationImpl.<init>
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.CancellableContinuationImpl.dispatchResume
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.CancellableContinuationImpl.invokeOnCancellation
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.CoroutineDispatcher.get
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.DispatchedTask.run
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.DispatchedTaskKt.resume
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.Job$DefaultImpls.get
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.JobKt__JobKt.invokeOnCompletion
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.JobNode.dispose
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.JobSupport.invokeOnCompletionInternal$kotlinx_coroutines_core
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.JobSupport.removeNode$kotlinx_coroutines_core
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.channels.BufferedChannel.access$getSendSegment$volatile$FU
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.channels.BufferedChannel.getOnReceiveCatching
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.channels.BufferedChannel.updateCellSend
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.channels.ChannelCoroutine.send
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.internal.DispatchedContinuation.get_reusableCancellableContinuation$volatile$FU
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.internal.LockFreeLinkedListNode.correctPrev
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.internal.LockFreeLinkedListNode.finishAdd
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.internal.ThreadContextKt.threadContextElements
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectClause1Impl.<init>
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectImplementation$ClauseData.tryRegisterAsWaiter
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectImplementation.cleanup
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectImplementation.doSelectSuspend
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectImplementation.findClause
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [JIT app cache]                                                                                       kotlinx.coroutines.selects.SelectImplementation.invoke
+0.39%     0.39%  1       com.netease.cloudmusic  18643  18643  [vdso]                                                                                                __kernel_clock_gettime
+0.39%     0.00%  0       DefaultDispatch         18643  5488   /apex/com.android.art/javalib/core-oj.jar                                                             core-oj.jar[+4b94fc]
+       |
+       -- core-oj.jar[+4b94fc]
+          |
+           -- art_jni_trampoline
+              art::Unsafe_park(_JNIEnv*, _jobject*, unsigned char, long) (.__uniq.319429422067363160645159987129209045680)
+              syscall
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+4ede6f6]
+       |
+       -- base.vdex[+4ede6f6]
+          |
+           -- art_quick_to_interpreter_bridge
+              artQuickToInterpreterBridge
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /system/framework/framework.jar                                                                       framework.jar[+182dfb5]
+       |
+       -- framework.jar[+182dfb5]
+          |
+           -- android.media.AudioTrack.getPlaybackHeadPosition
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+71e9ea2]
+       |
+       -- base.vdex[+71e9ea2]
+          |
+           -- kotlinx.coroutines.selects.SelectImplementation.findClause
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+71f2954]
+       |
+       -- base.vdex[+71f2954]
+          |
+           -- kotlinx.coroutines.channels.BufferedChannel.access$getSendSegment$volatile$FU
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+7327adc]
+       |
+       -- base.vdex[+7327adc]
+          |
+           -- art_jni_trampoline
+              __memset_aarch64
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/oat/arm64/base.vdex  base.vdex[+73283b7]
+       |
+       -- base.vdex[+73283b7]
+          |
+           -- art_quick_to_interpreter_bridge
+              artQuickToInterpreterBridge
+              ExecuteSwitchImplAsm
+              void art::interpreter::ExecuteSwitchImplCpp<false>(art::interpreter::SwitchImplContext*)
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/framework/framework.jar                                                                       framework.jar[+192fa4a]
+       |
+       -- framework.jar[+192fa4a]
+          |
+           -- android.os.Handler.sendMessageAtTime
+0.39%     0.00%  0       DefaultDispatch         18643  5488   /apex/com.android.art/lib64/libart.so                                                                 art::Unsafe_park(_JNIEnv*, _jobject*, unsigned char, long) (.__uniq.319429422067363160645159987129209045680)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       DefaultDispatch         18643  5488   [JIT app cache]                                                                                       art_jni_trampoline
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libbase.so                                                                android::base::SetLogger(std::__1::function<void (android::base::LogId, android::base::LogSeverity, char const*, char const*, unsigned int, char const*)>&&)::$_0::__invoke(__android_log_message const*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /apex/com.android.art/lib64/libbase.so                                                                void android::base::SplitByLogdChunks<void (android::base::LogId, android::base::LogSeverity, char const*, char const*)>(android::base::LogId, android::base::LogSeverity, char const*, char const*, unsigned int, char const*, void  const(&)(android::base::LogId, android::base::LogSeverity, char const*, char const*))
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /system/lib64/libandroid_runtime.so                                                                   android::android_util_Log_isLoggable(_JNIEnv*, _jobject*, _jstring*, int) (.__uniq.157499305217579457627359472493280248164)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /system/lib64/liblog.so                                                                               __android_log_logd_logger_with_timestamp
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /system/lib64/liblog.so                                                                               __android_log_print
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       ExoPlayer:Playb         18643  5610   /system_ext/lib64/libaudioclientimpl.so                                                               android::audiotrackstub::AudioTrackImpl::isLongTimeZeroData(void const*, int, android::AudioTrack const*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libc++.so                                                                               std::__1::__assoc_sub_state::set_value()
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              SkString::insertU32(unsigned long, unsigned int)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::JankTracker::dumpData(int, android::uirenderer::ProfileDataDescription const*, android::uirenderer::ProfileData const*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::renderthread::CanvasContext::dumpFrames(int)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue::TraceValue(android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue const&)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__hash_iterator<std::__1::__hash_node<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, void*>*> std::__1::__hash_table<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::hash<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::equal_to<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::find<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::__packaged_task_func<android::uirenderer::renderthread::RenderProxy::dumpProfileInfo(int, int)::$_0, std::__1::allocator<android::uirenderer::renderthread::RenderProxy::dumpProfileInfo(int, int)::$_0>, void ()>::operator()() (.__uniq.110435125376433984577876079601927332169.a2687a6d5c2ea9c65915d6f94022c2eb)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init_copy_ctor_external(char const*, unsigned long)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       RenderThread            18643  5460   /system/lib64/libhwui.so                                                                              std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>* std::__1::__construct_at[abi:nn220000]<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*>(std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>*, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, android::uirenderer::skiapipeline::SkiaMemoryTracer::TraceValue>&&)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 _jclass* art::JNIEnvExt::AddLocalReference<_jclass*>(art::ObjPtr<art::mirror::Object>)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::ArtMethod* art::FindMethodToCall<(art::InvokeType)1>(art::Thread*, art::ArtMethod*, art::ObjPtr<art::mirror::Object>*, art::Instruction const&, bool, bool*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::ClassLinker::FindResolvedMethod(art::ObjPtr<art::mirror::Class>, art::ObjPtr<art::mirror::DexCache>, art::ObjPtr<art::mirror::ClassLoader>, unsigned int)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::Thread::GetCurrentMethod(unsigned int*, bool, bool) const::$_0::operator()(art::StackVisitor const*) const (.__uniq.112444171608964125319761912539055931073)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 art::Thread_currentThread(_JNIEnv*, _jclass*) (.__uniq.300150332875289415499171563183413458937)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.art/lib64/libart.so                                                                 bool art::interpreter::DoCall<true>(art::ArtMethod*, art::Thread*, art::ShadowFrame&, art::Instruction const*, unsigned short, bool, art::JValue*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.i18n/lib64/libicu_jni.so                                                            NativeConverter_openConverter(_JNIEnv*, _jclass*, _jstring*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        dprintf
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::popBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned short)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> >::pushBlocks(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >*, unsigned long, unsigned int*, unsigned int)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::drain(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::refill(scudo::SizeClassAllocatorLocalCache<scudo::SizeClassAllocator64<scudo::PrimaryConfig<scudo::AndroidNormalConfig> > >::PerClass*, unsigned long, unsigned short)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.runtime/lib64/bionic/libc.so                                                        vdprintf
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libc++.so                                                            std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::encodeLayerCount(unsigned long, android::hardware::hidl_vec<unsigned char>*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::encodePixelFormatFourCC(unsigned int, android::hardware::hidl_vec<unsigned char>*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /apex/com.android.vndk.v30/lib64/libgralloctypes.so                                                   android::gralloc4::encodePlaneLayouts(std::__1::vector<aidl::android::hardware::graphics::common::PlaneLayout, std::__1::allocator<aidl::android::hardware::graphics::common::PlaneLayout> > const&, android::hardware::hidl_vec<unsigned char>*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libc++.so                                                                               std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__grow_by(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      android::gralloc4::decodeHeight(android::hardware::hidl_vec<unsigned char> const&, unsigned long*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      android::gralloc4::decodeName(android::hardware::hidl_vec<unsigned char> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libgralloctypes.so                                                                      void std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__assign_trivial[abi:nn220000]<unsigned char const*, unsigned char const*>(unsigned char const*, unsigned char const*, unsigned long)
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                int android::Gralloc4Mapper::metadataDumpHelper<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*), std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*) const
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libui.so                                                                                int android::Gralloc4Mapper::metadataDumpHelper<unsigned int>(android::hardware::graphics::mapper::V4_0::IMapper::BufferDump const&, aidl::android::hardware::graphics::common::StandardMetadataType, int (*)(android::hardware::hidl_vec<unsigned char> const&, unsigned int*), unsigned int*) const::'lambda'(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&)::operator()(android::hardware::graphics::mapper::V4_0::IMapper::MetadataDump const&) const
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /system/lib64/libutils.so                                                                             systemTime
+       [skipped in brief callgraph mode]
+0.39%     0.00%  0       com.netease.cloudmusic  18643  18643  /vendor/lib64/libgralloccore.so                                                                       void std::__1::vector<aidl::android::hardware::graphics::common::PlaneLayoutComponent, std::__1::allocator<aidl::android::hardware::graphics::common::PlaneLayoutComponent> >::__push_back_slow_path<aidl::android::hardware::graphics::common::PlaneLayoutComponent const&>(aidl::android::hardware::graphics::common::PlaneLayoutComponent const&)
+       [skipped in brief callgraph mode]

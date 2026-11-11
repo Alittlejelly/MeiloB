@@ -19,7 +19,9 @@ import com.ljyh.mei.data.model.Tracks
 import com.ljyh.mei.data.model.UserPlaylist
 import com.ljyh.mei.data.model.api.CreatePlaylistResult
 import com.ljyh.mei.data.model.api.Intelligence
+import com.ljyh.mei.data.model.qq.u.SearchResult
 import com.ljyh.mei.data.model.room.Playlist
+import com.ljyh.mei.data.model.room.QQSong
 import com.ljyh.mei.data.model.weapi.Radio
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.network.neteaseSessionFingerprint
@@ -32,7 +34,9 @@ import com.ljyh.mei.di.repository.observeOwnedPlaylists
 import com.ljyh.mei.di.repository.toLocalPlaylist
 import com.ljyh.mei.di.repository.ColorRepository
 import com.ljyh.mei.di.repository.LikeRepository
+import com.ljyh.mei.di.repository.QQSongRepository
 import com.ljyh.mei.playback.MediaUriProvider
+import com.ljyh.mei.ui.model.LyricCandidate
 import com.ljyh.mei.ui.model.LyricData
 import com.ljyh.mei.ui.model.MoreAction
 import com.ljyh.mei.ui.model.SortOrder
@@ -65,6 +69,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val repository: PlayerRepository,
+    private val qqSongRepository: QQSongRepository,
     private val userRepository: UserRepository,
     private val localPlaylistRepository: LocalPlaylistRepository,
     private val playlistRepository: PlaylistRepository,
@@ -74,7 +79,10 @@ class PlayerViewModel @Inject constructor(
     private val mediaUriProvider: MediaUriProvider,
     private val collections: LibraryCollectionsRepository,
 ) : ViewModel() {
+    val searchResult: StateFlow<Resource<SearchResult>> = lyricManager.qqSearchResult
     val lyric: StateFlow<LyricData> = lyricManager.lyricData
+    val lyricCandidates: StateFlow<List<LyricCandidate>> = lyricManager.lyricCandidates
+    val lyricOffsetMs: StateFlow<Int> = lyricManager.lyricOffsetMs
     val songLikes = repository.songLikes
     val songLikeGeneration = repository.songLikeGeneration
     val songLikeAccount = collections.accounts.stateIn(
@@ -165,14 +173,52 @@ class PlayerViewModel @Inject constructor(
     }
 
 
+    private val _qqSong = MutableStateFlow<QQSong?>(null)
+    val qqSong: StateFlow<QQSong?> = _qqSong
+
+    fun searchQQSong(keyword: String) {
+        lyricManager.searchQQSong(keyword)
+    }
+
+    fun selectQQSong(
+        metadata: MediaMetadata,
+        song: SearchResult.Request.Data.Body.ItemSong,
+    ) {
+        lyricManager.selectQQSongForLyric(metadata, song)
+    }
+
+    fun selectLyricCandidate(metadata: MediaMetadata, candidate: LyricCandidate) {
+        lyricManager.selectLyricCandidate(metadata, candidate)
+    }
+
+    fun adjustLyricOffset(metadata: MediaMetadata, deltaMs: Int) {
+        lyricManager.adjustLyricOffset(metadata, deltaMs)
+    }
+
+    fun resetLyricOffset(metadata: MediaMetadata) {
+        lyricManager.resetLyricOffset(metadata)
+    }
+
     fun resetLyricSource(metadata: MediaMetadata) {
         lyricManager.resetLyricSource(metadata)
+    }
+
+    fun insertSong(song: QQSong) {
+        viewModelScope.launch {
+            qqSongRepository.insertSong(song)
+        }
     }
 
     fun deleteSongById(id: String) {
         val metadata = mediaMetadata ?: return
         if (metadata.id.toString() == id) lyricManager.resetLyricSource(metadata)
     }
+
+    suspend fun getQQSongId(metadataId: Long): String? {
+        return qqSongRepository.getQQSong(metadataId.toString()).firstOrNull()?.qid
+    }
+
+
 
     fun refreshPlaylistChoices() {
         playlistChoicesJob?.cancel()

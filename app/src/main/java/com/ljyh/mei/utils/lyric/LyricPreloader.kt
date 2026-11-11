@@ -7,11 +7,13 @@ import com.ljyh.mei.data.model.qq.u.SearchResult
 import com.ljyh.mei.data.model.room.QQSong
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.repository.PlayerRepository
+import com.ljyh.mei.data.repository.KugouLyricRepository
 import com.ljyh.mei.di.repository.QQSongRepository
 import com.ljyh.mei.ui.model.LyricData
 import com.ljyh.mei.ui.model.LyricSourceData
 import com.ljyh.mei.utils.encrypt.QRCUtils
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -32,6 +34,7 @@ import kotlin.math.abs
 class LyricPreloader @Inject constructor(
     private val repository: PlayerRepository,
     private val qqSongRepository: QQSongRepository,
+    private val kugouRepository: KugouLyricRepository,
 ) {
     private val TAG = "LyricPreloader"
 
@@ -54,6 +57,7 @@ class LyricPreloader @Inject constructor(
     }
 
     private suspend fun fetchAndMerge(metadata: MediaMetadata, songId: String): LyricData? {
+        if (metadata.isBili) return fetchAndMergeBili(metadata, songId)
         val (netResult, amResult, qqResult) = coroutineScope {
             val netDeferred = async { fetchNetEase(songId) }
             val amDeferred = async { fetchAM(songId) }
@@ -83,6 +87,79 @@ class LyricPreloader @Inject constructor(
 
             mergeLyrics(sources, isPureMusic)
         }
+    }
+
+    /**
+     * B 站曲目预加载（BBPlayer 方案）：QQ 静默搜索匹配与酷狗搜索并发。
+     *
+     * QQ 命中会持久化到 qqSong 表；两路都落空时返回 null，交给前台加载重试。
+     */
+    private suspend fun fetchAndMergeBili(metadata: MediaMetadata, songId: String): LyricData? {
+        val qqResource: Resource<LyricResult>?
+        val kugouLrc: String?
+        coroutineScope {
+            val qqDeferred: Deferred<Resource<LyricResult>?> = async {
+                runCatching {
+                    val best = searchSilent(metadata) ?: return@runCatching null
+                    val qqSong = QQSong(
+                        id = songId,
+                        qid = best.id.toString(),
+                        title = best.title,
+                        artist = best.singer.joinToString(",") { it.name },
+                        album = best.album.title,
+                        duration = best.interval,
+                    )
+                    qqSongRepository.insertSong(qqSong)
+                    repository.getLyricNew(
+                        qqSong.title, qqSong.album, qqSong.artist,
+                        qqSong.duration, qqSong.qid.toLong(),
+                    )
+                }.getOrNull()
+            }
+            val kugouDeferred: Deferred<String?> = async {
+                runCatching {
+                    for (keyword in biliSearchKeywords(metadata)) {
+                        kugouRepository.searchAndFetchLrc(keyword, metadata.duration)
+                            ?.let { return@runCatching it.second }
+                    }
+                    null
+                }.getOrNull()
+            }
+            qqResource = qqDeferred.await()
+            kugouLrc = kugouDeferred.await()
+        }
+        val qqResult = (qqResource as? Resource.Success)?.data
+
+        val sources = mutableListOf<LyricSourceData>()
+        qqResult?.musicMusichallSongPlayLyricInfoGetPlayLyricInfo?.data?.let { data ->
+            try {
+                val decoded = data.copy(
+                    lyric = QRCUtils.decodeLyric(data.lyric),
+                    trans = QRCUtils.decodeLyric(data.trans, true),
+                    roma = QRCUtils.decodeLyric(data.roma),
+                )
+                sources.add(LyricSourceData.QQMusic(decoded, data.qrcT != 0, null))
+            } catch (e: Exception) {
+                Timber.e(e, "QRC decoding failed in bili preload")
+            }
+        }
+        kugouLrc?.takeIf { it.isNotBlank() }?.let { sources.add(LyricSourceData.Kugou(it)) }
+        if (sources.isEmpty()) return null
+        return withContext(Dispatchers.IO) { mergeLyrics(sources) }
+    }
+
+    private fun biliSearchKeywords(metadata: MediaMetadata): List<String> {
+        val artistName = metadata.artists.firstOrNull()?.name.orEmpty()
+        val title = metadata.title
+        val cleanedTitle = cleanTitle(title)
+        return buildList {
+            add(cleanedTitle)
+            add(title)
+            if (artistName.isNotBlank()) {
+                add("$cleanedTitle $artistName")
+                add("$title $artistName")
+            }
+        }.distinct()
     }
 
     private suspend fun fetchNetEase(id: String): Resource<Lyric> {

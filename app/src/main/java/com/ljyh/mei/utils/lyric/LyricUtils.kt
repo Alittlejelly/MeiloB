@@ -70,6 +70,7 @@ private fun LyricData.displayPriority(): Int {
         LyricSource.AM -> 5
         LyricSource.NetEaseCloudMusic -> if (isVerbatim) 4 else 2
         LyricSource.QQMusic -> if (isVerbatim) 3 else 1
+        LyricSource.Kugou -> 0
         LyricSource.Empty, LyricSource.Loading -> 0
     }
 }
@@ -156,6 +157,18 @@ fun mergeLyrics(sources: List<LyricSourceData>, isPureMusic: Boolean = false): L
                 lyricLine = attachPhonetics(LRCParser.parse(lrcText, q.trans), q.roma)
             )
         }
+    }
+
+    // 3) 酷狗 LRC（B 站曲目兜底源）
+    val kugouSource = sources.filterIsInstance<LyricSourceData.Kugou>().firstOrNull()
+    if (kugouSource != null && kugouSource.lyric.isNotBlank()) {
+        Timber.tag("LyricUtils").d("Kugou LRC")
+        return LyricData(
+            isVerbatim = false,
+            isPureMusic = isPureMusic,
+            source = LyricSource.Kugou,
+            lyricLine = LRCParser.parse(kugouSource.lyric, null)
+        )
     }
 
     // 都没有，返回默认

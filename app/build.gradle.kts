@@ -96,8 +96,8 @@ android {
             .get()
         minSdk = 33
         targetSdk = 37
-        versionCode = 101
-        versionName = "1.0.1"
+        versionCode = 111
+        versionName = "1.1.1"
         buildConfigField("long", "BUILD_NUMBER", "${buildNumber}L")
         buildConfigField("String", "BUILD_COMMIT_SHA", "\"$buildCommitSha\"")
         buildConfigField("boolean", "BUILD_SOURCE_DIRTY", buildSourceDirty.toString())
@@ -109,6 +109,11 @@ android {
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters += "arm64-v8a"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments += "-DANDROID_STL=c++_shared"
+            }
         }
     }
     externalNativeBuild {
@@ -143,11 +148,14 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+        prefab = true
     }
     packaging {
         // Direct-distribution APKs prioritize download size. Android extracts these
         // entries at install time instead of mmap'ing them directly from the APK.
         jniLibs.useLegacyPackaging = true
+        // The bundled Netease SDK and Oboe share the compatible libc++ runtime.
+        jniLibs.pickFirsts += "lib/arm64-v8a/libc++_shared.so"
         dex.useLegacyPackaging = true
     }
 }
@@ -170,7 +178,10 @@ kotlin {
 }
 
 dependencies {
+    implementation("io.github.neoruaa.glasmio:glasmio-scaffold:0.1.1")
+    implementation("io.github.neoruaa.glasmio:glasmio-preference:0.1.1")
 
+    implementation(libs.oboe)
     implementation(libs.androidx.core.ktx)
     implementation(libs.bcprov.jdk18on)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -189,6 +200,7 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.zxing.core)
     implementation(libs.miuix.navigation3.ui.android)
+    implementation(libs.miuix.ui.android)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.media3)
     implementation(libs.media3.session)
@@ -267,9 +279,9 @@ dependencies {
     implementation(libs.zoomable)
     implementation(libs.timber)
     implementation(libs.compose.cloudy)
-    implementation(libs.backdrop)
     implementation(libs.shapes)
     implementation(libs.capsule)
+    implementation(libs.backdrop)
 }
 
 //kotlin {

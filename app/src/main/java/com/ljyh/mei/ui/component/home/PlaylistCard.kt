@@ -41,8 +41,9 @@ import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import com.kyant.capsule.ContinuousRoundedRectangle
 import com.ljyh.mei.constants.PlaylistCardSize
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
 import com.ljyh.mei.utils.largeImage
 
 @Composable
@@ -161,7 +162,7 @@ fun PlaylistCard(
 @Composable
 internal fun Modifier.homeArtworkBorder(shape: Shape): Modifier = border(
     width = 0.5.dp,
-    color = Color(0xFF8E8E93).copy(alpha = 0.35f),
+    color = Color(0xFF8E8E93).copy(alpha = if (LocalGlassColors.current.isDark) 0.30f else 0.10f),
     shape = shape,
 )
 

@@ -1,10 +1,9 @@
 package com.ljyh.mei.ui.screen.playlist
 
+import com.ljyh.mei.ui.navigation.MeiloXLoadingPage
 import com.ljyh.mei.constants.MusicQuality
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -37,16 +36,31 @@ import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.playback.SongDownloadInfo
 import com.ljyh.mei.playback.queue.ListQueue
 import com.ljyh.mei.ui.component.DownloadConfirmDialog
+import com.ljyh.mei.ui.navigation.MeiloXPinnedPage
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.asPaddingValues
+import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerConnection
 import com.ljyh.mei.ui.model.UiPlaylist
-import com.ljyh.mei.ui.glass.IosCascadingMenuItem
+import io.github.neoruaa.glasmio.ui.GlasmioCascadingMenuItem
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.utils.DownloadManager
 import com.ljyh.mei.utils.rememberEnumPreference
 import com.ljyh.mei.utils.rememberPreference
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+internal fun PlaylistDetail.Playlist.cleanDetailCover(homeRadarArtwork: String? = null): String {
+    // Radar covers can have labels baked into the bitmap; the background is the original artwork.
+    val radarArtwork = (backgroundCoverUrl as? String)?.trim()?.takeIf {
+        specialType == 100 && name.contains("雷达") &&
+            (it.startsWith("https://") || it.startsWith("http://"))
+    }
+    return com.ljyh.mei.utils.playlistCoverWithoutOverlays(homeRadarArtwork ?: radarArtwork ?: coverImgUrl)
+}
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,13 +76,21 @@ fun PlaylistScreen(
 
     val context = LocalContext.current
     val navController = LocalNavController.current
-    val playerConnection = LocalPlayerConnection.current ?: return
+    val playerConnection = LocalPlayerConnection.current
+    if (playerConnection == null) {
+        MeiloXLoadingPage(
+            title = androidx.compose.ui.res.stringResource(com.ljyh.mei.R.string.library_page_playlists),
+            onNavigateBack = { navController.popBackStack() },
+        )
+        return
+    }
     val scope = rememberCoroutineScope()
     val selection = rememberDetailSelection(id)
 
     // 2. 状态收集
     val userId by rememberPreference(UserIdKey, "")
     val playlistDetail by viewModel.playlistDetail.collectAsState()
+    val radarArtwork by viewModel.radarArtwork.collectAsState()
     val removedTrackIds by viewModel.removedTrackIds.collectAsState()
     val subscriberState by viewModel.subscribePlaylist.collectAsState()
     val unSubscriberState by viewModel.unSubscribePlaylist.collectAsState()
@@ -135,7 +157,7 @@ fun PlaylistScreen(
     }
 
     // 5. 构建 UI 模型 (移除副作用和内部状态修改)
-    val uiData = remember(playlistDetail, userId, removedTrackIds) {
+    val uiData = remember(playlistDetail, userId, removedTrackIds, radarArtwork) {
         if (playlistDetail is Resource.Success) {
             val data = (playlistDetail as Resource.Success).data.playlist
             val visibleTrackCount = (data.trackCount - removedTrackIds.size).coerceAtLeast(0)
@@ -144,7 +166,7 @@ fun PlaylistScreen(
                 title = data.name,
                 count = visibleTrackCount,
                 subscriberCount = data.subscribedCount,
-                cover = data.coverImgUrl,
+                cover = data.cleanDetailCover(radarArtwork),
                 coverList = data.tracks.take(6).map { it.al.picUrl },
                 creatorName = data.creator.nickname,
                 isCreator = data.creator.userId.toString() == userId,
@@ -311,7 +333,7 @@ fun PlaylistScreen(
         onSubscribe = { toggleSubscription() },
         onRefresh = { selection.finish(); viewModel.getPlaylistDetail(id.toString()) },
     ).toMutableList().apply {
-        if (uiData.isCreator) add(2, IosCascadingMenuItem(
+        if (uiData.isCreator) add(2, GlasmioCascadingMenuItem(
             androidx.compose.ui.res.stringResource(com.ljyh.mei.R.string.playlist_order_title),
             "line.3.horizontal",
             enabled = playlistDetail is Resource.Success && trackOrder == null,
@@ -319,9 +341,13 @@ fun PlaylistScreen(
         ))
     }
 
-    trackOrder?.takeIf { it.playlistId == id.toString() }?.let { order ->
+    val activeOrder = trackOrder?.takeIf { it.playlistId == id.toString() }
+    var retainedOrder by remember(id) { mutableStateOf<PlaylistOrderState?>(null) }
+    if (activeOrder != null) androidx.compose.runtime.SideEffect { retainedOrder = activeOrder }
+    (activeOrder ?: retainedOrder)?.let { order ->
         PlaylistOrderSheet(
             state = order,
+            visible = activeOrder != null,
             onMove = viewModel::moveOrderedTrack,
             onVisibleTracks = viewModel::loadVisibleOrderTracks,
             onSave = viewModel::saveTrackOrder,
@@ -330,34 +356,41 @@ fun PlaylistScreen(
         )
     }
 
-    if (showDownloadDialog) {
-        DownloadConfirmDialog(
-            currentQuality = downloadQuality,
-            downloadPath = downloadPath,
-            onDismiss = { showDownloadDialog = false },
-            onConfirm = {
-                showDownloadDialog = false
-                doBulkDownload(pendingDownloadTracks)
-            },
-            onGoToSettings = {
-                showDownloadDialog = false
-                Screen.DownloadSettings.navigate(navController)
-            },
-            onGoToDownloadManage = {
-                showDownloadDialog = false
-                Screen.DownloadManage.navigate(navController)
-            }
-        )
-    }
+    DownloadConfirmDialog(
+        visible = showDownloadDialog,
+        currentQuality = downloadQuality,
+        downloadPath = downloadPath,
+        onDismiss = { showDownloadDialog = false },
+        onConfirm = {
+            showDownloadDialog = false
+            doBulkDownload(pendingDownloadTracks)
+        },
+        onGoToSettings = {
+            showDownloadDialog = false
+            Screen.DownloadSettings.navigate(navController)
+        },
+        onGoToDownloadManage = {
+            showDownloadDialog = false
+            Screen.DownloadManage.navigate(navController)
+        }
+    )
 
     // 8. UI 渲染
     if (playlistDetail is Resource.Error) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Error: ${(playlistDetail as Resource.Error).message}")
+        MeiloXPinnedPage(
+            title = androidx.compose.ui.res.stringResource(com.ljyh.mei.R.string.library_page_playlists),
+            bottomPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues().calculateBottomPadding(),
+            onNavigateBack = { navController.popBackStack() },
+        ) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text((playlistDetail as Resource.Error).message)
+            }
         }
     } else {
         CommonSongListScreen(
             useCoverBackground = true,
+            usePlaylistPortraitHeader = true,
+            landscapeLayout = com.ljyh.mei.ui.screen.playlist.SongListLandscapeLayout.Split,
             uiData = uiData,
             pagingItems = lazyPagingItems,
             isLoading = playlistDetail is Resource.Loading,

@@ -22,9 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
@@ -35,9 +33,11 @@ import com.kyant.capsule.ContinuousRoundedRectangle
 import com.ljyh.mei.R
 import com.ljyh.mei.data.model.MediaMetadata
 import com.ljyh.mei.ui.component.sheet.LocalPlayerSheet
+import com.ljyh.mei.ui.component.player.LocalPlayerRoamingModeLabel
 import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicMarqueeText
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import com.ljyh.mei.ui.component.player.component.applemusic.PlayerTitleWithMode
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
 
 @Composable
 fun PlayerHeader(
@@ -48,10 +48,11 @@ fun PlayerHeader(
     onMoreClick: () -> Unit,
     onLikeClick: () -> Unit,
     iconColor: Color = Color.White,
-    needShadow: Boolean = true,
     appleMusicStyle: Boolean = false,
+    applyStatusBarPadding: Boolean = true,
     onTextPositioned: (LayoutCoordinates) -> Unit = {},
     onRowPositioned: (LayoutCoordinates) -> Unit = {},
+    modeLabel: String? = LocalPlayerRoamingModeLabel.current,
 ) {
     val showLikeButton = !mediaMetadata.isLocal && !mediaMetadata.isPodcast && !mediaMetadata.isBili
     val marqueeEnabled = LocalPlayerSheet.current?.state?.isExpanded != false
@@ -63,15 +64,10 @@ fun PlayerHeader(
         )
     } else Modifier.clickable(onClick = onClick)
 
-    val shadowStyle = if (needShadow) Shadow(
-        color = Color.Black.copy(alpha = 0.5f),
-        offset = Offset(2f, 2f),
-        blurRadius = 8f
-    ) else null
 
     Row(
         modifier = modifier
-            .statusBarsPadding()
+            .then(if (applyStatusBarPadding) Modifier.statusBarsPadding() else Modifier)
             .fillMaxWidth()
             .then(metadataClick)
             .onGloballyPositioned(onRowPositioned),
@@ -90,16 +86,20 @@ fun PlayerHeader(
         ) {
             // --- 标题部分 ---
             if (appleMusicStyle) {
-                AppleMusicMarqueeText(
-                    text = mediaMetadata.title,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        shadow = shadowStyle,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    color = Color.White,
-                    edgeWidth = 22.5.dp,
-                    enabled = marqueeEnabled,
-                )
+                PlayerTitleWithMode(
+                    modeLabel, MaterialTheme.typography.titleMedium, Color.White.copy(alpha = 0.7f),
+                ) { titleModifier ->
+                    AppleMusicMarqueeText(
+                        text = mediaMetadata.title,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        color = Color.White,
+                        edgeWidth = 22.5.dp,
+                        enabled = marqueeEnabled,
+                        modifier = titleModifier,
+                    )
+                }
                 val subTitle = listOf(
                     mediaMetadata.artists.joinToString(", ") { it.name },
                     mediaMetadata.album.title,
@@ -107,23 +107,27 @@ fun PlayerHeader(
                 if (subTitle.isNotEmpty()) {
                     AppleMusicMarqueeText(
                         text = subTitle,
-                        style = MaterialTheme.typography.titleMedium.copy(shadow = shadowStyle),
+                        style = MaterialTheme.typography.titleMedium,
                         color = Color.White.copy(alpha = 0.7f),
                         edgeWidth = 22.5.dp,
                         enabled = marqueeEnabled,
                     )
                 }
             } else {
-                Text(
-                    text = mediaMetadata.title,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        shadow = shadowStyle,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    maxLines = 1,
-                    color = Color.White,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                PlayerTitleWithMode(
+                    modeLabel, MaterialTheme.typography.titleMedium, Color.White.copy(alpha = 0.7f),
+                ) { titleModifier ->
+                    Text(
+                        text = mediaMetadata.title,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        maxLines = 1,
+                        color = Color.White,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = titleModifier,
+                    )
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -131,7 +135,6 @@ fun PlayerHeader(
                         .basicMarquee(iterations = Int.MAX_VALUE)
                 ) {
                     val subTitleStyle = MaterialTheme.typography.titleMedium.copy(
-                        shadow = shadowStyle,
                         color = Color.White.copy(alpha = 0.7f)
                     )
 

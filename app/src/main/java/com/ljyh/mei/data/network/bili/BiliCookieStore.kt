@@ -120,16 +120,25 @@ class BiliCookieStore @Inject constructor(
         cached = snapshotFlow().first()
     }
 
-    val accountFlow: Flow<BiliAccount?> = snapshotFlow().map { s ->
-        if (!s.isLoggedIn) null else BiliAccount(
-            mid = s.dedeUserId.toLongOrNull() ?: 0,
-            name = s.nickname,
-            avatar = s.avatar,
-            level = s.level,
-            coin = s.coin,
-            isVip = s.isVip,
-        )
-    }
+    val accountFlow: Flow<BiliAccount?> = snapshotFlow().map { it.toAccount() }
+
+    /**
+     * 已缓存的账号快照（同步，不读盘）。
+     *
+     * 每个导航页都有独立的 `ViewModelStore`，切到媒体库会重建 ViewModel；如果用
+     * `stateIn(..., null)` 做初值，页面每次都会先闪一下"未登录"，再去 DataStore 读。
+     * 用内存副本做初值就不会有这个闪烁。
+     */
+    fun cachedAccount(): BiliAccount? = cached?.toAccount()
+
+    private fun Snapshot.toAccount(): BiliAccount? = if (!isLoggedIn) null else BiliAccount(
+        mid = dedeUserId.toLongOrNull() ?: 0,
+        name = nickname,
+        avatar = avatar,
+        level = level,
+        coin = coin,
+        isVip = isVip,
+    )
 
     suspend fun account(): BiliAccount? = accountFlow.first()
 

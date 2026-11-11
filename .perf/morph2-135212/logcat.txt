@@ -1,0 +1,929 @@
+--------- beginning of main
+         1793080324.145 31533 31533 I libprocessgroup: Created cgroup /sys/fs/cgroup/apps/uid_10150/pid_31533
+         1793080324.147 31533 31533 E Zygote  : process_name_ptr:31533 com.netease.cloudmusic
+         1793080324.148 31533 31533 E Zygote  : SetMemoryProtected process_name_ptr:31533 com.netease.cloudmusic
+         1793080324.153 31533 31533 I Zygote  : Process 31533 created for com.netease.cloudmusic
+         1793080324.153 31533 31533 I ease.cloudmusic: Late-enabling -Xcheck:jni
+         1793080324.192 31533 31533 I ease.cloudmusic: Using generational CollectorTypeCC GC.
+         1793080324.216 31533 31533 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+--------- beginning of system
+         1793080324.226 31533 31533 I ActivityThread: Current dynamic renderEngine type=0
+         1793080324.242 31533  9352 D ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+         1793080324.253 31533  9349 D MiuiDownscaleImpl: set override inverted scale : 1.0
+         1793080324.259 31533  9352 I ease.cloudmusic: IncAot: cached primary oat location: /data/app/~~_YjdR0ktQzI-fM6RWeqvvQ==/com.netease.cloudmusic-aU2fyFIWY7FZ4aMm4lCpiQ==/oat/arm64/base.vdex
+         1793080324.261 31533  9352 D nativeloader: Configuring clns-10 for other apk /data/app/~~_YjdR0ktQzI-fM6RWeqvvQ==/com.netease.cloudmusic-aU2fyFIWY7FZ4aMm4lCpiQ==/base.apk. target_sdk_version=33, uses_libraries=libOpenCL.so, library_path=/data/app/~~_YjdR0ktQzI-fM6RWeqvvQ==/com.netease.cloudmusic-aU2fyFIWY7FZ4aMm4lCpiQ==/lib/arm64:/data/app/~~_YjdR0ktQzI-fM6RWeqvvQ==/com.netease.cloudmusic-aU2fyFIWY7FZ4aMm4lCpiQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.netease.cloudmusic
+         1793080324.264 31533  9354 D AppScoutStateMachine: 31533-ScoutStateMachinecreated
+         1793080324.268 31533 31533 I HardwareRenderer: Process RenderPipelineType: 1
+         1793080324.268 31533 31533 I RENDER_TURBO: onActivityThreadCreate not in white list, pkg=com.netease.cloudmusic, renderType=1
+         1793080324.305 31533 31533 D ActivityThread: setEmbeddedParam packageName=com.neoruaa.meilox processName=com.netease.cloudmusic isEmbedded=false isIsolated=false
+         1793080324.305 31533 31533 D CompatChangeReporter: Compat change id reported: 333566037; UID 10150; state: ENABLED
+         1793080324.313 31533 31533 D nativeloader: Configuring clns-11 for other apk /system/framework/android.test.mock.jar. target_sdk_version=37, uses_libraries=ALL, library_path=/data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/lib/arm64:/data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.neoruaa.meilox
+         1793080324.313 31533 31533 D nativeloader: Extending system_exposed_libraries: libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libmisys_jni.xiaomi.so:libpag.hyperos.so:libffavc.hyperos.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libmodemsmartengine_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libdiag_system.qti.so:libqesdk_ndk_platform.qti.so:liblistenjni.qti.so:libautoui_image.xiaomi.so
+         1793080324.314 31533 31533 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+         1793080324.314 31533 31533 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+         1793080324.318 31533 31533 D nativeloader: Configuring clns-12 for other apk /data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/base.apk. target_sdk_version=37, uses_libraries=, library_path=/data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/lib/arm64:/data/app/~~Fyp6QWycwJvpfcUcgmcYAA==/com.neoruaa.meilox-avAkHrZ95ByxkoOa_lEO7A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.neoruaa.meilox
+         1793080324.329 31533 31533 D MiuiMonitorThread: Shared singleton Thread for stability monitor start
+         1793080324.330 31533  9360 D CompatChangeReporter: Compat change id reported: 458413887; UID 10150; state: ENABLED
+         1793080324.331 31533 31533 I Perf    : Connecting to perf service.
+         1793080324.334 31533 31533 D HWUI    : [HWUI] Flag vulkan_enhance_pipeline_cache enabled
+         1793080324.334 31533 31533 D HWUI    : [HWUI] EnhanceVkPipelineCache is disabled
+         1793080324.334 31533 31533 D HWUI    : [HWUI] EnhanceVkPipelineCache runtime=false, cacheType=0, saveImmediately=false, useInfoInterval=43200s, dataInterval=43200s, dataSizeThreshold=2048KB
+         1793080324.334 31533 31533 D HWUI    : [HWUI] Flag ddre disabled
+         1793080324.338 31533 31533 I ActivityThread: TrafficStats init done
+         1793080324.345 31533 31533 D nativeloader: Load libmirim_jni.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+         1793080324.346 31533 31533 I ComputilityLevel: getComputilityLevel(): 6
+         1793080324.348 31533 31533 I ActivityThread: Miui Feature Init done
+         1793080324.351 31533  9365 I ease.cloudmusic: miui report MiuiReportProxy. switch_local_ : 0 switch_cloud_ : 63 enable_report_ : 1 min_diff_heap_size_ : 10485760 gc_report_interval_time_ : 10000000000
+         1793080324.352 31533 31533 D CompatChangeReporter: Compat change id reported: 407952621; UID 10150; state: ENABLED
+         1793080324.352 31533 31533 D CompatChangeReporter: Compat change id reported: 419020719; UID 10150; state: ENABLED
+         1793080324.355 31533 31533 D ResMonitorStub: The current process type is: third_party_app, process name is: com.netease.cloudmusic
+         1793080324.356 31533 31533 D MIUIAutoUIManagerImpl: AutoUI app init: pkg = com.neoruaa.meilox is disabled by system
+         1793080324.358 31533 31533 D HyperOpt: initModules thirdAppOptInfo:ThirdAppOptInfo{mPackageInfo=PackageInfo{name='com.netease.cloudmusic', enable=true, modules=[Module{id='window', enable=true, policyList=[Policy{id='window', enable=true, activityInfos=[ActivityInfo{name='com.netease.cloudmusic.activity.IconChangeDefaultAlias', enable=true, analyzers=[Analyzer{id='dialog', enable=true, bindingMode='activity', bindingValue='com.netease.cloudmusic.activity.IconChangeDefaultAlias', calibrations=[Calibration{attr='windowSize', enable=true, current='', intent=''}]}]}]}]}, Module{id='camera', enable=true, policyList=[Policy{id='camera', enable=true, activityInfos=[ActivityInfo{name='com.netease.cloudmusic.activity.ScanActivity', enable=true, analyzers=[Analyzer{id='camera', enable=true, bindingMode='activity', bindingValue='', calibrations=[Calibration{attr='rotation', enable=true, current='', intent='0'}, Calibration{attr='deform', enable=true, current='', intent='0'}]}]}]}]}]}}
+         1793080324.372 31533 31533 D WM-WrkMgrInitializer: Initializing WorkManager with default configuration.
+         1793080324.387 31533 31533 D WM-Schedulers: Created SystemJobScheduler and enabled SystemJobService
+         1793080324.389 31533  9366 D WM-ForceStopRunnable: The default process name was not specified.
+         1793080324.390 31533  9366 D WM-ForceStopRunnable: Performing cleanup operations.
+         1793080324.408 31533 31533 I ComputilityLevel: getComputilityLevelV2(): 4
+         1793080324.411 31533 31533 W libc    : Access denied finding property "vendor.boostfwk.frameprefetcher"
+         1793080324.411 31533 31533 D UnionPowerNotifier: check_union_power_ioctl -1
+         1793080324.412 31533 31533 D FramePredict: FramePredict init: false
+         1793080324.418 31533 31533 D HWUI    : [HWUI] Flag vulkan_enhance_pipeline_cache enabled
+         1793080324.418 31533 31533 D HWUI    : [HWUI] EnhanceVkPipelineCache is disabled
+         1793080324.418 31533 31533 D HWUI    : [HWUI] EnhanceVkPipelineCache runtime=false, cacheType=0, saveImmediately=false, useInfoInterval=43200s, dataInterval=43200s, dataSizeThreshold=2048KB
+         1793080324.418 31533 31533 D HWUI    : [HWUI] Flag ddre disabled
+         1793080324.418 31533 31533 D ease.cloudmusic: blurUtils, initBackgroundBlurMinInterval processName(com.netease.cloudmusic), inWhiteLists(0)
+         1793080324.422 31533  9374 I DisplayManager: Choreographer implicitly registered for the refresh rate.
+         1793080324.423 31533 31533 D MIUIAutoUIImpl: MIUIAutoUIImpl has been initialized !!
+         1793080324.428 31533  9366 D WM-ForceStopRunnable: Application was force-stopped, rescheduling.
+         1793080324.437 31533  9374 W libc    : Access denied finding property "vendor.migl.debug"
+         1793080324.437 31533  9374 I libMiGL : EnableDR: 0
+         1793080324.437 31533  9374 D libMiGL : mDFIInterval: -1
+         1793080324.439 31533  9374 I AdrenoGLES-0: QUALCOMM build                   : d4f1d5539c, Iad64dfeba7
+         1793080324.439 31533  9374 I AdrenoGLES-0: Build Date                       : 11/07/24
+         1793080324.439 31533  9374 I AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.48.01.00
+         1793080324.439 31533  9374 I AdrenoGLES-0: Local Branch                     : 
+         1793080324.439 31533  9374 I AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.12.3.11.00.00.934.442
+         1793080324.439 31533  9374 I AdrenoGLES-0: Remote Branch                    : NONE
+         1793080324.439 31533  9374 I AdrenoGLES-0: Reconstruct Branch               : NOTHING
+         1793080324.439 31533  9374 I AdrenoGLES-0: Build Config                     : S P 12.1.6 AArch64
+         1793080324.439 31533  9374 I AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+         1793080324.439 31533  9374 I AdrenoGLES-0: Driver Version                   : 0805.0
+         1793080324.439 31533  9374 I AdrenoGLES-0: Process Name                     : com.netease.cloudmusic
+         1793080324.441 31533 31533 D DesktopExperienceFlags: Toggle override initialized to: false
+         1793080324.449 31533  9374 I DMABUFHEAPS: Using : Non-legacy ION heaps
+         1793080324.449 31533  9374 E DMABUFHEAPS: No ion heap of name ion_system_heap exists
+         1793080324.449 31533  9374 E DMABUFHEAPS: No ion heap of name ion_system_heap exists
+         1793080324.449 31533  9374 I AdrenoGLES-0: PFP: 0x016dd106, ME: 0x00000000
+         1793080324.466 31533  9374 I libEGL  : shader cache num entries: 118
+         1793080324.467 31533  9374 D HWUI    : [HWUI] Flag vulkan_enhance_pipeline_cache enabled
+         1793080324.467 31533  9374 D HWUI    : [HWUI] EnhanceVkPipelineCache is disabled
+         1793080324.467 31533  9374 D HWUI    : [HWUI] EnhanceVkPipelineCache runtime=false, cacheType=0, saveImmediately=false, useInfoInterval=43200s, dataInterval=43200s, dataSizeThreshold=2048KB
+         1793080324.467 31533  9374 D HWUI    : [HWUI] Flag ddre disabled
+         1793080324.467 31533  9374 D SKIA    : [Skia] EnhanceVkPipelineCache is false
+         1793080324.467 31533  9374 D HWUI    : MiShaderPrecompile handle com.netease.cloudmusic, isSksl: 0, isAppInPreCacheList: 0, isGpuVersionChanged: 0, isSkslChanged: 0
+         1793080324.492 31533 31533 D nativeloader: Load libforcedarkimpl.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+         1793080324.492 31533 31533 D HWUI    : JNI_OnLoad success
+         1793080324.505 31533 31533 D DecorViewStubImpl: updateOutlineFromOutside mDecorView = com.android.internal.policy.DecorView{7f032e4 V.E...... R.....ID 0,0-0,0}[], radii = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+         1793080324.509 31533 31533 D WmSystemUiDebug: set navigation bar color,Alpha=0.0, RGB:0,0,0 caller:androidx.activity.EdgeToEdgeApi35.setUp:353 androidx.activity.EdgeToEdge.enableEdgeToEdge$lambda$1:101 androidx.activity.EdgeToEdge$$ExternalSyntheticLambda0.run:0 androidx.activity.EdgeToEdge.enable:127 androidx.activity.EdgeToEdge.enable$default:79 com.ljyh.mei.MainActivity.onCreate:258 android.app.Activity.performCreate:9625 android.app.Activity.performCreate:9571 android.app.Instrumentation.callActivityOnCreate:1559 android.app.ActivityThread.performLaunchActivity:5180 
+         1793080324.518 31533 31533 D Activity: Activity = ActivityInfo{fef9950 com.ljyh.mei.MainActivity}, Resume onConfigurationChanged = {1.0 ?mcc0mnc [zh_CN] ldltr sw393dp w393dp h851dp 440dpi nrml long compactNeeded hdr widecg port finger -keyb/v/h -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 2340) mAppBounds=Rect(0, 0 - 1080, 2340) mMaxBounds=Rect(0, 0 - 1080, 2340) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0 mInSplitScreen=false letterBoxed=false foScaled=false isSpecificEmbedded=false embeddingScale=1.0 embeddingStatusBarHeight=0} as.4 s.2 fontWeightAdjustment=0/d/o themeChanged=4 themeChangedFlags=268466313 display=0 extraData = Bundle[{key_var_font_scale=74}] screenType=0/o}
+         1793080324.528 31533 31533 D CompatChangeReporter: Compat change id reported: 418924588; UID 10150; state: ENABLED
+         1793080324.529 31533 31533 I InterceptorProxy-Helper: registerContentObserver success for com.ljyh.mei.MainActivity@aa0518b, uri:content_catcher_status
+         1793080324.531 31533 31533 I InterceptorProxy-Helper: registerContentObserver success for com.ljyh.mei.MainActivity@aa0518b, uri:content_catcher_global_collect_status
+         1793080324.531 31533 31533 I InterceptorProxy: registerUIAgentListener ComponentInfo{com.neoruaa.meilox/com.ljyh.mei.MainActivity}, uid:10150
+         1793080324.541 31533 31533 D RenderLite: trim renderNode enable: false
+         1793080324.548 31533 31533 E MI-PreRender: init cloud whiteList failed
+         1793080324.549 31533 31533 W libc    : Access denied finding property "ro.vendor.qos.v1.enable"
+         1793080324.549 31533 31533 E XQos    : Failed to open /dev/xr_fbt, errinfo: No such file or directory
+         1793080324.549 31533 31533 E XQos    : QoS device not available, disabling QoS support
+         1793080324.549 31533 31533 E HWUI    : Failed to setTidQosLevel for hwui, tid 9396
+         1793080324.549 31533 31533 E HWUI    : Failed to setTidQosLevel for hwui, tid 9397
+         1793080324.555 31533  9374 D HWUI    : TAG_DDRE, CanvasContext::setDdreActivities: 
+         1793080324.558 31533 31533 D backgroundBlur: VRI.recordMiBlurUsedStatus mMiBlurUsed:false, size(0|0), win:com.neoruaa.meilox/com.ljyh.mei.MainActivity
+         1793080324.559 31533 31533 D FirstFrameSpeedUp: bls: [com.xcj.hm.kangfuyixue, jp.co.jibunbank.jibunmain]
+         1793080324.559 31533 31533 I ViewRootImpl: com.neoruaa.meilox/com.ljyh.mei.MainActivity use first frame acceleration
+         1793080324.572 31533 31533 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.app.Activity$$ExternalSyntheticLambda0@e4c7c2d
+         1793080324.662 31533 31533 D VRI[MainActivity]: WindowInsets changed: 1080x2340 statusBars:[0,90,0,0] navigationBars:[0,0,0,55] mandatorySystemGestures:[0,123,0,55] 
+         1793080324.923 31533 31533 I HWUI    : Using FreeType backend (prop=Auto)
+         1793080324.935 31533 31533 D WmSystemUiDebug: set navigation bar color,Alpha=0.0, RGB:0,0,0 caller:androidx.activity.EdgeToEdgeApi35.setUp:353 androidx.activity.EdgeToEdge.enableEdgeToEdge$lambda$1:101 androidx.activity.EdgeToEdge$$ExternalSyntheticLambda0.run:0 androidx.activity.EdgeToEdge.enable:127 com.ljyh.mei.MainActivity.onCreate$lambda$0$40$1$1$21$0:731 com.ljyh.mei.MainActivity.$r8$lambda$GW2-ZArZyjvNt0CaRaCUhLsslAA:0 com.ljyh.mei.MainActivity$$ExternalSyntheticLambda43.invoke:0 androidx.compose.runtime.DisposableEffectImpl.onRemembered:231 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberList:268 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberObservers:240 
+         1793080324.936 31533 31533 D WmSystemUiDebug: set navigation bar color,Alpha=0.0, RGB:0,0,0 caller:com.ljyh.mei.MainActivity.onCreate$lambda$0$40$1$1$21$0:757 com.ljyh.mei.MainActivity.$r8$lambda$GW2-ZArZyjvNt0CaRaCUhLsslAA:0 com.ljyh.mei.MainActivity$$ExternalSyntheticLambda43.invoke:0 androidx.compose.runtime.DisposableEffectImpl.onRemembered:231 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberList:268 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberObservers:240 androidx.compose.runtime.CompositionImpl.applyChangesInLocked:1229 androidx.compose.runtime.CompositionImpl.applyChanges:1256 androidx.compose.runtime.Recomposer.composeInitial$runtime:1211 androidx.compose.runtime.GapComposer$CompositionContextImpl.composeInitial$runtime:2987 
+         1793080325.069 31533 31533 I Surface : Creating surface for consumer unnamed-31533-0 with slotExpansion=1 for 64 slots
+         1793080325.069 31533 31533 W libc    : Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+         1793080325.070 31533 31533 I Surface : Creating surface for consumer VRI[MainActivity]#0(BLAST Consumer)0 with slotExpansion=1 for 64 slots
+         1793080325.070 31533 31533 W libc    : Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+         1793080325.073 31533  9410 E BLASTBufferQueue: Failed to setTidQosLevel for allocateBuffers, tid 9410
+         1793080325.115 31533 31533 D VRI[MainActivity]: vri.Setup new sync=wmsSync-VRI[MainActivity]#0
+         1793080325.195 31533 31533 D VRI[MainActivity]: vri.reportDrawFinished 1 0 Rect(0, 0 - 1080, 2340)
+         1793080325.196 31533 31533 I Choreographer: first vsync insert message into MessageQueue Head
+         1793080325.196 31533 31533 I Choreographer: Skipped 54 frames!  The application may be doing too much work on its main thread.
+         1793080325.199 31533 31533 D MainActivity: playerConnection: null
+         1793080325.234 31533  9427 I DpmTcmClient: RegisterTcmMonitor from: $Proxy3
+         1793080325.306 31533 31533 D WmSystemUiDebug: set navigation bar color,Alpha=0.0, RGB:0,0,0 caller:androidx.activity.EdgeToEdgeApi35.setUp:353 androidx.activity.EdgeToEdge.enableEdgeToEdge$lambda$1:101 androidx.activity.EdgeToEdge$$ExternalSyntheticLambda0.run:0 androidx.activity.EdgeToEdge.enable:127 com.ljyh.mei.MainActivity.onCreate$lambda$0$40$1$1$21$0:731 com.ljyh.mei.MainActivity.$r8$lambda$GW2-ZArZyjvNt0CaRaCUhLsslAA:0 com.ljyh.mei.MainActivity$$ExternalSyntheticLambda43.invoke:0 androidx.compose.runtime.DisposableEffectImpl.onRemembered:231 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberList:268 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberObservers:240 
+         1793080325.306 31533 31533 D WmSystemUiDebug: set navigation bar color,Alpha=0.0, RGB:0,0,0 caller:com.ljyh.mei.MainActivity.onCreate$lambda$0$40$1$1$21$0:757 com.ljyh.mei.MainActivity.$r8$lambda$GW2-ZArZyjvNt0CaRaCUhLsslAA:0 com.ljyh.mei.MainActivity$$ExternalSyntheticLambda43.invoke:0 androidx.compose.runtime.DisposableEffectImpl.onRemembered:231 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberList:268 androidx.compose.runtime.internal.RememberEventDispatcher.dispatchRememberObservers:240 androidx.compose.runtime.CompositionImpl.applyChangesInLocked:1229 androidx.compose.runtime.CompositionImpl.applyChanges:1256 androidx.compose.runtime.Recomposer$runRecomposeAndApplyChanges$2.invokeSuspend$lambda$2:733 androidx.compose.runtime.Recomposer$runRecomposeAndApplyChanges$2$$ExternalSyntheticLambda0.invoke:0 
+         1793080325.428 31533  9340 I ease.cloudmusic: Compiler allocated 6830KB to compile void android.view.ViewRootImpl.performTraversals(long)
+         1793080325.453 31533 31533 D ViewRootImplStubImpl: ViewOutlineProvider skip radii dispatch, lastDispatched=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], radii=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], pending=false
+         1793080325.480 31533 31533 I ease.cloudmusic: hiddenapi: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app, TargetSdkVersion=37) using reflection: allowed
+         1793080325.515 31533  9374 D HWUI    : [HWUI] Flag vulkan_enhance_pipeline_cache enabled
+         1793080325.515 31533  9374 D HWUI    : [HWUI] EnhanceVkPipelineCache is disabled
+         1793080325.515 31533  9374 D HWUI    : [HWUI] EnhanceVkPipelineCache runtime=false, cacheType=0, saveImmediately=false, useInfoInterval=43200s, dataInterval=43200s, dataSizeThreshold=2048KB
+         1793080325.515 31533  9374 D HWUI    : [HWUI] Flag ddre disabled
+         1793080325.525 31533  9354 I HWUI    : Davey! duration=929ms; Flags=160, FrameTimelineVsyncId=39650253, IntendedVsync=88921490234048, Vsync=88922090659940, InputEventId=0, HandleInputStart=88922098425452, AnimationStart=88922098427015, PerformTraversalsStart=88922211004150, DrawStart=88922356114775, FrameDeadline=88922144113745, FrameStartTime=88922098228525, FrameInterval=11118998, WorkloadTarget=16222223, AnimationTime=88922090659940, FlingPosition=0, FlingFrameInterval=0, InputEventTime=0, InputEventAction=-1, FirstTimeForInputEventAction=0, InputEventSignal=-1, WindowMode=1, SyncQueued=88922381000609, SyncStart=88922381049723, IssueDrawCommandsStart=88922381433890, SwapBuffers=88922416706963, FrameCompleted=88922419487379, DequeueBufferDuration=18021, QueueBufferDuration=236042, GpuCompleted=88922419487379, SwapBuffersCompleted=88922417850036, DisplayPresentTime=0, CommandSubmissionCompleted=88922416706963, 
+         1793080325.527 31533 31533 D SimpleCache: Creating CacheDataSource instance
+         1793080325.534 31533 31533 I ExoPlayerImpl: Init acfe111 [AndroidXMedia3/1.11.1] [umi, Mi 10, Xiaomi, 37]
+         1793080325.549 31533 31533 D SimpleCache: Creating CacheDataSource instance
+         1793080325.550 31533 31533 I ExoPlayerImpl: Init b9a276f [AndroidXMedia3/1.11.1] [umi, Mi 10, Xiaomi, 37]
+         1793080325.554 31533  9442 D AudioSystem: onNewServiceWithAdapter: media.audio_flinger service obtained 0xb40000785e5b4150
+         1793080325.554 31533  9442 D AudioSystem: getService: IAudioFlingerService retrieved: 0xb40000774e4ec990  IAudioFlinger cached: 0xb40000785e5b4150
+         1793080325.584 31533  9444 I OkHttp  : --> POST https://music.163.com/weapi/listen/together/status/get (2-byte body)
+         1793080325.590 31533 31533 I MediaSessionImpl: Init d54855b [AndroidXMedia3/1.11.1] [umi, Mi 10, Xiaomi, 37]
+         1793080325.595 31533 31533 I MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+         1793080325.601 31533  9444 D ChineseIP: Generated: 1.26.7.6 | Loc: 赤峰
+         1793080325.613 31533 31533 I MediaController: Init 3244536 [AndroidXMedia3/1.11.1] [umi, Mi 10, Xiaomi, 37]
+         1793080325.628 31533 31533 I Choreographer: Skipped 35 frames!  The application may be doing too much work on its main thread.
+         1793080325.631 31533  9459 I OkHttp  : --> GET https://api.bilibili.com/x/web-interface/newlist?rid=3&pn=1&ps=30
+         1793080325.662 31533 31533 I HandWritingStubImpl: refreshLastKeyboardType: 1
+         1793080325.662 31533 31533 I HandWritingStubImpl: getCurrentKeyboardType: 1
+         1793080325.681 31533 31533 D MainActivity: Service Connected
+         1793080325.682 31533 31533 D PlayerConnection: PlayerConnection initialized
+         1793080325.859 31533 31533 D PlayerActionToolbar: mode,queue
+         1793080325.879 31533  9444 I OkHttp  : <-- 200 https://music.163.com/weapi/listen/together/status/get (294ms, unknown-length body)
+         1793080325.958 31533  9459 I OkHttp  : <-- 200 https://api.bilibili.com/x/web-interface/newlist?rid=3&pn=1&ps=30 (326ms, unknown-length body)
+         1793080326.072 31533 31533 D InsetsController: hide(ime())
+         1793080326.072 31533 31533 I ImeTracker: com.neoruaa.meilox:d0660e9c: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+         1793080326.073 31533 31533 I HandWritingStubImpl: getCurrentKeyboardType: 1
+         1793080326.082 31533 31533 D MainActivity: playerConnection: com.ljyh.mei.playback.PlayerConnection@3b85e08
+         1793080326.131 31533 31533 I Choreographer: Skipped 38 frames!  The application may be doing too much work on its main thread.
+         1793080326.230 31533 31533 D MusicService: Restored playback snapshot -> items: 30, index: 3, position: 41, source: queue
+         1793080326.266 31533  9444 I OkHttp  : --> POST https://interface.music.163.com/eapi/listen/together/status/get (2-byte body)
+         1793080326.268 31533 31533 I MediaController: Init 3001725 [AndroidXMedia3/1.11.1] [umi, Mi 10, Xiaomi, 37]
+         1793080326.276 31533  9510 D ResolvingDataSource: Fully cached on disk: bili_117511211257160_43090706732
+         1793080326.289 31533  9510 D MetadataUtil: Skipped unknown metadata entry: desc
+         1793080326.302 31533  9459 I OkHttp  : --> GET https://api.bilibili.com/x/web-interface/view?aid=117511127305366
+         1793080326.307 31533 31533 W EpFrameworkFactory: activated: false jar exist: false
+         1793080326.334 31533  9442 D AudioSystem: onNewService: media.audio_policy service obtained 0xb40000774e57e250
+         1793080326.334 31533  9442 D AudioSystem: getService: IAudioPolicyService retrieved: 0xb40000774e57e250  cached: 0xb40000774e57e250
+         1793080326.336 31533  9442 W AidlConversionCppNdk: aidl2legacy_AudioChannelLayout_audio_channel_mask_t: no legacy output audio_channel_mask_t found for AudioChannelLayout{layoutMask: 16}
+         1793080326.344 31533  9442 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+         1793080326.351 31533  9442 W VideoCapabilities: Unsupported mime image/vnd.android.heic
+         1793080326.353 31533  9442 W VideoCapabilities: Unrecognized profile/level 0/3 for video/mpeg2
+         1793080326.353 31533  9442 W VideoCapabilities: Unrecognized profile/level 0/3 for video/mpeg2
+         1793080326.359 31533  9442 W VideoCapabilities: Unrecognized profile 4 for video/av01
+         1793080326.359 31533  9442 W VideoCapabilities: Unrecognized profile 8 for video/av01
+         1793080326.364 31533  9442 W VideoCapabilities: Unrecognized profile 4 for video/av01
+         1793080326.364 31533  9442 W VideoCapabilities: Unrecognized profile 8 for video/av01
+         1793080326.366 31533  9442 W VideoCapabilities: Unsupported mime image/vnd.android.heic
+         1793080326.370 31533  9442 W VideoCapabilities: Unrecognized profile/level 0/3 for video/mpeg2
+         1793080326.371 31533  9442 W VideoCapabilities: Unrecognized profile/level 0/3 for video/mpeg2
+         1793080326.385 31533  9442 W VideoCapabilities: Unrecognized profile 4 for video/av01
+         1793080326.385 31533  9442 W VideoCapabilities: Unrecognized profile 8 for video/av01
+         1793080326.396 31533  9442 W VideoCapabilities: Unrecognized profile 4 for video/av01
+         1793080326.396 31533  9442 W VideoCapabilities: Unrecognized profile 8 for video/av01
+         1793080326.406 31533  9442 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+         1793080326.406 31533  9459 I OkHttp  : <-- 200 https://api.bilibili.com/x/web-interface/view?aid=117511127305366 (104ms, unknown-length body)
+         1793080326.416 31533  9442 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+         1793080326.418 31533  9442 I MediaCodec: The process name is com.netease.cloudmusic 
+         1793080326.418 31533  9442 I MediaCodec: Retry enabled for HDCP failure
+         1793080326.418 31533  9442 D MediaCodec: MediaCodec overwrite invalid pid -1->31533
+         1793080326.418 31533  9442 D MediaCodec: MediaCodec u-p-n client:10150-31533-com.neoruaa.meilox process:10150-31533-com.netease.cloudmusic
+         1793080326.418 31533  9442 D MediaCodec: mWeChatVideoUploadOptimizationFlag 0
+         1793080326.418 31533  9442 I MediaCodec: MediaCodec::MediaCodec()
+         1793080326.419 31533  9510 D ResolvingDataSource: Fully cached on disk: bili_117511211257160_43090706732
+         1793080326.421 31533  9442 I ApexCodecsLazy: ApexCodecs loading skipped on non-CN device (region=cn)
+         1793080326.421 31533  9442 I Codec2Client: Available Codec2 services: "default" "software"
+         1793080326.424 31533  9442 W ease.cloudmusic: Failed to query component store for system resources: 6
+         1793080326.425 31533  9442 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+         1793080326.425 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: INITIALIZING
+         1793080326.425 31533  9522 D CCodec  : allocate(c2.android.aac.decoder)
+         1793080326.427 31533  9522 I CCodec  : setting up 'default' as default (vendor) store
+         1793080326.434 31533  9522 I CCodec  : Created component [c2.android.aac.decoder] for [c2.android.aac.decoder]
+         1793080326.434 31533  9522 D CCodecConfig: read media type: audio/mp4a-latm
+         1793080326.435 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+         1793080326.435 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+         1793080326.435 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+         1793080326.436 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+         1793080326.436 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+         1793080326.436 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+         1793080326.436 31533  9522 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+         1793080326.437 31533  9522 I CCodecConfig: query failed after returning 21 values (BAD_INDEX)
+         1793080326.437 31533  9522 D CCodecConfig: c2 config diff is Dict {
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 coded.aac-packaging.value = 0
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 coded.bitrate.value = 64000
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 coded.pl.level = 0
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 coded.pl.profile = 8192
+         1793080326.437 31533  9522 D CCodecConfig:   c2::i32 coding.drc.album-mode.value = 0
+         1793080326.437 31533  9522 D CCodecConfig:   c2::float coding.drc.attenuation-factor.value = 1
+         1793080326.437 31533  9522 D CCodecConfig:   c2::float coding.drc.boost-factor.value = 1
+         1793080326.437 31533  9522 D CCodecConfig:   c2::i32 coding.drc.compression-mode.value = 3
+         1793080326.437 31533  9522 D CCodecConfig:   c2::i32 coding.drc.effect-type.value = 3
+         1793080326.437 31533  9522 D CCodecConfig:   c2::float coding.drc.encoded-level.value = 0.25
+         1793080326.437 31533  9522 D CCodecConfig:   c2::float coding.drc.reference-level.value = -16
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 8192
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 input.delay.value = 0
+         1793080326.437 31533  9522 D CCodecConfig:   string input.media-type.value = "audio/mp4a-latm"
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 output.delay.value = 2
+         1793080326.437 31533  9522 D CCodecConfig:   c2::float output.drc.output-loudness.value = 0.25
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+         1793080326.437 31533  9522 D CCodecConfig:   string output.media-type.value = "audio/raw"
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 raw.channel-mask.value = 0
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 raw.max-channel-count.value = 8
+         1793080326.437 31533  9522 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+         1793080326.437 31533  9522 D CCodecConfig: }
+         1793080326.437 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: INITIALIZED
+         1793080326.442 31533  9459 I OkHttp  : --> GET https://api.bilibili.com/x/player/wbi/playurl?bvid=BV1D2xN6iErD&aid=117511127305366&cid=43090120423&qn=0&fnval=16&fnver=0&fourk=1&voice_balance=1&wts=1793080326&w_rid=dba06b2489cf4c65b68115da5ca68966
+         1793080326.442 31533  9522 I MediaCodec: MediaCodec will operate in async mode
+         1793080326.442 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] configure: ClientName: com.neoruaa.meilox ComponentName: c2.android.aac.decoder
+         1793080326.442 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+         1793080326.442 31533  9442 I MediaCodec:   float operating-rate = 44100.000000
+         1793080326.442 31533  9442 I MediaCodec:   string log-session-id = "fVsljJed3xMp8V1q"
+         1793080326.442 31533  9442 I MediaCodec:   int32_t sample-rate = 44100
+         1793080326.442 31533  9442 I MediaCodec:   int32_t importance = 1000
+         1793080326.442 31533  9442 I MediaCodec:   string mime = "audio/mp4a-latm"
+         1793080326.442 31533  9442 I MediaCodec:   int32_t channel-count = 2
+         1793080326.442 31533  9442 I MediaCodec:   int32_t priority = 0
+         1793080326.442 31533  9442 I MediaCodec:   int32_t max-output-channel-count = 99
+         1793080326.442 31533  9442 I MediaCodec:   Buffer csd-0 = {
+         1793080326.442 31533  9442 I MediaCodec:     00000000:  12 10                                             ..
+         1793080326.442 31533  9442 I MediaCodec:   }
+         1793080326.442 31533  9442 I MediaCodec: }
+         1793080326.442 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: CONFIGURING
+         1793080326.443 31533  9522 D CCodec  : [c2.android.aac.decoder] buffers are bound to CCodec for this session
+         1793080326.443 31533  9522 D CCodecConfig: no c2 equivalents for log-session-id
+         1793080326.443 31533  9522 D CCodecConfig: no c2 equivalents for importance
+         1793080326.443 31533  9522 D CCodecConfig: no c2 equivalents for flags
+         1793080326.443 31533  9522 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+         1793080326.443 31533  9522 W Codec2Client: query -- param skipped: index = 1107298332.
+         1793080326.443 31533  9522 D CCodec  : encoding statistics level = 0
+         1793080326.443 31533  9522 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-album-mode = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-boost-level = 127
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-cut-level = 127
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-effect-type = 3
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-encoded-target-level = -1
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-max-output-channel_count = 8
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-target-ref-level = 64
+         1793080326.443 31533  9522 D CCodec  :   int32_t bitrate = 64000
+         1793080326.443 31533  9522 D CCodec  :   int32_t channel-count = 2
+         1793080326.443 31533  9522 D CCodec  :   int32_t channel-mask = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t level = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t max-input-size = 8192
+         1793080326.443 31533  9522 D CCodec  :   int32_t max-output-channel-count = 8
+         1793080326.443 31533  9522 D CCodec  :   string mime = "audio/mp4a-latm"
+         1793080326.443 31533  9522 D CCodec  :   int32_t profile = 2
+         1793080326.443 31533  9522 D CCodec  :   int32_t sample-rate = 44100
+         1793080326.443 31533  9522 D CCodec  : }
+         1793080326.443 31533  9522 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-album-mode = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-boost-level = 127
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-cut-level = 127
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-effect-type = 3
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-drc-output-loudness = -1
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-encoded-target-level = -1
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-max-output-channel_count = 8
+         1793080326.443 31533  9522 D CCodec  :   int32_t aac-target-ref-level = 64
+         1793080326.443 31533  9522 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t channel-count = 2
+         1793080326.443 31533  9522 D CCodec  :   int32_t channel-mask = 0
+         1793080326.443 31533  9522 D CCodec  :   int32_t max-output-channel-count = 8
+         1793080326.443 31533  9522 D CCodec  :   string mime = "audio/raw"
+         1793080326.443 31533  9522 D CCodec  :   int32_t sample-rate = 44100
+         1793080326.443 31533  9522 D CCodec  :   int32_t android._config-pcm-encoding = 2
+         1793080326.443 31533  9522 D CCodec  : }
+         1793080326.443 31533  9522 I CCodecConfig: query failed after returning 21 values (BAD_INDEX)
+         1793080326.443 31533  9522 E ease.cloudmusic: Failed to query component interface for required system resources: 6
+         1793080326.443 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: CONFIGURED
+         1793080326.444 31533  9442 D MediaCodec: keep callback message for reclaim
+         1793080326.444 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: STARTING
+         1793080326.445 31533  9522 W Codec2Client: query -- param skipped: index = 1342179345.
+         1793080326.445 31533  9522 W Codec2Client: query -- param skipped: index = 2415921170.
+         1793080326.445 31533  9522 W Codec2Client: query -- param skipped: index = 1610614798.
+         1793080326.445 31533  9522 D C2Store : Using ION
+         1793080326.446 31533  9522 D CCodecBufferChannel: [c2.android.aac.decoder#437] Created input block pool with allocatorID 16 => poolID 17 - OK (0)
+         1793080326.446 31533  9522 I CCodecBufferChannel: [mId: 0] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-album-mode = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-boost-level = 127
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-cut-level = 127
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-effect-type = 3
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-encoded-target-level = -1
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-max-output-channel_count = 8
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-target-ref-level = 64
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t bitrate = 64000
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t channel-count = 2
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t channel-mask = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t level = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t max-input-size = 8192
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t max-output-channel-count = 8
+         1793080326.446 31533  9522 I CCodecBufferChannel:   string mime = "audio/mp4a-latm"
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t profile = 2
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t sample-rate = 44100
+         1793080326.446 31533  9522 I CCodecBufferChannel: }
+         1793080326.446 31533  9522 I CCodecBufferChannel: [c2.android.aac.decoder#437] Created output block pool with allocatorID 16 => poolID 418 - OK
+         1793080326.446 31533  9522 D CCodecBufferChannel: [c2.android.aac.decoder#437] Configured output block pool ids 418 => OK
+         1793080326.446 31533  9522 I CCodecBufferChannel: [mId: 0] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-album-mode = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-boost-level = 127
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-cut-level = 127
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-effect-type = 3
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-drc-output-loudness = -1
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-encoded-target-level = -1
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-max-output-channel_count = 8
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t aac-target-ref-level = 64
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t channel-count = 2
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t channel-mask = 0
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t max-output-channel-count = 8
+         1793080326.446 31533  9522 I CCodecBufferChannel:   string mime = "audio/raw"
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t sample-rate = 44100
+         1793080326.446 31533  9522 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 2
+         1793080326.446 31533  9522 I CCodecBufferChannel: }
+         1793080326.446 31533  9522 D CCodecBuffers: [c2.android.aac.decoder#437:1D-Output.Impl[N]] converted 0 buffers to array mode of 6
+         1793080326.447 31533  9522 D CCodecBufferChannel: [c2.android.aac.decoder#437] start: updating output delay 2
+         1793080326.447 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] setState: STARTED
+         1793080326.447 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] start: attempt 0 result 0 (done)
+         1793080326.451 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000046439 timediff: 0
+         1793080326.452 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000069659 timediff: 1
+         1793080326.452 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000092879 timediff: 0
+         1793080326.456 31533  9522 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-mask.value = 12
+         1793080326.456 31533  9522 D CCodecBuffers: [c2.android.aac.decoder#437:Output[N]] popFromStashAndRegister: at 1000000046439us, output format changed to AMessage(what = 0x00000000) = {
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-drc-album-mode = 0
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-drc-boost-level = 127
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-drc-cut-level = 127
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-drc-effect-type = 3
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-drc-output-loudness = -1
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-encoded-target-level = -1
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-max-output-channel_count = 8
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t aac-target-ref-level = 64
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t buffer-batch-max-output-size = 0
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t buffer-batch-threshold-output-size = 0
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t channel-count = 2
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t channel-mask = 12
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t max-output-channel-count = 8
+         1793080326.456 31533  9522 D CCodecBuffers:   string mime = "audio/raw"
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t sample-rate = 44100
+         1793080326.456 31533  9522 D CCodecBuffers:   int32_t android._config-pcm-encoding = 2
+         1793080326.456 31533  9522 D CCodecBuffers: }
+         1793080326.467 31533  9442 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 80
+         1793080326.468 31533  9442 E AudioTrack: Failed to load XML file: /odm/etc/audio/audio_lowpower_app_list.xml
+         1793080326.469 31533  9442 I AudioTrackImpl: initAudioTrackImpl()
+         1793080326.469 31533  9442 W AudioTrackStub: mSchedDyEnable=0, dynamic audio scheduling disabled or untrusted_app domain
+         1793080326.469 31533  9442 D AudioTrack: set(): (sessionId=4105), mcallback is 1, streamType -1, sampleRate 44100, format 0x1, channelMask 0x3, frameCount 176400, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 31533, uid: 10150, deviceId: 0, packageName: com.neoruaa.meilox, attributionTag: (null), token: binder:0xb40000775e4bf990, renouncedPermissions: [], next: []}
+         1793080326.469 31533  9442 D AudioTrackImpl: [APM]-AT isSupportChannelMask() channelMask=0x3 result=0
+         1793080326.475 31533  9442 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=2
+         1793080326.476 31533  9442 I ease.cloudmusic: hiddenapi: Accessing hidden method Landroid/media/AudioTrack;->getLatency()I (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/media3/exoplayer/audio/AudioTrackPositionTracker; (domain=app, TargetSdkVersion=37) using reflection: allowed
+         1793080326.477 31533  9442 D android.media.AudioTrack: setStereoVolume setParameters is 1.0, rightVolume is 1.0, isMuted is false, mIsLastMute is false, mNeedNotifyedNative is true
+         1793080326.477 31533  9442 D AudioTrackImpl: setMediaSetMute(372): Parameter media_set_track_muted is 0 return
+         1793080326.477 31533  9442 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is com.neoruaa.meilox
+         1793080326.478 31533  9442 I AudioAppRegistry: loadXmlOnce: loaded from /system_ext/etc/audio_app_registry.xml
+         1793080326.478 31533  9442 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=4105
+         1793080326.567 31533  9459 I OkHttp  : <-- 200 https://api.bilibili.com/x/player/wbi/playurl?bvid=BV1D2xN6iErD&aid=117511127305366&cid=43090120423&qn=0&fnval=16&fnver=0&fourk=1&voice_balance=1&wts=1793080326&w_rid=dba06b2489cf4c65b68115da5ca68966 (124ms, unknown-length body)
+         1793080326.614 31533  9508 D MetadataUtil: Skipped unknown metadata entry: desc
+         1793080326.620 31533  9442 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+         1793080326.627 31533  9442 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+         1793080326.710 31533  9444 I OkHttp  : <-- 200 https://interface.music.163.com/eapi/listen/together/status/get (443ms, 82-byte body)
+         1793080326.758 31533 31533 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@adf305d
+         1793080327.005 31533  9427 I SkJpegCodec: [mId: 14] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.005 31533  9495 I SkJpegCodec: [mId: 15] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.005 31533  9427 I SkJpegCodec: [mId: 14] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.500000
+         1793080327.005 31533  9495 D HWUI    : ImageDecoder_nDecodeBitmap: width = 512, height = 288, encodedFormat = 3
+         1793080327.005 31533  9427 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080327.005 31533  9495 I SkJpegCodec: [mId: 15] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.005 31533  9495 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 2560, Dimensions.height = 1440};
+         1793080327.005 31533  9427 I SkJpegCodec: [mId: 14] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.005 31533  9427 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 1280, Dimensions.height = 720};
+         1793080327.007 31533  9496 I SkJpegCodec: [mId: 16] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.007 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 1440, height = 810, encodedFormat = 3
+         1793080327.007 31533  9496 I SkJpegCodec: [mId: 16] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 10240, 
+         1793080327.007 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 2560, Dimensions.height = 1440};
+         1793080327.008 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080327.009 31533  9428 I SkJpegCodec: [mId: 17] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.009 31533  9428 I SkJpegCodec: [mId: 17] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.250000
+         1793080327.010 31533  9428 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080327.010 31533  9428 I SkJpegCodec: [mId: 17] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.010 31533  9428 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 2560, Dimensions.height = 1440};
+         1793080327.018 31533  9495 I SkJpegCodec: [mId: 15] skia-debug onGetGainmapInfo returns false
+         1793080327.020 31533  9495 I SkJpegCodec: [mId: 18] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.021 31533  9495 I SkJpegCodec: [mId: 18] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.125000
+         1793080327.021 31533  9495 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080327.021 31533  9495 I SkJpegCodec: [mId: 18] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 960, 
+         1793080327.021 31533  9495 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 240, Dimensions.height = 135};
+         1793080327.021 31533  9495 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080327.022 31533  9427 I SkJpegCodec: [mId: 14] skia-debug onGetGainmapInfo returns false
+         1793080327.026 31533  9495 I SkJpegCodec: [mId: 18] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 135
+         1793080327.027 31533  9495 I SkJpegCodec: [mId: 18] skia-debug onGetGainmapInfo returns false
+         1793080327.027 31533  9404 I SkJpegCodec: [mId: 19] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.027 31533  9404 I SkJpegCodec: [mId: 19] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.500000
+         1793080327.027 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 168, height = 126, encodedFormat = 3
+         1793080327.027 31533  9404 I SkJpegCodec: [mId: 19] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.500000
+         1793080327.027 31533  9404 I SkJpegCodec: [mId: 19] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.027 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 561, Dimensions.height = 422};
+         1793080327.031 31533  9426 I SkJpegCodec: [mId: 20] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.031 31533  9426 I SkJpegCodec: [mId: 20] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.125000
+         1793080327.031 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080327.031 31533  9426 I SkJpegCodec: [mId: 20] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 960, 
+         1793080327.031 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 240, Dimensions.height = 135};
+         1793080327.031 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080327.034 31533  9426 I SkJpegCodec: [mId: 20] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 135
+         1793080327.034 31533  9426 I SkJpegCodec: [mId: 20] skia-debug onGetGainmapInfo returns false
+         1793080327.036 31533  9495 I SkJpegCodec: [mId: 21] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.036 31533  9495 I SkJpegCodec: [mId: 21] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.250000
+         1793080327.036 31533  9495 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080327.036 31533  9495 I SkJpegCodec: [mId: 21] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.036 31533  9495 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 2560, Dimensions.height = 1440};
+         1793080327.036 31533  9404 I SkJpegCodec: [mId: 19] skia-debug onGetGainmapInfo returns false
+         1793080327.044 31533  9428 I SkJpegCodec: [mId: 17] skia-debug onGetGainmapInfo returns false
+         1793080327.044 31533  9495 I SkJpegCodec: [mId: 21] skia-debug onGetGainmapInfo returns false
+         1793080327.044 31533  9496 I SkJpegCodec: [mId: 16] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 1440
+         1793080327.058 31533  9496 I SkJpegCodec: [mId: 16] skia-debug onGetGainmapInfo returns false
+         1793080327.181 31533  9426 I SkJpegCodec: [mId: 22] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.181 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 1280, height = 720, encodedFormat = 3
+         1793080327.181 31533  9426 I SkJpegCodec: [mId: 22] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 5120, 
+         1793080327.181 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 1280, Dimensions.height = 720};
+         1793080327.181 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080327.186 31533  9444 I OkHttp  : --> POST https://interface.music.163.com/api/song/like/check (27-byte body)
+         1793080327.187 31533  9428 I SkJpegCodec: [mId: 23] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.187 31533  9428 I SkJpegCodec: [mId: 23] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.500000
+         1793080327.187 31533  9428 D HWUI    : ImageDecoder_nDecodeBitmap: width = 256, height = 144, encodedFormat = 3
+         1793080327.187 31533  9428 I SkJpegCodec: [mId: 23] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.500000
+         1793080327.187 31533  9428 I SkJpegCodec: [mId: 23] skia-debug SkJpegCodec::onStartScanlineDecode: 
+         1793080327.187 31533  9428 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 1280, Dimensions.height = 720};
+         1793080327.187 31533  9444 I OkHttp  : <-- HTTP FAILED: java.io.IOException: NetEase account session changed; retry the action. https://interface.music.163.com/api/song/like/check (1ms)
+         1793080327.191 31533  9426 I SkJpegCodec: [mId: 22] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 720
+         1793080327.191 31533  9426 I SkJpegCodec: [mId: 22] skia-debug onGetGainmapInfo returns false
+         1793080327.194 31533  9428 I SkJpegCodec: [mId: 23] skia-debug onGetGainmapInfo returns false
+         1793080327.200 31533  9351 I HWUI    : Davey! duration=1055ms; Flags=160, FrameTimelineVsyncId=39651107, IntendedVsync=88923035546444, Vsync=88923224435331, InputEventId=0, HandleInputStart=88923232394879, AnimationStart=88923232400192, PerformTraversalsStart=88923697081910, DrawStart=88923697278785, FrameDeadline=88923162650915, FrameStartTime=88923230973160, FrameInterval=11111111, WorkloadTarget=16222223, AnimationTime=88923224435331, FlingPosition=0, FlingFrameInterval=0, InputEventTime=0, InputEventAction=-1, FirstTimeForInputEventAction=0, InputEventSignal=-1, WindowMode=1, SyncQueued=88924054238264, SyncStart=88924054375920, IssueDrawCommandsStart=88924058886077, SwapBuffers=88924087067952, FrameCompleted=88924091294983, DequeueBufferDuration=30312, QueueBufferDuration=177864, GpuCompleted=88924091294983, SwapBuffersCompleted=88924087533056, DisplayPresentTime=0, CommandSubmissionCompleted=88924087067952, 
+         1793080327.267 31533 31533 I Choreographer: Skipped 84 frames!  The application may be doing too much work on its main thread.
+         1793080327.298 31533  9343 I ease.cloudmusic: This is non sticky GC, maxfree is 8388608 minfree is 524288
+         1793080327.298 31533  9343 I ease.cloudmusic: NativeAlloc concurrent copying GC freed 32MB AllocSpace bytes, 22(3464KB) LOS objects, 35% free, 44MB/68MB, paused 105us,67us total 104.376ms
+         1793080327.341 31533 31533 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.app.Activity$$ExternalSyntheticLambda0@e4c7c2d
+         1793080327.385 31533 31533 I PlaybackAudio: deck=0 decoder=c2.android.aac.decoder initMs=34
+         1793080327.385 31533 31533 I PlaybackAudio: deck=0 mime=audio/mp4a-latm sampleRate=44100 channels=2 pcm=-1
+         1793080327.386 31533 31533 I PlaybackAudio: deck=0 outputRate=44100 encoding=2 channels=12 buffer=705600 offload=false
+         1793080327.401 31533  9512 I HWUI    : Davey! duration=1065ms; Flags=160, FrameTimelineVsyncId=39651153, IntendedVsync=88923235601054, Vsync=88924168401818, InputEventId=0, HandleInputStart=88924169414410, AnimationStart=88924169417847, PerformTraversalsStart=88924259630087, DrawStart=88924259813368, FrameDeadline=88924129546434, FrameStartTime=88924169013420, FrameInterval=11104771, WorkloadTarget=16222223, AnimationTime=88924168401818, FlingPosition=0, FlingFrameInterval=0, InputEventTime=0, InputEventAction=-1, FirstTimeForInputEventAction=0, InputEventSignal=-1, WindowMode=1, SyncQueued=88924280976493, SyncStart=88924281399983, IssueDrawCommandsStart=88924281640868, SwapBuffers=88924293317483, FrameCompleted=88924301113941, DequeueBufferDuration=15365, QueueBufferDuration=222500, GpuCompleted=88924301113941, SwapBuffersCompleted=88924294017170, DisplayPresentTime=0, CommandSubmissionCompleted=88924293317483, 
+         1793080327.411 31533  9428 D LyricUtils: no lyric
+         1793080327.467 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 961ms before pts: 1000000278639
+         1793080327.467 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000278639 timediff: 961
+         1793080327.468 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000301859 timediff: 1
+         1793080327.468 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000325079 timediff: 0
+         1793080327.468 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080327.470 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080327.486 31533 31533 D Player State: NetEase account session changed; retry the action
+         1793080327.489 31533  9614 D MetadataUtil: Skipped unknown metadata entry: desc
+         1793080327.500 31533  9444 I OkHttp  : --> POST https://interface.music.163.com/api/song/lyric/v1 (81-byte body)
+         1793080327.524 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug Enter SkJpegEncoder::Encode.
+         1793080327.524 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug Enter SkJpegEncoder::Make and Options: { fQuality = 90 fDownsample = 0 fAlphaOption = 0};.
+         1793080327.524 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug src.info is SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 512, Dimensions.height = 288};.
+         1793080327.525 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug Create a new SkJpegEncoderImpl.
+         1793080327.525 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug Enter SkJpegEncoderImpl::onEncodeRows and numRows is 288
+         1793080327.526 31533 31533 I SkJpegEncoder: [mId: 501] skia-debug Out SkJpegEncoder::Encode with original encode.
+         1793080327.609 31533 31533 D LyricPreloader: silent QQ search retry: 《点燃银河尽头的篝火》+《For Forever》-2026华晨宇火星演唱会乐园2.0-10.6南京站
+         1793080327.610 31533  9626 I OkHttp  : --> POST https://interface.music.163.com/api/song/lyric/v1 (81-byte body)
+         1793080327.634 31533  9628 I OkHttp  : --> POST https://u.y.qq.com/cgi-bin/musicu.fcg (377-byte body)
+         1793080327.634 31533  9627 I OkHttp  : --> POST https://u.y.qq.com/cgi-bin/musicu.fcg (453-byte body)
+         1793080327.715 31533  9444 I OkHttp  : <-- 200 https://interface.music.163.com/api/song/lyric/v1 (214ms, unknown-length body)
+         1793080327.906 31533  9426 I SkJpegCodec: [mId: 24] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080327.906 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080327.906 31533  9426 I SkJpegCodec: [mId: 24] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080327.906 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080327.906 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080327.907 31533  9426 I SkJpegCodec: [mId: 24] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080327.907 31533  9426 I SkJpegCodec: [mId: 24] skia-debug onGetGainmapInfo returns false
+         1793080328.007 31533  9426 I SkJpegCodec: [mId: 25] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.008 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080328.008 31533  9426 I SkJpegCodec: [mId: 25] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080328.008 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080328.008 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.008 31533  9426 I SkJpegCodec: [mId: 25] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080328.008 31533  9426 I SkJpegCodec: [mId: 25] skia-debug onGetGainmapInfo returns false
+         1793080328.083 31533  9626 I OkHttp  : <-- 200 https://interface.music.163.com/api/song/lyric/v1 (473ms, unknown-length body)
+         1793080328.114 31533  9495 D LyricUtils: NetEase LRC
+         1793080328.172 31533  9426 I SkJpegCodec: [mId: 26] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.173 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080328.173 31533  9426 I SkJpegCodec: [mId: 26] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080328.173 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080328.173 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.173 31533  9426 I SkJpegCodec: [mId: 26] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080328.173 31533  9426 I SkJpegCodec: [mId: 26] skia-debug onGetGainmapInfo returns false
+         1793080328.217 31533  9405 I SkJpegCodec: [mId: 27] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.217 31533  9426 I SkJpegCodec: [mId: 28] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.217 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080328.217 31533  9426 I SkJpegCodec: [mId: 28] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080328.217 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080328.218 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.218 31533  9405 I SkJpegCodec: [mId: 27] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.125000
+         1793080328.218 31533  9405 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080328.218 31533  9405 I SkJpegCodec: [mId: 27] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 960, 
+         1793080328.218 31533  9405 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 240, Dimensions.height = 135};
+         1793080328.218 31533  9405 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.218 31533  9426 I SkJpegCodec: [mId: 28] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080328.218 31533  9426 I SkJpegCodec: [mId: 28] skia-debug onGetGainmapInfo returns false
+         1793080328.225 31533  9426 I SkJpegCodec: [mId: 29] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.225 31533  9426 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080328.225 31533  9426 I SkJpegCodec: [mId: 29] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080328.225 31533  9426 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080328.225 31533  9426 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.225 31533  9426 I SkJpegCodec: [mId: 29] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080328.225 31533  9426 I SkJpegCodec: [mId: 29] skia-debug onGetGainmapInfo returns false
+         1793080328.230 31533  9405 I SkJpegCodec: [mId: 27] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 135
+         1793080328.231 31533  9405 I SkJpegCodec: [mId: 27] skia-debug onGetGainmapInfo returns false
+         1793080328.332 31533  9374 E LB      : fail to open node: No such file or directory
+         1793080328.332 31533  9374 E LB      : fail to open node: No such file or directory
+         1793080328.366 31533  9405 I SkJpegCodec: [mId: 30] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.366 31533  9405 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080328.366 31533  9405 I SkJpegCodec: [mId: 30] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080328.366 31533  9405 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080328.366 31533  9405 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.367 31533  9405 I SkJpegCodec: [mId: 30] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080328.367 31533  9405 I SkJpegCodec: [mId: 30] skia-debug onGetGainmapInfo returns false
+         1793080328.500 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 110ms for 9 inputs by pts: 1000000487619
+         1793080328.500 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000000487619
+         1793080328.500 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000487619 timediff: 1000
+         1793080328.500 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000510839 timediff: 0
+         1793080328.501 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000534058 timediff: 1
+         1793080328.698 31533  9496 I SkJpegCodec: [mId: 31] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080328.698 31533  9496 I SkJpegCodec: [mId: 31] skia-debug SkJpegCodec::onGetScaledDimensions: desiredScale = 0.125000
+         1793080328.698 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 224, height = 126, encodedFormat = 3
+         1793080328.698 31533  9496 I SkJpegCodec: [mId: 31] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 956, 
+         1793080328.698 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 239, Dimensions.height = 135};
+         1793080328.698 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080328.718 31533  9496 I SkJpegCodec: [mId: 31] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 135
+         1793080328.719 31533  9496 I SkJpegCodec: [mId: 31] skia-debug onGetGainmapInfo returns false
+         1793080328.968 31533  9627 I OkHttp  : <-- 200 https://u.y.qq.com/cgi-bin/musicu.fcg (1333ms, unknown-length body)
+         1793080328.970 31533  9628 I OkHttp  : <-- 200 https://u.y.qq.com/cgi-bin/musicu.fcg (1335ms, unknown-length body)
+         1793080329.038 31533  9627 I OkHttp  : --> POST https://u.y.qq.com/cgi-bin/musicu.fcg (472-byte body)
+         1793080329.057 31533  9628 I OkHttp  : --> POST https://u.y.qq.com/cgi-bin/musicu.fcg (390-byte body)
+         1793080329.238 31533  9343 I ease.cloudmusic: This is sticky GC, maxfree is 8388608 minfree is 524288
+         1793080329.287 31533  9404 D LyricUtils: NetEase LRC
+         1793080329.314 31533  9627 I OkHttp  : <-- 200 https://u.y.qq.com/cgi-bin/musicu.fcg (275ms, unknown-length body)
+         1793080329.319 31533  9428 D LyricUtils: NetEase LRC
+         1793080329.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000000580498
+         1793080329.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000000580498
+         1793080329.501 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000580498 timediff: 1000
+         1793080329.502 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000603718 timediff: 1
+         1793080329.503 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000626938 timediff: 1
+         1793080329.553 31533  9628 I OkHttp  : <-- 200 https://u.y.qq.com/cgi-bin/musicu.fcg (495ms, unknown-length body)
+         1793080329.593 31533  9496 D LyricUtils: NetEase LRC
+         1793080330.201 31533  9364 W ArtReportUtils: requestArtMetricsAsync: mCacheColdLunchMetrics is empty, timeout 5s.
+         1793080330.260 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88927156, downTime=88927156, phoneEventTime=1793080330254 } moveCount:0
+         1793080330.265 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080330.318 31533  9374 E ease.cloudmusic: FrameInsert open fail: No such file or directory
+         1793080330.335 31533  9692 D ProfileInstaller: Installing profile for com.neoruaa.meilox
+         1793080330.434 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88927313, downTime=88927156, phoneEventTime=1793080330411 } moveCount:5
+         1793080330.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000000673378
+         1793080330.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 998ms before pts: 1000000673378
+         1793080330.501 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000673378 timediff: 998
+         1793080330.502 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000696598 timediff: 1
+         1793080330.502 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000719818 timediff: 0
+         1793080330.503 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080330.503 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080330.532 31533  9496 I SkJpegCodec: [mId: 32] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080330.532 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080330.532 31533  9496 I SkJpegCodec: [mId: 32] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080330.532 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080330.532 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080330.532 31533  9496 I SkJpegCodec: [mId: 32] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080330.532 31533  9496 I SkJpegCodec: [mId: 32] skia-debug onGetGainmapInfo returns false
+         1793080330.725 31533  9496 I SkJpegCodec: [mId: 33] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080330.725 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080330.725 31533  9496 I SkJpegCodec: [mId: 33] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080330.725 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080330.725 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080330.725 31533  9496 I SkJpegCodec: [mId: 33] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080330.725 31533  9496 I SkJpegCodec: [mId: 33] skia-debug onGetGainmapInfo returns false
+         1793080331.038 31533  9404 I SkJpegCodec: [mId: 34] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080331.038 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080331.038 31533  9404 I SkJpegCodec: [mId: 34] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080331.038 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080331.038 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080331.039 31533  9404 I SkJpegCodec: [mId: 34] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080331.039 31533  9404 I SkJpegCodec: [mId: 34] skia-debug onGetGainmapInfo returns false
+         1793080331.177 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88928070, downTime=88928070, phoneEventTime=1793080331168 } moveCount:0
+         1793080331.178 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080331.388 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88928231, downTime=88928070, phoneEventTime=1793080331329 } moveCount:5
+         1793080331.405 31533  9404 I SkJpegCodec: [mId: 35] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080331.405 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080331.405 31533  9404 I SkJpegCodec: [mId: 35] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080331.405 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080331.405 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080331.406 31533  9404 I SkJpegCodec: [mId: 35] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080331.406 31533  9404 I SkJpegCodec: [mId: 35] skia-debug onGetGainmapInfo returns false
+         1793080331.500 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] state STARTED mFlags 19456 Stats 5056ms:Client:com.neoruaa.meilox,Component:c2.android.aac.decoder,Qin:31,DQin:0/0,Render:0,Drop:25,DQout:0/0
+         1793080331.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 249ms for 4 inputs by pts: 1000000766258
+         1793080331.501 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000000766258
+         1793080331.501 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000766258 timediff: 999
+         1793080331.501 31533  9522 D BufferPoolAccessor2.0: bufferpool2 0xb40000786e534b98 : 5(40960 size) total buffers - 4(32768 size) used buffers - 32/37 (recycle/alloc) - 8/34 (fetch/transfer)
+         1793080331.501 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000789478 timediff: 0
+         1793080331.502 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000812698 timediff: 1
+         1793080331.502 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080331.522 31533  9404 I SkJpegCodec: [mId: 36] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080331.522 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080331.522 31533  9404 I SkJpegCodec: [mId: 36] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080331.522 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080331.522 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080331.522 31533  9404 I SkJpegCodec: [mId: 36] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080331.522 31533  9404 I SkJpegCodec: [mId: 36] skia-debug onGetGainmapInfo returns false
+         1793080332.190 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88929089, downTime=88929089, phoneEventTime=1793080332187 } moveCount:0
+         1793080332.190 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080332.335 31533  9340 I ease.cloudmusic: Compiler allocated 6062KB to compile kotlin.Unit com.ljyh.mei.ui.glass.GlassBottomBarKt.GlassBottomBar_eHTjO5g$lambda$12(androidx.compose.runtime.State, float, java.util.List, kotlinx.coroutines.CoroutineScope, boolean, int, com.ljyh.mei.ui.glass.GlassColors, com.ljyh.mei.ui.glass.GlassAppearance, com.kyant.backdrop.Backdrop, long, boolean, com.ljyh.mei.ui.glass.NavigationInnerShadowRenderer, com.kyant.backdrop.backdrops.LayerBackdrop, com.ljyh.mei.ui.glass.BottomControlContact, com.kyant.backdrop.Backdrop, com.ljyh.mei.ui.glass.NavigationInnerShadowRenderer, com.kyant.backdrop.Backdrop, com.ljyh.mei.ui.glass.GlassBottomBarKt$GlassBottomBar$navigationViewConfiguration$1$1, androidx.compose.runtime.State, androidx.compose.runtime.State, kotlin.jvm.functions.Function1, androidx.compose.runtime.State, androidx.compose.runtime.MutableState, androidx.compose.runtime.State, androidx.compose.runtime.State, com.ljyh.mei.ui.glass.GlassTabItem, com.ljyh.mei.ui.glass.StableGlassTabItems, androidx.compose.foundation.layout.BoxWithConstraintsScope, androidx.compose.runtime.Composer, int)
+         1793080332.357 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88929245, downTime=88929089, phoneEventTime=1793080332343 } moveCount:5
+         1793080332.501 31533  9442 D AudioTrackImpl: [audioTrackData][fine] 5s(f:5999 m:0 s:0 k:0 z:0) : pid 31533 uid 10150 sessionId 4105 sr 44100 ch 2 fmt 1 maxAmplitude 5869
+         1793080332.502 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000000859138
+         1793080332.502 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000000859138
+         1793080332.502 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000859138 timediff: 1000
+         1793080332.503 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000882358 timediff: 1
+         1793080332.504 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000905578 timediff: 1
+         1793080332.741 31533  9404 I SkJpegCodec: [mId: 37] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080332.741 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080332.741 31533  9404 I SkJpegCodec: [mId: 37] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080332.741 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080332.741 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080332.742 31533  9404 I SkJpegCodec: [mId: 37] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080332.742 31533  9404 I SkJpegCodec: [mId: 37] skia-debug onGetGainmapInfo returns false
+         1793080332.856 31533  9404 I SkJpegCodec: [mId: 38] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080332.856 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080332.856 31533  9404 I SkJpegCodec: [mId: 38] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080332.856 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080332.856 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080332.857 31533  9404 I SkJpegCodec: [mId: 38] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080332.857 31533  9404 I SkJpegCodec: [mId: 38] skia-debug onGetGainmapInfo returns false
+         1793080333.104 31533  9404 I SkJpegCodec: [mId: 39] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080333.105 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080333.105 31533  9404 I SkJpegCodec: [mId: 39] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080333.105 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080333.105 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080333.105 31533  9404 I SkJpegCodec: [mId: 39] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080333.105 31533  9404 I SkJpegCodec: [mId: 39] skia-debug onGetGainmapInfo returns false
+         1793080333.503 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000000952018
+         1793080333.503 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000000952018
+         1793080333.503 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000000952018 timediff: 999
+         1793080333.504 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000975238 timediff: 1
+         1793080333.505 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000998458 timediff: 1
+         1793080333.575 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88930474, downTime=88930474, phoneEventTime=1793080333572 } moveCount:0
+         1793080333.575 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080333.728 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88930597, downTime=88930474, phoneEventTime=1793080333695 } moveCount:5
+         1793080334.506 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 167ms for 6 inputs by pts: 1000001091337
+         1793080334.506 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001091337
+         1793080334.506 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001091337 timediff: 999
+         1793080334.507 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001114557 timediff: 1
+         1793080334.507 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001137777 timediff: 0
+         1793080334.605 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88931504, downTime=88931504, phoneEventTime=1793080334602 } moveCount:0
+         1793080334.605 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080334.720 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88931602, downTime=88931504, phoneEventTime=1793080334700 } moveCount:4
+         1793080335.239 31533  9404 I SkJpegCodec: [mId: 40] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080335.239 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080335.239 31533  9404 I SkJpegCodec: [mId: 40] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080335.239 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080335.239 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080335.240 31533  9404 I SkJpegCodec: [mId: 40] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080335.240 31533  9404 I SkJpegCodec: [mId: 40] skia-debug onGetGainmapInfo returns false
+         1793080335.403 31533  9496 I SkJpegCodec: [mId: 41] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080335.403 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080335.403 31533  9496 I SkJpegCodec: [mId: 41] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080335.403 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080335.404 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080335.405 31533  9496 I SkJpegCodec: [mId: 41] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080335.405 31533  9496 I SkJpegCodec: [mId: 41] skia-debug onGetGainmapInfo returns false
+         1793080335.505 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000001184217
+         1793080335.505 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 997ms before pts: 1000001184217
+         1793080335.505 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001184217 timediff: 997
+         1793080335.506 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001207437 timediff: 1
+         1793080335.506 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001230657 timediff: 0
+         1793080335.598 31533  9343 I ease.cloudmusic: This is non sticky GC, maxfree is 8388608 minfree is 524288
+         1793080336.316 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88933204, downTime=88933204, phoneEventTime=1793080336302 } moveCount:0
+         1793080336.317 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080336.504 31533  9442 D AudioTrackImpl: [audioTrackData][fine] 10s(f:10002 m:0 s:0 k:0 z:0) : pid 31533 uid 10150 sessionId 4105 sr 44100 ch 2 fmt 1 maxAmplitude 15174
+         1793080336.505 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] state STARTED mFlags 19456 Stats 5005ms:Client:com.neoruaa.meilox,Component:c2.android.aac.decoder,Qin:22,DQin:0/0,Render:0,Drop:22,DQout:0/0
+         1793080336.506 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 249ms for 4 inputs by pts: 1000001277097
+         1793080336.506 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001277097
+         1793080336.506 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001277097 timediff: 999
+         1793080336.506 31533  9522 D BufferPoolAccessor2.0: bufferpool2 0xb40000786e534b98 : 5(40960 size) total buffers - 4(32768 size) used buffers - 54/59 (recycle/alloc) - 11/56 (fetch/transfer)
+         1793080336.507 31533 31533 I MiInputConsumer: optimized resample latency: 17239955 ns
+         1793080336.507 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001300317 timediff: 1
+         1793080336.507 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001323537 timediff: 0
+         1793080336.510 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88933403, downTime=88933204, phoneEventTime=1793080336501 } moveCount:7
+         1793080337.409 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88934308, downTime=88934308, phoneEventTime=1793080337406 } moveCount:0
+         1793080337.409 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080337.508 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 167ms for 6 inputs by pts: 1000001416417
+         1793080337.508 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 998ms before pts: 1000001416417
+         1793080337.508 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001416417 timediff: 998
+         1793080337.509 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001439637 timediff: 1
+         1793080337.509 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001462857 timediff: 0
+         1793080337.510 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080337.510 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080337.626 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88934486, downTime=88934308, phoneEventTime=1793080337584 } moveCount:9
+         1793080338.447 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88935346, downTime=88935346, phoneEventTime=1793080338444 } moveCount:0
+         1793080338.447 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080338.509 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000001509297
+         1793080338.509 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001509297
+         1793080338.509 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001509297 timediff: 999
+         1793080338.510 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001532517 timediff: 1
+         1793080338.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001555736 timediff: 1
+         1793080338.657 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88935543, downTime=88935346, phoneEventTime=1793080338641 } moveCount:9
+         1793080339.345 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88936244, downTime=88936244, phoneEventTime=1793080339342 } moveCount:0
+         1793080339.345 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080339.469 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88936369, downTime=88936244, phoneEventTime=1793080339467 } moveCount:9
+         1793080339.510 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 200ms for 5 inputs by pts: 1000001625396
+         1793080339.510 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 998ms before pts: 1000001625396
+         1793080339.510 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001625396 timediff: 998
+         1793080339.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001648616 timediff: 1
+         1793080339.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001671836 timediff: 0
+         1793080339.512 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080339.812 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88936711, downTime=88936711, phoneEventTime=1793080339809 } moveCount:0
+         1793080339.813 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080339.922 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88936820, downTime=88936711, phoneEventTime=1793080339918 } moveCount:5
+         1793080340.470 31533  9404 I SkJpegCodec: [mId: 42] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080340.470 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080340.470 31533  9404 I SkJpegCodec: [mId: 42] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080340.470 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080340.471 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080340.471 31533  9404 I SkJpegCodec: [mId: 42] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080340.471 31533  9404 I SkJpegCodec: [mId: 42] skia-debug onGetGainmapInfo returns false
+         1793080340.510 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 249ms for 4 inputs by pts: 1000001718276
+         1793080340.510 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001718276
+         1793080340.510 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001718276 timediff: 999
+         1793080340.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001741496 timediff: 1
+         1793080340.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001764716 timediff: 0
+         1793080340.518 31533  9404 I SkJpegCodec: [mId: 43] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080340.518 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080340.518 31533  9404 I SkJpegCodec: [mId: 43] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080340.518 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080340.518 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080340.518 31533  9404 I SkJpegCodec: [mId: 43] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080340.519 31533  9404 I SkJpegCodec: [mId: 43] skia-debug onGetGainmapInfo returns false
+         1793080340.698 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88937597, downTime=88937597, phoneEventTime=1793080340695 } moveCount:0
+         1793080340.698 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080340.712 31533  9404 I SkJpegCodec: [mId: 44] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080340.712 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080340.712 31533  9404 I SkJpegCodec: [mId: 44] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080340.712 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080340.712 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080340.713 31533  9404 I SkJpegCodec: [mId: 44] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080340.713 31533  9404 I SkJpegCodec: [mId: 44] skia-debug onGetGainmapInfo returns false
+         1793080340.804 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88937696, downTime=88937597, phoneEventTime=1793080340794 } moveCount:5
+         1793080341.509 31533  9442 D AudioTrackImpl: [audioTrackData][fine] 15s(f:15007 m:0 s:0 k:0 z:0) : pid 31533 uid 10150 sessionId 4105 sr 44100 ch 2 fmt 1 maxAmplitude 20830
+         1793080341.510 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] state STARTED mFlags 19456 Stats 5005ms:Client:com.neoruaa.meilox,Component:c2.android.aac.decoder,Qin:23,DQin:0/0,Render:0,Drop:23,DQout:0/0
+         1793080341.511 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000001811156
+         1793080341.511 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001811156
+         1793080341.511 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001811156 timediff: 999
+         1793080341.512 31533  9522 D BufferPoolAccessor2.0: bufferpool2 0xb40000786e534b98 : 5(40960 size) total buffers - 4(32768 size) used buffers - 77/82 (recycle/alloc) - 13/79 (fetch/transfer)
+         1793080341.512 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001834376 timediff: 1
+         1793080341.513 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001857596 timediff: 1
+         1793080341.513 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080341.513 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080341.514 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080341.578 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88938479, downTime=88938479, phoneEventTime=1793080341577 } moveCount:0
+         1793080341.578 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080341.746 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88938622, downTime=88938479, phoneEventTime=1793080341720 } moveCount:8
+         1793080342.513 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 200ms for 5 inputs by pts: 1000001927256
+         1793080342.513 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000001927256
+         1793080342.513 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001927256 timediff: 999
+         1793080342.513 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001950476 timediff: 0
+         1793080342.514 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000001973696 timediff: 0
+         1793080342.648 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88939548, downTime=88939548, phoneEventTime=1793080342646 } moveCount:0
+         1793080342.648 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080342.804 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88939677, downTime=88939548, phoneEventTime=1793080342775 } moveCount:7
+         1793080343.465 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88940357, downTime=88940357, phoneEventTime=1793080343455 } moveCount:0
+         1793080343.466 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080343.513 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 249ms for 4 inputs by pts: 1000002020136
+         1793080343.513 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000002020136
+         1793080343.513 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002020136 timediff: 999
+         1793080343.514 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002043356 timediff: 1
+         1793080343.514 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002066575 timediff: 0
+         1793080343.514 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080343.514 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080343.613 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88940501, downTime=88940357, phoneEventTime=1793080343599 } moveCount:6
+         1793080344.514 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000002113015
+         1793080344.514 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000002113015
+         1793080344.514 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002113015 timediff: 1000
+         1793080344.515 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002136235 timediff: 1
+         1793080344.515 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002159455 timediff: 0
+         1793080344.517 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080344.784 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88941679, downTime=88941679, phoneEventTime=1793080344777 } moveCount:0
+         1793080344.784 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080344.938 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88941804, downTime=88941679, phoneEventTime=1793080344902 } moveCount:5
+         1793080345.516 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 167ms for 6 inputs by pts: 1000002252335
+         1793080345.516 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000002252335
+         1793080345.516 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002252335 timediff: 999
+         1793080345.517 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000002275555 timediff: 1
+         1793080345.517 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002298775 timediff: 0
+         1793080345.518 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080345.518 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080345.728 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88942626, downTime=88942626, phoneEventTime=1793080345724 } moveCount:0
+         1793080345.729 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080345.880 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88942765, downTime=88942626, phoneEventTime=1793080345863 } moveCount:7
+         1793080346.368 31533  9374 I libEGL  : shader cache num entries: 271
+         1793080346.474 31533  9496 I SkJpegCodec: [mId: 50] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080346.475 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080346.475 31533  9496 I SkJpegCodec: [mId: 50] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080346.475 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080346.475 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080346.477 31533  9496 I SkJpegCodec: [mId: 50] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080346.477 31533  9496 I SkJpegCodec: [mId: 50] skia-debug onGetGainmapInfo returns false
+         1793080346.488 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88943389, downTime=88943389, phoneEventTime=1793080346487 } moveCount:0
+         1793080346.489 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080346.516 31533  9442 D AudioTrackImpl: [audioTrackData][fine] 20s(f:20014 m:0 s:0 k:0 z:0) : pid 31533 uid 10150 sessionId 4105 sr 44100 ch 2 fmt 1 maxAmplitude 11541
+         1793080346.516 31533  9522 I MediaCodec: [mId: 0] [audio-debug-dec] state STARTED mFlags 19456 Stats 5006ms:Client:com.neoruaa.meilox,Component:c2.android.aac.decoder,Qin:23,DQin:0/0,Render:0,Drop:23,DQout:0/0
+         1793080346.517 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000002345215
+         1793080346.517 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000002345215
+         1793080346.517 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002345215 timediff: 1000
+         1793080346.517 31533  9522 D BufferPoolAccessor2.0: bufferpool2 0xb40000786e534b98 : 5(40960 size) total buffers - 4(32768 size) used buffers - 100/105 (recycle/alloc) - 17/102 (fetch/transfer)
+         1793080346.518 31533  9404 I SkJpegCodec: [mId: 51] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080346.518 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000002368435 timediff: 1
+         1793080346.518 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080346.518 31533  9404 I SkJpegCodec: [mId: 51] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080346.518 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080346.518 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080346.518 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002391655 timediff: 0
+         1793080346.519 31533  9404 I SkJpegCodec: [mId: 51] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080346.519 31533  9404 I SkJpegCodec: [mId: 51] skia-debug onGetGainmapInfo returns false
+         1793080346.531 31533  9404 I SkJpegCodec: [mId: 52] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080346.531 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080346.531 31533  9404 I SkJpegCodec: [mId: 52] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080346.531 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080346.531 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080346.532 31533  9404 I SkJpegCodec: [mId: 52] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080346.532 31533  9404 I SkJpegCodec: [mId: 52] skia-debug onGetGainmapInfo returns false
+         1793080346.601 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88943496, downTime=88943389, phoneEventTime=1793080346594 } moveCount:6
+         1793080347.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 200ms for 5 inputs by pts: 1000002461315
+         1793080347.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 999ms before pts: 1000002461315
+         1793080347.520 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000002461315 timediff: 999
+         1793080347.521 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002484535 timediff: 1
+         1793080347.522 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002507755 timediff: 1
+         1793080347.524 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080348.519 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 200ms for 5 inputs by pts: 1000002577414
+         1793080348.519 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 996ms before pts: 1000002577414
+         1793080348.519 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002577414 timediff: 996
+         1793080348.519 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002600634 timediff: 0
+         1793080348.520 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002623854 timediff: 0
+         1793080348.520 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080349.101 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88946001, downTime=88946001, phoneEventTime=1793080349099 } moveCount:0
+         1793080349.102 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080349.205 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88946097, downTime=88946001, phoneEventTime=1793080349195 } moveCount:4
+         1793080349.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 249ms for 4 inputs by pts: 1000002670294
+         1793080349.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 1000ms before pts: 1000002670294
+         1793080349.520 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002670294 timediff: 1000
+         1793080349.521 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002693514 timediff: 1
+         1793080349.521 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002716734 timediff: 0
+         1793080349.672 31533  9496 I SkJpegCodec: [mId: 53] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080349.672 31533  9496 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080349.672 31533  9496 I SkJpegCodec: [mId: 53] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080349.672 31533  9496 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080349.673 31533  9496 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080349.674 31533  9496 I SkJpegCodec: [mId: 53] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080349.674 31533  9496 I SkJpegCodec: [mId: 53] skia-debug onGetGainmapInfo returns false
+         1793080349.765 31533  9404 I SkJpegCodec: [mId: 54] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080349.765 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080349.766 31533  9404 I SkJpegCodec: [mId: 54] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080349.766 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080349.766 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080349.767 31533  9404 I SkJpegCodec: [mId: 54] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080349.768 31533  9404 I SkJpegCodec: [mId: 54] skia-debug onGetGainmapInfo returns false
+         1793080349.847 31533  9404 I SkJpegCodec: [mId: 55] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080349.847 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080349.848 31533  9404 I SkJpegCodec: [mId: 55] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080349.848 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080349.848 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080349.848 31533  9404 I SkJpegCodec: [mId: 55] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080349.848 31533  9404 I SkJpegCodec: [mId: 55] skia-debug onGetGainmapInfo returns false
+         1793080349.872 31533  9404 I SkJpegCodec: [mId: 56] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080349.872 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080349.873 31533  9404 I SkJpegCodec: [mId: 56] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080349.873 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080349.873 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080349.873 31533  9404 I SkJpegCodec: [mId: 56] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080349.873 31533  9404 I SkJpegCodec: [mId: 56] skia-debug onGetGainmapInfo returns false
+         1793080350.051 31533  9404 I SkJpegCodec: [mId: 57] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080350.052 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080350.052 31533  9404 I SkJpegCodec: [mId: 57] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080350.052 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080350.052 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080350.052 31533  9404 I SkJpegCodec: [mId: 57] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080350.052 31533  9404 I SkJpegCodec: [mId: 57] skia-debug onGetGainmapInfo returns false
+         1793080350.175 31533  9404 I SkJpegCodec: [mId: 58] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080350.175 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080350.175 31533  9404 I SkJpegCodec: [mId: 58] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080350.175 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080350.176 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080350.176 31533  9404 I SkJpegCodec: [mId: 58] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080350.176 31533  9404 I SkJpegCodec: [mId: 58] skia-debug onGetGainmapInfo returns false
+         1793080350.199 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=88947099, downTime=88947099, phoneEventTime=1793080350197 } moveCount:0
+         1793080350.199 31533 31533 D VRI[MainActivity]: getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+         1793080350.284 31533  9404 I SkJpegCodec: [mId: 59] skia-debug SkJpegCodec::+SkJpegCodec
+         1793080350.284 31533  9404 D HWUI    : ImageDecoder_nDecodeBitmap: width = 320, height = 200, encodedFormat = 3
+         1793080350.284 31533  9404 I SkJpegCodec: [mId: 59] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1280, 
+         1793080350.284 31533  9404 I SkJpegCodec: dstInfo: SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 320, Dimensions.height = 200};
+         1793080350.285 31533  9404 W libc    : Access denied finding property "vendor.video.jpegopt.enable"
+         1793080350.285 31533  9404 I SkJpegCodec: [mId: 59] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 200
+         1793080350.285 31533  9404 I SkJpegCodec: [mId: 59] skia-debug onGetGainmapInfo returns false
+         1793080350.296 31533 31533 I MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.neoruaa.meilox/com.ljyh.mei.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=88947190, downTime=88947099, phoneEventTime=1793080350288 } moveCount:4
+         1793080350.380 31533 10091 D libEGL  : Post task 1
+         1793080350.381 31533 10201 D libEGL  : Worker thread start 507515010240
+         1793080350.381 31533 10201 D libEGL  : Run task 1
+         1793080350.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Average input time interval reaches 250ms for 4 inputs by pts: 1000002763174
+         1793080350.520 31533  9442 W MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: Input time interval reaches 998ms before pts: 1000002763174
+         1793080350.520 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000002763174 timediff: 998
+         1793080350.521 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000002786394 timediff: 1
+         1793080350.521 31533  9442 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 0 pts: 1000002809614 timediff: 0
+         1793080350.522 31533  9522 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)
+         1793080350.522 31533  9527 D PipelineWatcher: [0xb4000078fe55e040] pipelineFull: too many frames in pipeline (6)

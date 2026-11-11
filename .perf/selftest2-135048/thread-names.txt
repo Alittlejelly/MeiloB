@@ -1,0 +1,7 @@
+﻿adb.exe : /system/bin/sh: syntax error: unexpected 'do'
+At E:\MeiloX\MeiloX\scripts\glass-capture.ps1:22 char:30
++ function ADB([string]$cmd) { & $Adb @D shell $cmd 2>&1 }
++                              ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (/system/bin/sh:...unexpected 'do':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

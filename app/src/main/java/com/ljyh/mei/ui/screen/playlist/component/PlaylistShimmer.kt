@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import com.ljyh.mei.constants.songListCoverSize
+import com.ljyh.mei.constants.songListCoverCornerRadius
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.kyant.capsule.ContinuousRoundedRectangle
-import com.ljyh.mei.ui.glass.GlassCapsule
+import com.ljyh.mei.ui.component.SharedGlassCapsule
 import com.ljyh.mei.ui.component.shimmer.ButtonPlaceholder
 import com.ljyh.mei.ui.component.shimmer.ShimmerHost
 import com.ljyh.mei.ui.component.shimmer.TextPlaceholder
@@ -82,7 +86,7 @@ private fun MobileShimmerContent(flatDetailStyle: Boolean = false) {
                 modifier = Modifier
                     .height(48.dp)
                     .width(140.dp)
-                    .clip(GlassCapsule),
+                    .clip(SharedGlassCapsule),
                 verticalPadding = 0.dp,
             )
             ButtonPlaceholder(modifier = Modifier.size(48.dp))
@@ -132,7 +136,7 @@ private fun TabletShimmerContent() {
                     modifier = Modifier
                         .height(48.dp)
                         .width(140.dp)
-                        .clip(GlassCapsule),
+                        .clip(SharedGlassCapsule),
                     verticalPadding = 0.dp,
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -170,11 +174,13 @@ private fun TabletShimmerContent() {
  * 单个歌曲行的骨架
  */
 @Composable
-private fun TrackItemShimmer(isTablet: Boolean, flatDetailStyle: Boolean = false) {
+internal fun TrackItemShimmer(isTablet: Boolean, flatDetailStyle: Boolean = false, showArtwork: Boolean = true, showDuration: Boolean = false) {
+    val compactRows = flatDetailStyle && rememberDeviceInfo().isLandscape
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = if (flatDetailStyle) 0.dp else 16.dp),
+            .then(if (flatDetailStyle) Modifier.heightIn(min = if (showArtwork) { 56.dp } else 52.dp) else Modifier)
+            .padding(vertical = if (flatDetailStyle) 4.dp else 10.dp, horizontal = if (flatDetailStyle) 0.dp else 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isTablet) {
@@ -191,12 +197,13 @@ private fun TrackItemShimmer(isTablet: Boolean, flatDetailStyle: Boolean = false
         ) {
             TextPlaceholder(
                 modifier = Modifier
-                    .size(if (isTablet) 40.dp else 50.dp)
-                    .clip(ContinuousRoundedRectangle(8.dp)),
+                    .then(if (!showArtwork) Modifier.size(width = 18.dp, height = 14.dp)
+                        else Modifier.size(if (flatDetailStyle) songListCoverSize(compactRows) else if (isTablet) 40.dp else 50.dp))
+                    .clip(ContinuousRoundedRectangle(if (flatDetailStyle) songListCoverCornerRadius(compactRows) else 8.dp)),
                 verticalPadding = 0.dp,
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(if (flatDetailStyle) 12.dp else 16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 TextPlaceholder(modifier = Modifier
                     .height(16.dp)
@@ -222,7 +229,11 @@ private fun TrackItemShimmer(isTablet: Boolean, flatDetailStyle: Boolean = false
                 .height(14.dp))
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
-        ButtonPlaceholder(modifier = Modifier.size(24.dp))
+        if (showDuration) {
+            TextPlaceholder(Modifier.width(40.dp).height(16.dp), verticalPadding = 0.dp)
+        }
+        Spacer(modifier = Modifier.width(if (flatDetailStyle) 12.dp else 16.dp))
+        ButtonPlaceholder(modifier = Modifier.size(if (flatDetailStyle) 44.dp else 24.dp)
+            .then(if (flatDetailStyle && !compactRows) Modifier.offset(x = 8.dp) else Modifier))
     }
 }

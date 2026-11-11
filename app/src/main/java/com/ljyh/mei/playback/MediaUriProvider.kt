@@ -246,9 +246,6 @@ class MediaUriProvider @Inject constructor(
             cid = video.cid
             video.bvid?.let { biliBvidCache[aid] = it }
         }
-        val bvid = biliBvidCache[aid]
-            ?: biliRepository.resolveBvidByAid(aid)?.also { biliBvidCache[aid] = it }
-            ?: throw SourceNotFoundException("Unable to resolve Bilibili bvid for $mediaId")
         val now = System.currentTimeMillis()
         urlCache.values.firstOrNull {
             it.cacheKey.startsWith(playbackCacheKeyPrefix(mediaId)) && it.expiresAtMs > now
@@ -260,6 +257,12 @@ class MediaUriProvider @Inject constructor(
                 }
             }
         }
+        // wbi playurl 必须带 bvid：**只传 aid 时接口会返回 code=0 但 dash 为空**，
+        // 播放器侧只能看到"该视频没有可播放的音频流"，完全不像参数错误。
+        // 这一跳不能省，bvid 按 aid 缓存，正常只有第一次播放会真的发请求。
+        val bvid = biliBvidCache[aid]
+            ?: biliRepository.resolveBvidByAid(aid)?.also { biliBvidCache[aid] = it }
+            ?: throw SourceNotFoundException("无法获取视频信息(bvid)：$mediaId")
         val stream = try {
             biliRepository.resolveAudioStream(aid = aid, bvid = bvid, cid = cid)
         } catch (e: CancellationException) {
@@ -272,6 +275,16 @@ class MediaUriProvider @Inject constructor(
             BILI_AUDIO_ID_HIRES -> MusicQuality.HIRES.text
             BILI_AUDIO_ID_EXHIGH -> MusicQuality.EXHIGH.text
             else -> MusicQuality.STANDARD.text
+        }
+        // 播放失败时最需要这些：地址落在哪个 CDN、还剩多久过期、带宽档位是否被降级。
+        // 只有 host/deadline 这种非敏感信息，不含签名串。
+        runCatching {
+            val uri = android.net.Uri.parse(stream.url)
+            Timber.tag("BiliDiag").i(
+                "bili audio aid=%s cid=%s audioId=%s bw=%s host=%s deadline=%s len=%s",
+                aid, cid, stream.audioId, stream.bandwidth, uri.host,
+                uri.getQueryParameter("deadline"), stream.url.length,
+            )
         }
         val identity = "bili-$aid-$cid-${stream.audioId}"
         val cacheEntry = CachedUrl(

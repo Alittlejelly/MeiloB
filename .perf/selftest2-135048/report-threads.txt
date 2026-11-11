@@ -1,0 +1,12 @@
+﻿Cmdline: /system/bin/simpleperf record -p 18643 --duration 4 -f 1000 -e cpu-clock --call-graph fp -o cap-selftest2.data
+Arch: arm64
+Event: cpu-clock (type 1, config 0)
+Samples: 258
+Event count: 258000000
+
+Overhead  Sample  Tid
+78.29%    202     18643
+16.28%    42      5460
+4.65%     12      5610
+0.39%     1       5426
+0.39%     1       5488

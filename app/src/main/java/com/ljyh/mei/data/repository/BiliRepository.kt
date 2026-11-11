@@ -87,6 +87,9 @@ class BiliRepository @Inject constructor(
 ) {
     val accountFlow: Flow<BiliAccount?> = cookieStore.accountFlow
 
+    /** 同步取内存里的账号快照，用作 ViewModel 状态初值，避免切页闪"未登录"。 */
+    fun cachedAccount(): BiliAccount? = cookieStore.cachedAccount()
+
     suspend fun account(): BiliAccount? = cookieStore.account()
 
     suspend fun isLoggedIn(): Boolean = cookieStore.snapshot().isLoggedIn
@@ -340,9 +343,32 @@ class BiliRepository @Inject constructor(
 
     // ---- 收藏夹 ----
 
-    suspend fun favFolders(mid: Long): Resource<List<BiliFavFolder>> = withContext(Dispatchers.IO) {
-        runCatching { ensureSession() }
-        safeApiCall { api.favFolders(upMid = mid) }.let { result ->
+    /**
+     * 收藏夹列表的短 TTL 缓存。
+     *
+     * 每个页面有独立的 ViewModelStore，切一次媒体库就会重建 ViewModel 并重新拉取，
+     * 用户能明显感觉到"每次都要等一下"。这里缓存 60s，下拉刷新用 `force` 绕过。
+     */
+    private class FavListCache<T>(val at: Long, val items: List<T>)
+
+    private var createdListCache: FavListCache<BiliFavFolder>? = null
+    private var collectedListCache: FavListCache<BiliFavFolder>? = null
+
+    private fun <T> FavListCache<T>?.fresh(): List<T>? =
+        this?.takeIf { System.currentTimeMillis() - it.at < FAV_LIST_CACHE_TTL_MS }?.items
+
+    suspend fun favFolders(mid: Long, force: Boolean = false): Resource<List<BiliFavFolder>> =
+        withContext(Dispatchers.IO) {
+            if (!force) createdListCache.fresh()?.let { return@withContext Resource.Success(it) }
+            runCatching { ensureSession() }
+            // 收藏夹为空时最需要知道"这次请求到底带没带登录态"：失效的 SESSDATA 会被
+            // B 站当匿名，只返回公开夹，code 仍是 0，前端看起来就是"没有收藏"。
+            val session = cookieStore.snapshot()
+            Timber.tag("BiliDiag").i(
+                "favFolders req mid=%s loggedIn=%s sessLen=%s jct=%s",
+                mid, session.isLoggedIn, session.sessdata.length, session.biliJct.isNotBlank(),
+            )
+            safeApiCall { api.favFolders(upMid = mid) }.let { result ->
             when (result) {
                 is Resource.Success -> {
                     if (result.data?.code != 0) {
@@ -360,17 +386,17 @@ class BiliRepository @Inject constructor(
                         mid, list.size,
                         list.take(3).map { "${it.id}:attr=${it.attr}" },
                     )
-                    Resource.Success(
-                        list.map {
-                            BiliFavFolder(
-                                id = it.id,
-                                title = it.title.orEmpty(),
-                                mediaCount = it.mediaCount,
-                                // attr bit0 = 1 表示私有收藏夹。
-                                isPublic = it.attr and 1 == 0,
-                            )
-                        }
-                    )
+                    val folders = list.map {
+                        BiliFavFolder(
+                            id = it.id,
+                            title = it.title.orEmpty(),
+                            mediaCount = it.mediaCount,
+                            // attr bit0 = 1 表示私有收藏夹。
+                            isPublic = it.attr and 1 == 0,
+                        )
+                    }
+                    createdListCache = FavListCache(System.currentTimeMillis(), folders)
+                    Resource.Success(folders)
                 }
                 is Resource.Error -> {
                     Timber.tag("BiliDiag").w("favFolders http error mid=%s msg=%s", mid, result.message)
@@ -423,8 +449,9 @@ class BiliRepository @Inject constructor(
         }
 
     /** 收藏的合集 / 收藏的文件夹列表。 */
-    suspend fun favCollectedFolders(mid: Long, pn: Int = 1): Resource<List<BiliFavFolder>> =
+    suspend fun favCollectedFolders(mid: Long, pn: Int = 1, force: Boolean = false): Resource<List<BiliFavFolder>> =
         withContext(Dispatchers.IO) {
+            if (!force) collectedListCache.fresh()?.let { return@withContext Resource.Success(it) }
             runCatching { ensureSession() }
             safeApiCall { api.favFolderCollected(upMid = mid, pn = pn) }.let { result ->
                 when (result) {
@@ -434,11 +461,11 @@ class BiliRepository @Inject constructor(
                                 result.data?.message ?: "收藏合集加载失败(${result.data?.code})"
                             )
                         }
-                        Resource.Success(
-                            result.data?.data?.list.orEmpty().map {
-                                BiliFavFolder(id = it.id, title = it.title.orEmpty(), mediaCount = it.mediaCount)
-                            }
-                        )
+                        val folders = result.data?.data?.list.orEmpty().map {
+                            BiliFavFolder(id = it.id, title = it.title.orEmpty(), mediaCount = it.mediaCount)
+                        }
+                        collectedListCache = FavListCache(System.currentTimeMillis(), folders)
+                        Resource.Success(folders)
                     }
                     is Resource.Error -> Resource.Error(result.message ?: "收藏合集加载失败")
                     Resource.Loading -> Resource.Loading
@@ -800,6 +827,9 @@ class BiliRepository @Inject constructor(
 
     private companion object {
         const val WBI_KEY_TTL_MS = 12 * 60 * 60 * 1000L
+
+        /** 收藏夹列表缓存时长：切页/返回时直接复用，下拉刷新强制绕过。 */
+        const val FAV_LIST_CACHE_TTL_MS = 60_000L
         val LOGIN_COOKIE_NAMES = setOf("SESSDATA", "bili_jct", "DedeUserID", "DedeUserID__ckMd5", "sid", "b_nut", "buvid3", "buvid4")
     }
 
@@ -860,8 +890,42 @@ class BiliRepository @Inject constructor(
                 aid = aid.takeIf { it > 0 },
                 cid = cid,
             )
-            check(response.code == 0) { response.message ?: "音频地址获取失败" }
-            val dash = response.data?.dash ?: error("该视频没有可播放的音频流")
+            // 带上 code，否则播放器只会给出 ERROR_CODE_IO_UNSPECIFIED，完全看不出是
+            // -404（cid 不匹配）、-10403（地区限制）还是 -352（风控）。
+            check(response.code == 0) {
+                "音频地址获取失败(${response.code}): ${response.message.orEmpty()}"
+            }
+            val dash = response.data?.dash
+            if (dash == null) {
+                // 有一类稿件 B 站根本不下发 DASH：`code=0`、`dash` 为空、只有 `durl`
+                // （单个渐进式 MP4，音轨混在视频里）。典型是长视频/直播回放。
+                // 这类只能整段串流，取不到纯音频轨，但能播就比报错强。
+                val progressive = response.data?.durl?.firstOrNull { !it.url.isNullOrBlank() }
+                if (progressive?.url != null) {
+                    val seconds = progressive.length / 1000.0
+                    val bandwidth = if (seconds > 0 && progressive.size > 0) {
+                        (progressive.size * 8 / seconds).toLong()
+                    } else 0L
+                    Timber.tag("BiliDiag").i(
+                        "playurl durl fallback: aid=%s cid=%s q=%s len=%sms size=%s",
+                        aid, cid, response.data?.quality, progressive.length, progressive.size,
+                    )
+                    return@withContext BiliAudioStream(
+                        url = progressive.url,
+                        audioId = BILI_AUDIO_ID_STANDARD,
+                        // 混流 MP4：音频轨在 video/mp4 容器里，交给 Mp4Extractor 解出音轨。
+                        mimeType = "video/mp4",
+                        codecs = null,
+                        bandwidth = bandwidth,
+                    )
+                }
+                Timber.tag("BiliDiag").w(
+                    "playurl no dash: code=%s msg=%s hasData=%s durl=%s bvid=%s aid=%s cid=%s",
+                    response.code, response.message, response.data != null,
+                    response.data?.durl?.size ?: 0, bvid, aid, cid,
+                )
+                error("该视频没有可播放的音频流(code=${response.code})")
+            }
             val candidates = buildList {
                 dash.audio?.let { addAll(it) }
                 dash.flac?.let { add(it) }
@@ -869,7 +933,7 @@ class BiliRepository @Inject constructor(
             // 杜比流（30250/30251）为 EC-3，部分设备无法解码：有其他选择时优先跳过。
             val decodable = candidates.filter { it.id !in setOf(30250, 30251) }
             val stream = (decodable.ifEmpty { candidates }).maxByOrNull { it.id }
-                ?: error("该视频没有可播放的音频流")
+                ?: error("该视频没有可播放的音频流(audio=${candidates.size})")
             val audioId = when {
                 stream.id == BILI_AUDIO_ID_HIRES -> BILI_AUDIO_ID_HIRES
                 stream.id > BILI_AUDIO_ID_EXHIGH -> BILI_AUDIO_ID_EXHIGH

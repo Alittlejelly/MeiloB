@@ -24,8 +24,8 @@ import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
 import coil3.toBitmap
-import com.kyant.backdrop.backdrops.LayerBackdrop
-import com.kyant.backdrop.backdrops.layerBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.LayerBackdrop
+import io.github.neoruaa.glasmio.glass.render.backdrops.layerBackdrop
 import com.ljyh.mei.constants.MeshFlowSpeedKey
 import com.ljyh.mei.constants.MeshLowFreqVolumeKey
 import com.ljyh.mei.constants.MeshPlayingKey
@@ -41,7 +41,7 @@ import com.ljyh.mei.ui.component.player.component.mesh.runMeshFrames
 import com.ljyh.mei.ui.component.sheet.LocalPlayerSheet
 import com.ljyh.mei.ui.component.sheet.playerBackgroundAlpha
 import com.ljyh.mei.ui.component.utils.LifecycleStartedEffect
-import com.ljyh.mei.ui.glass.trackBackdropPosition
+import io.github.neoruaa.glasmio.glass.trackBackdropPosition
 import com.ljyh.mei.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -166,7 +166,7 @@ fun FluidBackground(
                 // The mesh renderer already flattens album crossfades into one texture.
                 compositingStrategy = CompositingStrategy.ModulateAlpha
                 this.alpha = alpha.coerceIn(0f, 1f) *
-                    (sheet?.state?.progress?.let(::playerBackgroundAlpha) ?: 1f)
+                    (sheet?.motionProgress?.let(::playerBackgroundAlpha) ?: 1f)
             },
     ) {
         Box(

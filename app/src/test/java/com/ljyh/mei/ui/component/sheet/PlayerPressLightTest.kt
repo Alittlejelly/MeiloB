@@ -3,7 +3,7 @@ package com.ljyh.mei.ui.component.sheet
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import com.ljyh.mei.ui.glass.GlassPressHighlight
+import io.github.neoruaa.glasmio.glass.GlassPressHighlight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
@@ -12,6 +12,40 @@ import org.junit.Test
 
 class PlayerPressLightTest {
     private val pressed = GlassPressHighlight(0.8f, Offset(0.25f, 0.7f))
+
+    @Test fun combinedGlowPolynomialPreservesOriginalField() {
+        val points = floatArrayOf(.0198550718f, .1016667613f, .2372337950f, .4082826788f,
+            .5917173212f, .7627662050f, .8983332387f, .9801449282f)
+        val weights = floatArrayOf(.0506142681f, .1111905172f, .1568533229f, .1813418917f,
+            .1813418917f, .1568533229f, .1111905172f, .0506142681f)
+        val bessel = floatArrayOf(1f, 1f, .25f, .02777777778f, .001736111111f,
+            .00006944444444f, 1.929012346e-6f, 3.936759889e-8f, 6.151187327e-10f)
+        var maxError = 0f
+        var tail = 0f
+        for (sample in 0..100000) {
+            val x = sample * (5f / 100000f)
+            var reference = 0f
+            for (i in points.indices) {
+                val t = points[i]
+                val q = x * x * t * t * .25f
+                var value = bessel.last()
+                for (k in bessel.lastIndex - 1 downTo 0) value = value * q + bessel[k]
+                reference += weights[i] * t * kotlin.math.exp(-.5f * t * t) * value
+            }
+            val envelope = kotlin.math.exp(-.5f * x * x)
+            reference *= envelope
+            val c = PlayerPressGlowCoefficients
+            var combined = c.last()
+            for (k in c.lastIndex - 1 downTo 0) combined = combined * (x * x) + c[k]
+            combined *= envelope
+            val error = kotlin.math.abs(combined - reference)
+            maxError = maxOf(maxError, error)
+            assertTrue(error <= maxOf(0.0000000298023224f, reference / 4096f))
+            if (sample == 100000) tail = combined
+        }
+        assertTrue("Maximum field error: $maxError", maxError <= 0.0000002f)
+        assertTrue(tail > 0f)
+    }
 
     @Test fun heldPointerMovesIndependentlyOfTheFrozenMiniPlayerGeometry() = runBlocking {
         val light = PlayerPressLight(this)
@@ -66,6 +100,30 @@ class PlayerPressLightTest {
         light.capture(pressed)
         assertEquals(pressed, light.current(0f))
         assertTrue(light.hasCapture)
+    }
+
+    @Test fun takeoverPreservesTheActualGlowIndependentlyOfPressDeformation() = runBlocking {
+        val clock = BroadcastFrameClock()
+        val light = PlayerPressLight(CoroutineScope(coroutineContext + clock))
+        try {
+            val captured = pressed.copy(progress = 0.35f, glowProgress = 0.9f, dissipationProgress = 0.2f)
+            light.capture(captured)
+            assertEquals(captured, light.current(0f))
+            val held = light.current(0.4f)
+            assertEquals(captured.glowProgress * playerPressHighlightAlpha(0.4f), held.glowProgress, 0f)
+            assertEquals(captured.copy(progress = 0f, glowProgress = 0f),
+                light.current(PlayerBackgroundHandoffEnd))
+            light.release(0.4f)
+            assertEquals(held, light.current(0f))
+            repeat(4) { yield(); clock.sendFrame(it * 16_666_667L); yield() }
+            val released = light.current(0f)
+            assertTrue(released.progress < held.progress)
+            assertTrue(released.glowProgress < held.glowProgress)
+            assertEquals(captured.glowProgress / captured.progress,
+                released.glowProgress / released.progress, 0.0001f)
+            assertEquals(captured.dissipationProgress, released.dissipationProgress, 0f)
+            assertEquals(released, light.current(1f))
+        } finally { light.clear() }
     }
 
     @Test fun heldDragFadesUntilTheBackgroundOwnsTheSurface() = runBlocking {

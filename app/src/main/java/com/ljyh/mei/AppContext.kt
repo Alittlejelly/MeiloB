@@ -59,7 +59,9 @@ class AppContext : Application(), SingletonImageLoader.Factory {
             .crossfade(true)
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(this, 0.1)
+                    // 10% 对封面密集的网格页偏小，滚动时容易反复解码同一批图；
+                    // 提到 20%（Coil 官方默认量级）后命中率明显更好，内存仍在可控范围。
+                    .maxSizePercent(this, 0.2)
                     .build()
             }
             .diskCache {

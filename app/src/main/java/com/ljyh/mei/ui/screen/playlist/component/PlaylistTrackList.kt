@@ -1,5 +1,6 @@
 package com.ljyh.mei.ui.screen.playlist.component
 
+import com.kyant.capsule.ContinuousRoundedRectangle
 import androidx.compose.ui.geometry.Rect
 
 import androidx.compose.foundation.background
@@ -30,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
@@ -40,8 +40,8 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.ljyh.mei.constants.PlaylistTrackTableHeaderKey
 import com.ljyh.mei.data.model.MediaMetadata
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.LocalGroupedListBackgroundAlpha
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.core.LocalGroupedListBackgroundAlpha
 import com.ljyh.mei.ui.component.item.Track
 import com.ljyh.mei.utils.rememberPreference
 
@@ -57,7 +57,8 @@ fun PlaylistTrackList(
     onTrackDownload: ((MediaMetadata) -> Unit)? = null,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    emptyMessage: String? = null
+    emptyMessage: String? = null,
+    flatDetailStyle: Boolean = false,
 ) {
 
     val playlistTrackTableHeader by rememberPreference(PlaylistTrackTableHeaderKey,  false)
@@ -80,6 +81,17 @@ fun PlaylistTrackList(
             }
             // 如果是平板，可以在这里加一个 StickyHeader 作为“表头”
 
+            if (flatDetailStyle) {
+                playlistTrackItems(
+                    pagingItems = pagingItems, staticTracks = staticTracks,
+                    isTablet = false, showTableHeader = false,
+                    onTrackClick = onTrackClick, onMoreClick = onMoreClick,
+                    emptyMessage = emptyMessage, flatDetailStyle = true,
+                    showLeadingDivider = headerContent == null,
+                )
+                return@LazyColumn
+            }
+
             if (pagingItems != null) {
                 items(
                     count = pagingItems.itemCount,
@@ -88,12 +100,22 @@ fun PlaylistTrackList(
                 ) { index ->
                     val track = pagingItems[index]
                     if (track != null) {
-                        Track(
+                        if (flatDetailStyle) DetailTrackRow(
+                            track = track,
+                            trackNumber = index + 1,
+                            showArtwork = true,
+                            isCurrentTrack = false,
+                            isPlaying = false,
+                            isFavorite = false,
+                            onClick = { onTrackClick(track, index) },
+                            selected = null,
+                            onMoreClick = { onMoreClick(track, it) },
+                        ) else Track(
                             track = track,
                             index = index,
                             isTablet = isTablet,
                             onClick = { onTrackClick(track, index) },
-                            onMoreClick = { onMoreClick(track, it) }
+                            onMoreClick = { onMoreClick(track, it) },
                         )
                     }
                 }
@@ -152,12 +174,22 @@ fun PlaylistTrackList(
                     }
                 }
                 itemsIndexed(staticTracks, key = { _, item -> item.id }) { index, track ->
-                    Track(
+                    if (flatDetailStyle) DetailTrackRow(
+                        track = track,
+                        trackNumber = index + 1,
+                        showArtwork = true,
+                        isCurrentTrack = false,
+                        isPlaying = false,
+                        isFavorite = false,
+                        onClick = { onTrackClick(track, index) },
+                        selected = null,
+                        onMoreClick = { onMoreClick(track, it) },
+                    ) else Track(
                         track = track,
                         index = index,
                         isTablet = isTablet,
                         onClick = { onTrackClick(track, index) },
-                        onMoreClick = { onMoreClick(track, it) }
+                        onMoreClick = { onMoreClick(track, it) },
                     )
                 }
             }
@@ -183,10 +215,12 @@ fun LazyListScope.playlistTrackItems(
     selectedTrackIds: Set<String> = emptySet(),
     flatDetailStyle: Boolean = false,
     showArtwork: Boolean = true,
+    showDuration: Boolean = false,
     currentTrackId: String? = null,
     trackNumbers: Map<Long, Int> = emptyMap(),
     isPlaying: Boolean = false,
     favoriteTrackIds: Set<String> = emptySet(),
+    showLeadingDivider: Boolean = true,
 ) {
     val itemCount = pagingItems?.itemCount ?: staticTracks.size
     val showsTableHeader = isTablet && showTableHeader && !flatDetailStyle
@@ -215,7 +249,7 @@ fun LazyListScope.playlistTrackItems(
             val track = pagingItems[index]
             if (track != null) {
                 PlaylistSurface(
-                    isFirst = index == 0 && !showsTableHeader,
+                    isFirst = index == 0 && !showsTableHeader && (!flatDetailStyle || showLeadingDivider),
                     isLast = index == itemCount - 1 && !hasAppendFooter,
                     flatDetailStyle = flatDetailStyle,
                 ) {
@@ -224,6 +258,7 @@ fun LazyListScope.playlistTrackItems(
                             track = track,
                             trackNumber = trackNumbers[track.id] ?: index + 1,
                             showArtwork = showArtwork,
+                            showDuration = showDuration,
                             isCurrentTrack = track.id.toString() == currentTrackId,
                             isPlaying = isPlaying,
                             isFavorite = !track.isLocal && !track.isPodcast && track.id > 0 &&
@@ -284,7 +319,7 @@ fun LazyListScope.playlistTrackItems(
     } else {
         itemsIndexed(staticTracks, key = { _, item -> item.id }) { index, track ->
             PlaylistSurface(
-                isFirst = index == 0,
+                isFirst = index == 0 && (!flatDetailStyle || showLeadingDivider),
                 isLast = index == staticTracks.lastIndex,
                 flatDetailStyle = flatDetailStyle,
             ) {
@@ -293,6 +328,7 @@ fun LazyListScope.playlistTrackItems(
                         track = track,
                         trackNumber = trackNumbers[track.id] ?: index + 1,
                         showArtwork = showArtwork,
+                        showDuration = showDuration,
                         isCurrentTrack = track.id.toString() == currentTrackId,
                         isPlaying = isPlaying,
                         isFavorite = !track.isLocal && !track.isPodcast && track.id > 0 &&
@@ -366,7 +402,7 @@ internal fun PlaylistSurface(
     }
     val colors = LocalGlassColors.current
     val backgroundAlpha = LocalGroupedListBackgroundAlpha.current.coerceIn(0f, 1f)
-    val shape = RoundedCornerShape(
+    val shape = ContinuousRoundedRectangle(
         topStart = if (isFirst) 26.dp else 0.dp,
         topEnd = if (isFirst) 26.dp else 0.dp,
         bottomStart = if (isLast) 26.dp else 0.dp,

@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
-import com.ljyh.mei.ui.glass.IosAlertButtonRole
-import com.ljyh.mei.ui.glass.IosAlertButtonSpec
-import com.ljyh.mei.ui.glass.IosAlertDialog
+import io.github.neoruaa.glasmio.ui.GlasmioAlertButtonRole
+import io.github.neoruaa.glasmio.ui.GlasmioAlertButtonSpec
+import io.github.neoruaa.glasmio.ui.GlasmioAlertDialog
 
 
 @Composable
@@ -54,7 +54,7 @@ fun ConfirmationDialog(
     openDialog: MutableState<Boolean>
 ) {
     if (openDialog.value) {
-        IosAlertDialog(
+        GlasmioAlertDialog(
             onDismissRequest = {
                 openDialog.value = false
                 onDismiss()
@@ -62,15 +62,15 @@ fun ConfirmationDialog(
             title = title,
             message = text,
             buttons = listOf(
-                IosAlertButtonSpec(
+                GlasmioAlertButtonSpec(
                     label = stringResource(android.R.string.cancel),
-                    role = IosAlertButtonRole.Cancel,
+                    role = GlasmioAlertButtonRole.Cancel,
                     onClick = {
                         openDialog.value = false
                         onDismiss()
                     },
                 ),
-                IosAlertButtonSpec(
+                GlasmioAlertButtonSpec(
                     label = stringResource(android.R.string.ok),
                     onClick = {
                         openDialog.value = false

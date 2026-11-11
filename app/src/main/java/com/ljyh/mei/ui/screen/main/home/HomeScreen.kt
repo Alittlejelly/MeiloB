@@ -4,15 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,19 +19,15 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,27 +38,30 @@ import com.ljyh.mei.data.model.bili.BiliVideo
 import com.ljyh.mei.data.model.bili.toMediaItem
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.playback.queue.ListQueue
-import com.ljyh.mei.ui.component.BiliCover
-import com.ljyh.mei.ui.component.GlobalProfileAvatarButton
-import com.ljyh.mei.ui.glass.IosPinnedPage
-import com.ljyh.mei.ui.glass.IosTypography
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.local.LocalNavController
+import com.ljyh.mei.ui.component.globalProfileHeaderAction
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalPlayerConnection
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
+import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
+import com.ljyh.mei.ui.screen.account.biliVideoGridItems
 
 /**
- * 首页：B 站音乐区投稿流，单列纵向列表 + 下拉刷新。
+ * 首页：B 站音乐区投稿流。竖屏手机单列，平板/横屏按宽度分列成网格（与收藏夹一致），
+ * 外加大标题折叠、顶部渐进模糊与下拉刷新。
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val navController = LocalNavController.current
+    // 列表状态交给 MeiloXPinnedListPage：它内部注册导航视口、算大标题折叠与顶部模糊，
+    // 与收藏、搜索结果等页面用的是同一套页面骨架。
     val listState = rememberLazyListState()
     val playerConnection = LocalPlayerConnection.current
     val scope = rememberCoroutineScope()
@@ -78,13 +73,9 @@ fun HomeScreen(
     val guessLike by viewModel.guessLike.collectAsState()
 
     val systemBarsPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
-    val collapseDistancePx = with(LocalDensity.current) { 56.dp.toPx() }
-    val collapseProgress by remember(listState) {
-        derivedStateOf {
-            if (listState.firstVisibleItemIndex > 0) 1f
-            else (listState.firstVisibleItemScrollOffset / collapseDistancePx).coerceIn(0f, 1f)
-        }
-    }
+    val colors = LocalGlassColors.current
+    val backgroundColor = if (colors.isDark) colors.groupedBackground else Color.White
+    val gridColumns = rememberHomeGridColumns()
 
     fun playVideos(videos: List<BiliVideo>, startIndex: Int) {
         val connection = playerConnection ?: return
@@ -107,106 +98,86 @@ fun HomeScreen(
         listState.scrollToItem(0)
     }
 
-    IosPinnedPage(
+    MeiloXPinnedListPage(
         title = stringResource(R.string.app_tab_home),
+        listState = listState,
         bottomPadding = systemBarsPadding.calculateBottomPadding(),
-        collapseProgress = collapseProgress,
-        backgroundColor = if (LocalGlassColors.current.isDark) LocalGlassColors.current.groupedBackground else Color.White,
-        actions = { GlobalProfileAvatarButton() },
-    ) { pinnedPadding ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refresh() },
-        ) {
-            when (val result = feed) {
-                is Resource.Success -> {
-                    val videos = result.data
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            top = pinnedPadding.calculateTopPadding() - 4.dp,
-                            bottom = pinnedPadding.calculateBottomPadding() + HomeSectionSpacing,
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(HomeSectionSpacing),
-                    ) {
-                        item(key = "ios-large-title", contentType = "title") {
-                            Text(
-                                stringResource(R.string.app_tab_home),
-                                style = IosTypography.largeTitle,
-                                color = LocalGlassColors.current.content,
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                            )
-                        }
-                        if (!guessLike) {
-                            item(key = "region-selector", contentType = "regions") {
-                                RegionSelectorRow(
-                                    regions = viewModel.regions,
-                                    selected = region,
-                                    onSelect = viewModel::selectRegion,
-                                )
-                            }
-                        }
-                        if (videos.isEmpty()) {
-                            item(key = "feed-empty", contentType = "empty") {
-                                Text(
-                                    viewModel.feedEmptyText,
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 48.dp),
-                                )
-                            }
-                        }
-                        itemsIndexed(
-                            items = videos,
-                            key = { _, video -> "bili_${video.aid}_${video.cid}" },
-                            contentType = { _, _ -> "bili-row" },
-                        ) { index, video ->
-                            MusicZoneRow(
-                                video = video,
-                                onClick = { playVideos(videos, index) },
-                            )
-                            if (index == videos.lastIndex) {
-                                LaunchedEffect(video.aid) { viewModel.loadMoreLatest() }
-                            }
-                        }
-                        if (loadingMore) {
-                            item(key = "feed-loading", contentType = "loading") {
-                                Text(
-                                    "加载中…",
-                                    fontSize = 13.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 12.dp),
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
-                        }
+        // 横向留白由页面统一给，行内不再各加 16dp。
+        horizontalContentPadding = 16.dp,
+        largeTitleHorizontalPadding = 12.dp,
+        // 网格行本身就是"一行多格"，再用 24dp 的节间距会显得很散。
+        verticalArrangement = Arrangement.spacedBy(if (gridColumns > 1) 8.dp else HomeSectionSpacing),
+        backgroundColor = backgroundColor,
+        actions = { listOf(globalProfileHeaderAction()) },
+        listWrapper = { content ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.refresh() },
+            ) { content() }
+        },
+    ) {
+        when (val result = feed) {
+            is Resource.Success -> {
+                val videos = result.data
+                if (!guessLike) {
+                    item(key = "region-selector", contentType = "regions") {
+                        RegionSelectorRow(
+                            regions = viewModel.regions,
+                            selected = region,
+                            onSelect = viewModel::selectRegion,
+                        )
                     }
                 }
-
-                is Resource.Error -> {
-                    ErrorRetry(
-                        message = result.message ?: "加载失败",
-                        onRetry = { viewModel.refresh() },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = pinnedPadding.calculateTopPadding()),
-                    )
+                if (videos.isEmpty()) {
+                    item(key = "feed-empty", contentType = "empty") {
+                        Text(
+                            viewModel.feedEmptyText,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                        )
+                    }
                 }
-
-                Resource.Loading -> {
-                    HomeShimmer(
-                        contentPadding = PaddingValues(
-                            top = pinnedPadding.calculateTopPadding(),
-                            bottom = pinnedPadding.calculateBottomPadding() + HomeSectionSpacing,
-                        ),
-                    )
+                // 竖屏单列逐行；平板/横屏按宽度分列成网格，与收藏夹、搜索结果同一套排布。
+                biliVideoGridItems(
+                    videos = videos,
+                    columns = gridColumns,
+                    key = { video -> "bili_${video.aid}_${video.cid}" },
+                    onReachEnd = { viewModel.loadMoreLatest() },
+                    gridCoverWidth = homeGridCoverWidth(gridColumns),
+                    // 页面已统一给 16dp 横向留白，行内不再重复。
+                    rowHorizontalPadding = 0.dp,
+                ) { index, _ -> playVideos(videos, index) }
+                if (loadingMore) {
+                    item(key = "feed-loading", contentType = "loading") {
+                        Text(
+                            "加载中…",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                 }
+            }
+
+            is Resource.Error -> item(key = "feed-error", contentType = "error") {
+                ErrorRetry(
+                    message = result.message ?: "加载失败",
+                    onRetry = { viewModel.refresh() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 56.dp),
+                )
+            }
+
+            Resource.Loading -> item(key = "feed-shimmer", contentType = "loading") {
+                HomeShimmerBlocks()
             }
         }
     }
@@ -232,7 +203,6 @@ private fun RegionSelectorRow(
     }
     LazyRow(
         state = rowState,
-        contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         itemsIndexed(items = regions, key = { _, r -> r.rid }) { _, r ->
@@ -255,56 +225,28 @@ private fun RegionSelectorRow(
     }
 }
 
-/** 分区投稿行（左封面右标题，单列纵向）。 */
+/**
+ * 首页的列数：竖屏手机单列（1），横屏/平板按可用宽度分列。
+ *
+ * 一列约占 200dp，上限 4 列 —— 5 列时每格只剩一百多 dp，封面和两行标题互相挤压，
+ * 观感太密。手机/平板横屏下就是 2–4 列。
+ */
 @Composable
-private fun MusicZoneRow(
-    video: BiliVideo,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        BiliCover(
-            imageUrl = biliThumb(video.cover).orEmpty(),
-            modifier = Modifier
-                .weight(1f)
-                .height(76.dp)
-                .clip(ContinuousRoundedRectangle(10.dp)),
-        )
-        Column(
-            modifier = Modifier.weight(1.9f),
-        ) {
-            Text(
-                video.title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = LocalGlassColors.current.content,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                lineHeight = 18.sp,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                buildString {
-                    append(video.uploader.orEmpty())
-                    if (video.playCount > 0) {
-                        append(" · ")
-                        append(biliCount(video.playCount))
-                        append("播放")
-                    }
-                },
-                fontSize = 12.sp,
-                color = LocalGlassColors.current.content.copy(alpha = 0.55f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+private fun rememberHomeGridColumns(): Int {
+    val device = rememberDeviceInfo()
+    val configuration = LocalConfiguration.current
+    return if (device.isLandscape || device.isTablet) {
+        (configuration.screenWidthDp.dp / 200.dp).toInt().coerceIn(2, 4)
+    } else {
+        1
     }
+}
+
+/** 网格模式下封面宽度随列数收缩，保证每格右侧始终留得下两行标题。 */
+private fun homeGridCoverWidth(columns: Int): Dp = when {
+    columns >= 4 -> 70.dp
+    columns == 3 -> 92.dp
+    else -> 118.dp
 }
 
 @Composable

@@ -59,7 +59,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.repository.BiliQrLoginState
 import com.ljyh.mei.data.repository.BiliRepository
-import com.ljyh.mei.ui.glass.IosPinnedListPage
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -296,7 +296,7 @@ fun BiliLoginScreen(
         }
     }
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = "登录哔哩哔哩",
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),

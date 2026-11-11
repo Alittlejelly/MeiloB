@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.ljyh.mei.BuildConfig
 import com.ljyh.mei.constants.AndroidUserAgent
 import com.ljyh.mei.data.network.QQMusicUApiService
+import com.ljyh.mei.data.network.KugouApiService
 import com.ljyh.mei.data.network.NeteaseSecurityDns
 import com.ljyh.mei.data.network.NETEASE_EXPECTED_SESSION_HEADER
 import com.ljyh.mei.data.network.api.ApiService
@@ -289,6 +290,37 @@ object RetrofitModule {
     @Provides
     fun provideBiliApiService(@Named("biliRetrofit") retrofit: Retrofit): BiliApiService {
         return retrofit.create(BiliApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    @Named("kugouOkHttp")
+    fun provideKugouOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            })
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("kugouRetrofit")
+    fun provideKugouRetrofit(@Named("kugouOkHttp") okHttpClient: OkHttpClient): Retrofit {
+        // 酷狗三个端点分布在不同 host，接口里全部使用绝对 URL，这里只挂一个占位 baseUrl。
+        return Retrofit.Builder()
+            .baseUrl("http://mobilecdn.kugou.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideKugouApiService(@Named("kugouRetrofit") retrofit: Retrofit): KugouApiService {
+        return retrofit.create(KugouApiService::class.java)
     }
 
     private fun determineCryptoMethod(url: String): String {

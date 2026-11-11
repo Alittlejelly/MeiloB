@@ -43,6 +43,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
@@ -126,8 +128,15 @@ class PlaylistRepository(
         val result: Deferred<Resource<BaseResponse>>,
     )
 
-    suspend fun getPlaylistDetail(id: String): Resource<PlaylistDetail> {
+    suspend fun getPlaylistDetail(
+        id: String,
+        expectedSession: String? = null,
+        trackLimit: Int = 5_000,
+    ): Resource<PlaylistDetail> {
         val key = SubscriptionKey(subscriptionAccount(), id)
+        if (expectedSession != null &&
+            (key.account.isBlank() || neteaseSessionFingerprint(key.account) != expectedSession)
+        ) return Resource.Error("NetEase account changed during the playlist request")
         val entry = synchronized(subscriptionLock) {
             subscriptions.getOrPut(key, ::SubscriptionEntry).also { it.readers++ }
         }
@@ -142,7 +151,7 @@ class PlaylistRepository(
                 }
                 val response = withContext(ioDispatcher) {
                     safeApiCall {
-                        apiService.getPlaylistDetail(GetPlaylistDetail(id = id))
+                        apiService.getPlaylistDetail(GetPlaylistDetail(id = id, n = trackLimit.toString()), expectedSession)
                     }
                 }
                 // A read started before a write must not publish its old subscription state.
@@ -161,6 +170,15 @@ class PlaylistRepository(
             }
         }
     }
+
+    suspend fun getPlaylistSongDetails(ids: List<String>, expectedSession: String): List<PlaylistDetail.Playlist.Track> =
+        withContext(ioDispatcher) {
+            requireOrderSession(expectedSession)
+            val response = apiService.getSongDetail(GetSongDetails(ids.joinToString(",")), expectedSession)
+            requireOrderSession(expectedSession)
+            check(response.code == 200) { "Unable to load songs (${response.code})" }
+            response.songs
+        }
 
     private fun removeIdleSubscription(key: SubscriptionKey, entry: SubscriptionEntry) {
         // Keep the revision alive while a reader can still return an older response.
@@ -232,24 +250,40 @@ class PlaylistRepository(
         return operation.await()
     }
 
-    suspend fun getCompletePlaylistTracks(detail: PlaylistDetail): List<MediaMetadata> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getCompletePlaylistTracks(
+        detail: PlaylistDetail,
+        expectedSession: String? = null,
+        retainedTracks: List<MediaMetadata> = emptyList(),
+        onSnapshot: suspend (List<MediaMetadata>) -> Unit = {},
+    ): List<MediaMetadata> {
+        return withContext(ioDispatcher) {
             val playlist = detail.playlist
-            val tracksById = playlist.tracks.associateBy { it.id }.toMutableMap()
-
-            playlist.trackIds
-                .map { it.id }
-                .filterNot(tracksById::containsKey)
-                .chunked(200)
-                .forEach { ids ->
-                    apiService.getSongDetail(GetSongDetails(ids.joinToString(",")))
-                        .songs
-                        .forEach { track -> tracksById[track.id] = track }
+            fun checkSession() {
+                if (expectedSession != null) {
+                    val credential = subscriptionAccount()
+                    check(credential.isNotBlank() && neteaseSessionFingerprint(credential) == expectedSession) {
+                        "NetEase account changed during the playlist request"
+                    }
                 }
-
-            playlist.trackIds
-                .mapNotNull { trackId -> tracksById[trackId.id] }
-                .map { track -> track.toMediaMetadata() }
+            }
+            checkSession()
+            collectPlaylistTracksIncrementally(
+                orderedIds = playlist.trackIds.map { it.id },
+                initialTracks = playlist.tracks.map { it.toMediaMetadata() },
+                retainedTracks = retainedTracks,
+                key = MediaMetadata::id,
+                loadBatch = { ids ->
+                    checkSession()
+                    val response = apiService.getSongDetail(GetSongDetails(ids.joinToString(",")), expectedSession)
+                    checkSession()
+                    check(response.code == 200) { "Unable to load songs (${response.code})" }
+                    response.songs.map { it.toMediaMetadata() }
+                },
+                onSnapshot = { tracks ->
+                    checkSession()
+                    onSnapshot(tracks)
+                },
+            )
         }
     }
 
@@ -352,6 +386,7 @@ class PlaylistRepository(
                     }
                 }
                 if (subscriptionAccount() != account) return@withContext Resource.Error("NetEase account changed during playlist update")
+                _collectionChanges.emit(Unit)
             }
             result
         }
@@ -422,13 +457,18 @@ class PlaylistRepository(
     suspend fun deletePlaylist(
         id: String
     ): Resource<BaseMessageResponse> {
-        return withContext(Dispatchers.IO) {
+        val account = subscriptionAccount()
+        return withContext(ioDispatcher) {
             safeApiCall {
                 apiService.deletePlaylist(
                     DeletePlaylist(
                         ids = "[$id]"
                     )
-                )
+                ).also {
+                    if (it.code == 200 && account.isNotBlank() && subscriptionAccount() == account) {
+                        _collectionChanges.emit(Unit)
+                    }
+                }
             }
         }
     }
@@ -458,4 +498,33 @@ class PlaylistRepository(
     }
 
 
+}
+
+/** Publish immutable ordered snapshots before waiting for the next song-detail batch. */
+internal suspend fun <T> collectPlaylistTracksIncrementally(
+    orderedIds: List<Long>,
+    initialTracks: List<T>,
+    retainedTracks: List<T> = emptyList(),
+    key: (T) -> Long,
+    loadBatch: suspend (List<Long>) -> List<T>,
+    onSnapshot: suspend (List<T>) -> Unit,
+): List<T> {
+    val ids = orderedIds.distinct()
+    // The refreshed ID list is authoritative; fresh details replace retained metadata.
+    val tracksById = (retainedTracks + initialTracks).associateBy(key).toMutableMap()
+    val missingBatches = ids.filterNot(tracksById::containsKey).chunked(200)
+    var snapshot = ids.mapNotNull(tracksById::get)
+    if (snapshot.isNotEmpty() || missingBatches.isEmpty()) {
+        currentCoroutineContext().ensureActive()
+        onSnapshot(snapshot)
+    }
+    missingBatches.forEachIndexed { index, batch ->
+        currentCoroutineContext().ensureActive()
+        val tracks = loadBatch(batch)
+        currentCoroutineContext().ensureActive()
+        tracks.forEach { tracksById[key(it)] = it }
+        snapshot = ids.mapNotNull(tracksById::get)
+        if (snapshot.isNotEmpty() || index == missingBatches.lastIndex) onSnapshot(snapshot)
+    }
+    return snapshot
 }

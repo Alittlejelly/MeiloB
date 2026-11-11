@@ -1,0 +1,836 @@
+﻿Applications Graphics Acceleration Info:
+Uptime: 88788905 Realtime: 1880363879
+
+** Graphics info for pid 18643 [com.netease.cloudmusic] **
+
+Stats since: 88780788744256ns
+Total frames rendered: 0
+Janky frames: 0 (0.00%)
+Janky frames (legacy): 0 (0.00%)
+50th percentile: 4950ms
+90th percentile: 4950ms
+95th percentile: 4950ms
+99th percentile: 4950ms
+Number Missed Vsync: 0
+Number High input latency: 0
+Number Slow UI thread: 0
+Number Slow bitmap uploads: 0
+Number Slow issue draw commands: 0
+Number Frame deadline missed: 0
+Number Frame deadline missed (legacy): 0
+HISTOGRAM: 5ms=0 6ms=0 7ms=0 8ms=0 9ms=0 10ms=0 11ms=0 12ms=0 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 26ms=0 27ms=0 28ms=0 29ms=0 30ms=0 31ms=0 32ms=0 34ms=0 36ms=0 38ms=0 40ms=0 42ms=0 44ms=0 46ms=0 48ms=0 53ms=0 57ms=0 61ms=0 65ms=0 69ms=0 73ms=0 77ms=0 81ms=0 85ms=0 89ms=0 93ms=0 97ms=0 101ms=0 105ms=0 109ms=0 113ms=0 117ms=0 121ms=0 125ms=0 129ms=0 133ms=0 150ms=0 200ms=0 250ms=0 300ms=0 350ms=0 400ms=0 450ms=0 500ms=0 550ms=0 600ms=0 650ms=0 700ms=0 750ms=0 800ms=0 850ms=0 900ms=0 950ms=0 1000ms=0 1050ms=0 1100ms=0 1150ms=0 1200ms=0 1250ms=0 1300ms=0 1350ms=0 1400ms=0 1450ms=0 1500ms=0 1550ms=0 1600ms=0 1650ms=0 1700ms=0 1750ms=0 1800ms=0 1850ms=0 1900ms=0 1950ms=0 2000ms=0 2050ms=0 2100ms=0 2150ms=0 2200ms=0 2250ms=0 2300ms=0 2350ms=0 2400ms=0 2450ms=0 2500ms=0 2550ms=0 2600ms=0 2650ms=0 2700ms=0 2750ms=0 2800ms=0 2850ms=0 2900ms=0 2950ms=0 3000ms=0 3050ms=0 3100ms=0 3150ms=0 3200ms=0 3250ms=0 3300ms=0 3350ms=0 3400ms=0 3450ms=0 3500ms=0 3550ms=0 3600ms=0 3650ms=0 3700ms=0 3750ms=0 3800ms=0 3850ms=0 3900ms=0 3950ms=0 4000ms=0 4050ms=0 4100ms=0 4150ms=0 4200ms=0 4250ms=0 4300ms=0 4350ms=0 4400ms=0 4450ms=0 4500ms=0 4550ms=0 4600ms=0 4650ms=0 4700ms=0 4750ms=0 4800ms=0 4850ms=0 4900ms=0 4950ms=0
+50th gpu percentile: 4950ms
+90th gpu percentile: 4950ms
+95th gpu percentile: 4950ms
+99th gpu percentile: 4950ms
+GPU HISTOGRAM: 1ms=0 2ms=0 3ms=0 4ms=0 5ms=0 6ms=0 7ms=0 8ms=0 9ms=0 10ms=0 11ms=0 12ms=0 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 4950ms=0
+
+Pipeline=Skia (OpenGL)
+Memory policy:
+  Max surface area: 2527200
+  Max resource usage: 363.92MB (x48)
+  Background retention: 50% (altUiHidden = true)
+  GPU Context timeout: 10
+Contexts: 1 (stopped = 1)
+CPU Caches:
+  Glyph Cache: 1.46 MB (1 entry)
+  Glyph Count: 250 
+Total CPU memory usage:
+  1534679 bytes, 1.46 MB (0.00 bytes is purgeable)
+GPU Caches:
+  Other:
+    Other: 0.00 bytes (1 entry)
+    Buffer Object: 2.94 KB (6 entries)
+    StencilAttachment: 7.94 MB (7 entries)
+  SW Path Mask:
+    Texture: 64.16 MB (683 entries)
+  Scratch:
+    Texture: 2.00 MB (1 entry)
+    Buffer Object: 78.00 KB (2 entries)
+    RenderTarget: 19.41 MB (264 entries)
+  Image:
+    Texture: 19.64 MB (47 entries)
+Total GPU memory usage:
+  118718656 bytes, 113.22 MB (72.11 MB is purgeable)
+Pipeline Cache: inactiveDetail dimensions: 
+Texture:				256000		{320x200}	44
+Texture:				4665600		{1440x810}	2
+RenderTarget:				65536		{256x256}	97
+Buffer Object:				49152		{0x0}	1
+Texture:				2097152		{2048x1024}	1
+RenderTarget:				131072		{512x256}	42
+Buffer Object:				30720		{0x0}	1
+RenderTarget:				262144		{1024x256}	22
+RenderTarget:				32768		{256x128}	63
+RenderTarget:				16384		{128x128}	40
+Texture:				131410		{773x170}	3
+Texture:				129528		{771x168}	3
+Texture:				128318		{773x166}	3
+Texture:				121000		{968x125}	4
+Texture:				118818		{966x123}	4
+Texture:				117128		{968x121}	4
+Texture:				86450		{455x190}	2
+Texture:				97812		{572x171}	2
+Texture:				115731		{693x167}	2
+Texture:				114015		{691x165}	2
+Texture:				112959		{693x163}	2
+Texture:				116000		{928x125}	2
+Texture:				113898		{926x123}	2
+Texture:				112288		{928x121}	2
+Texture:				69184		{376x184}	4
+Texture:				90972		{532x171}	4
+Texture:				85600		{535x160}	4
+Texture:				84214		{533x158}	4
+Texture:				83460		{535x156}	4
+Texture:				106000		{848x125}	4
+Texture:				104058		{846x123}	4
+Texture:				102608		{848x121}	4
+Texture:				86868		{508x171}	3
+Texture:				67606		{439x154}	1
+Texture:				66424		{437x152}	1
+Texture:				65850		{439x150}	1
+Texture:				100000		{800x125}	3
+Texture:				98154		{798x123}	3
+Texture:				96800		{800x121}	3
+Texture:				81909		{479x171}	1
+Texture:				92750		{742x125}	1
+Texture:				91020		{740x123}	1
+Texture:				89782		{742x121}	1
+Texture:				79686		{466x171}	2
+Texture:				89500		{716x125}	2
+Texture:				87822		{714x123}	2
+Texture:				86636		{716x121}	2
+Texture:				77292		{452x171}	1
+Texture:				86000		{688x125}	1
+Texture:				84378		{686x123}	1
+Texture:				83248		{688x121}	1
+Texture:				81567		{477x171}	3
+Texture:				92250		{738x125}	3
+Texture:				90528		{736x123}	3
+Texture:				89298		{738x121}	3
+Texture:				85500		{500x171}	1
+Texture:				98000		{784x125}	1
+Texture:				96186		{782x123}	1
+Texture:				94864		{784x121}	1
+Texture:				78914		{422x187}	2
+Texture:				94905		{555x171}	2
+Texture:				102828		{627x164}	2
+Texture:				101250		{625x162}	2
+Texture:				100320		{627x160}	2
+Texture:				111750		{894x125}	2
+Texture:				109716		{892x123}	2
+Texture:				108174		{894x121}	2
+Texture:				83916		{444x189}	2
+Texture:				96786		{566x171}	2
+Texture:				110715		{671x165}	2
+Texture:				109047		{669x163}	2
+Texture:				108031		{671x161}	2
+Texture:				114500		{916x125}	2
+Texture:				112422		{914x123}	2
+Texture:				110836		{916x121}	2
+Texture:				88730		{467x190}	1
+Texture:				98838		{578x171}	1
+Texture:				120456		{717x168}	1
+Texture:				118690		{715x166}	1
+Texture:				117588		{717x164}	1
+Texture:				117500		{940x125}	1
+Texture:				115374		{938x123}	1
+Texture:				113740		{940x121}	1
+Texture:				91298		{478x191}	1
+Texture:				99693		{583x171}	1
+Texture:				124152		{739x168}	1
+Texture:				122342		{737x166}	1
+Texture:				121196		{739x164}	1
+Texture:				118750		{950x125}	1
+Texture:				116604		{948x123}	1
+Texture:				114950		{950x121}	1
+Texture:				77979		{417x187}	1
+Texture:				94563		{553x171}	1
+Texture:				101352		{618x164}	1
+Texture:				99792		{616x162}	1
+Texture:				98880		{618x160}	1
+Texture:				111250		{890x125}	1
+Texture:				109224		{888x123}	1
+Texture:				107690		{890x121}	1
+Texture:				88236		{516x171}	1
+Texture:				73632		{472x156}	1
+Texture:				72380		{470x154}	1
+Texture:				71744		{472x152}	1
+Texture:				102000		{816x125}	1
+Texture:				100122		{814x123}	1
+Texture:				98736		{816x121}	1
+Texture:				84645		{495x171}	1
+Texture:				96750		{774x125}	1
+Texture:				94956		{772x123}	1
+Texture:				93654		{774x121}	1
+Texture:				81738		{478x171}	1
+Texture:				92500		{740x125}	1
+Texture:				90774		{738x123}	1
+Texture:				89540		{740x121}	1
+Texture:				79515		{465x171}	2
+Texture:				89250		{714x125}	2
+Texture:				87576		{712x123}	2
+Texture:				86394		{714x121}	2
+Texture:				77121		{451x171}	1
+Texture:				85750		{686x125}	1
+Texture:				84132		{684x123}	1
+Texture:				83006		{686x121}	1
+Texture:				83448		{488x171}	2
+Texture:				95000		{760x125}	2
+Texture:				93234		{758x123}	2
+Texture:				91960		{760x121}	2
+Texture:				87381		{511x171}	3
+Texture:				69905		{451x155}	2
+Texture:				68697		{449x153}	2
+Texture:				68101		{451x151}	2
+Texture:				100750		{806x125}	3
+Texture:				98892		{804x123}	3
+Texture:				97526		{806x121}	3
+Texture:				76296		{408x187}	1
+Texture:				93708		{548x171}	1
+Texture:				97800		{600x163}	1
+Texture:				96278		{598x161}	1
+Texture:				95400		{600x159}	1
+Texture:				110000		{880x125}	1
+Texture:				107994		{878x123}	1
+Texture:				106480		{880x121}	1
+Texture:				81968		{436x188}	1
+Texture:				96102		{562x171}	2
+Texture:				108896		{656x166}	1
+Texture:				105948		{654x162}	1
+Texture:				106272		{656x162}	1
+Texture:				113500		{908x125}	2
+Texture:				111438		{906x123}	2
+Texture:				109868		{908x121}	2
+Texture:				69552		{378x184}	1
+Texture:				91143		{533x171}	1
+Texture:				86240		{539x160}	1
+Texture:				84846		{537x158}	1
+Texture:				84084		{539x156}	1
+Texture:				106250		{850x125}	1
+Texture:				104304		{848x123}	1
+Texture:				102850		{850x121}	1
+Texture:				83961		{491x171}	1
+Texture:				95750		{766x125}	1
+Texture:				93972		{764x123}	1
+Texture:				92686		{766x121}	1
+Texture:				81225		{475x171}	1
+Texture:				91750		{734x125}	1
+Texture:				90036		{732x123}	1
+Texture:				88814		{734x121}	1
+Texture:				78318		{458x171}	1
+Texture:				87500		{700x125}	1
+Texture:				85854		{698x123}	1
+Texture:				84700		{700x121}	1
+Texture:				76950		{450x171}	1
+Texture:				85500		{684x125}	1
+Texture:				83886		{682x123}	1
+Texture:				82764		{684x121}	1
+Texture:				69750		{450x155}	1
+Texture:				68544		{448x153}	1
+Texture:				67950		{450x151}	1
+Texture:				72705		{393x185}	1
+Texture:				92511		{541x171}	1
+Texture:				91040		{569x160}	1
+Texture:				89586		{567x158}	1
+Texture:				88764		{569x156}	1
+Texture:				108250		{866x125}	1
+Texture:				106272		{864x123}	1
+Texture:				104786		{866x121}	1
+Texture:				75516		{406x186}	1
+Texture:				93537		{547x171}	1
+Texture:				96390		{595x162}	1
+Texture:				94880		{593x160}	1
+Texture:				94010		{595x158}	1
+Texture:				109750		{878x125}	1
+Texture:				107748		{876x123}	1
+Texture:				106238		{878x121}	1
+Texture:				67528		{367x184}	2
+Texture:				90288		{528x171}	3
+Texture:				82362		{518x159}	2
+Texture:				81012		{516x157}	2
+Texture:				80290		{518x155}	2
+Texture:				105000		{840x125}	3
+Texture:				103074		{838x123}	3
+Texture:				101640		{840x121}	3
+Texture:				67144		{436x154}	1
+Texture:				65968		{434x152}	1
+Texture:				83619		{489x171}	2
+Texture:				95250		{762x125}	2
+Texture:				93480		{760x123}	2
+Texture:				92202		{762x121}	2
+Texture:				81054		{474x171}	1
+Texture:				91500		{732x125}	1
+Texture:				89790		{730x123}	1
+Texture:				88572		{732x121}	1
+Texture:				82251		{481x171}	2
+Texture:				93250		{746x125}	2
+Texture:				91512		{744x123}	2
+Texture:				90266		{746x121}	2
+Texture:				87039		{509x171}	2
+Texture:				68068		{442x154}	1
+Texture:				66880		{440x152}	1
+Texture:				66300		{442x150}	1
+Texture:				100250		{802x125}	2
+Texture:				98400		{800x123}	2
+Texture:				97042		{802x121}	2
+Texture:				67712		{368x184}	1
+Texture:				82521		{519x159}	1
+Texture:				81169		{517x157}	1
+Texture:				80445		{519x155}	1
+Texture:				74772		{402x186}	1
+Texture:				93195		{545x171}	1
+Texture:				95094		{587x162}	1
+Texture:				93600		{585x160}	1
+Texture:				92746		{587x158}	1
+Texture:				109250		{874x125}	1
+Texture:				107256		{872x123}	1
+Texture:				105754		{874x121}	1
+Texture:				80464		{428x188}	1
+Texture:				95418		{558x171}	1
+Texture:				105600		{640x165}	1
+Texture:				103994		{638x163}	1
+Texture:				103040		{640x161}	1
+Texture:				112500		{900x125}	1
+Texture:				110454		{898x123}	1
+Texture:				108900		{900x121}	1
+Texture:				76483		{409x187}	1
+Texture:				93879		{549x171}	1
+Texture:				98126		{602x163}	1
+Texture:				96600		{600x161}	1
+Texture:				95718		{602x159}	1
+Texture:				110250		{882x125}	1
+Texture:				108240		{880x123}	1
+Texture:				106722		{882x121}	1
+Texture:				68080		{370x184}	1
+Texture:				90459		{529x171}	1
+Texture:				83157		{523x159}	1
+Texture:				81797		{521x157}	1
+Texture:				81065		{523x155}	1
+Texture:				105250		{842x125}	1
+Texture:				103320		{840x123}	1
+Texture:				101882		{842x121}	1
+Texture:				67760		{440x154}	1
+Texture:				66576		{438x152}	1
+Texture:				66000		{440x150}	1
+Texture:				80028		{468x171}	2
+Texture:				90000		{720x125}	2
+Texture:				88314		{718x123}	2
+Texture:				87120		{720x121}	2
+Texture:				84816		{496x171}	1
+Texture:				97000		{776x125}	1
+Texture:				95202		{774x123}	1
+Texture:				93896		{776x121}	1
+Texture:				66976		{364x184}	1
+Texture:				89946		{526x171}	1
+Texture:				81408		{512x159}	1
+Texture:				80070		{510x157}	1
+Texture:				79360		{512x155}	1
+Texture:				104500		{836x125}	1
+Texture:				102582		{834x123}	1
+Texture:				101156		{836x121}	1
+Texture:				68816		{374x184}	1
+Texture:				90801		{531x171}	1
+Texture:				85120		{532x160}	1
+Texture:				83740		{530x158}	1
+Texture:				82992		{532x156}	1
+Texture:				105750		{846x125}	1
+Texture:				103812		{844x123}	1
+Texture:				102366		{846x121}	1
+Texture:				89091		{521x171}	1
+Texture:				76616		{488x157}	1
+Texture:				75330		{486x155}	1
+Texture:				74664		{488x153}	1
+Texture:				103250		{826x125}	1
+Texture:				101352		{824x123}	1
+Texture:				99946		{826x121}	1
+Texture:				86355		{505x171}	1
+Texture:				99250		{794x125}	1
+Texture:				97416		{792x123}	1
+Texture:				96074		{794x121}	1
+Texture:				84987		{497x171}	2
+Texture:				97250		{778x125}	2
+Texture:				95448		{776x123}	2
+Texture:				94138		{778x121}	2
+Texture:				88407		{517x171}	1
+Texture:				74100		{475x156}	1
+Texture:				72842		{473x154}	1
+Texture:				72200		{475x152}	1
+Texture:				102250		{818x125}	1
+Texture:				100368		{816x123}	1
+Texture:				98978		{818x121}	1
+Texture:				71040		{384x185}	1
+Texture:				91656		{536x171}	1
+Texture:				88872		{552x161}	1
+Texture:				86350		{550x157}	1
+Texture:				86664		{552x157}	1
+Texture:				107000		{856x125}	1
+Texture:				105042		{854x123}	1
+Texture:				103576		{856x121}	1
+Texture:				70300		{380x185}	1
+Texture:				91314		{534x171}	1
+Texture:				87423		{543x161}	1
+Texture:				86019		{541x159}	1
+Texture:				85251		{543x157}	1
+Texture:				106500		{852x125}	1
+Texture:				104550		{850x123}	1
+Texture:				103092		{852x121}	1
+Texture:				88578		{518x171}	1
+Texture:				75203		{479x157}	1
+Texture:				73935		{477x155}	1
+Texture:				73287		{479x153}	1
+Texture:				102500		{820x125}	1
+Texture:				100614		{818x123}	1
+Texture:				99220		{820x121}	1
+Texture:				84132		{492x171}	1
+Texture:				96000		{768x125}	1
+Texture:				94218		{766x123}	1
+Texture:				92928		{768x121}	1
+Texture:				84474		{494x171}	1
+Texture:				96500		{772x125}	1
+Texture:				94710		{770x123}	1
+Texture:				93412		{772x121}	1
+Texture:				68376		{444x154}	1
+Texture:				67184		{442x152}	1
+Texture:				66600		{444x150}	1
+Texture:				67160		{365x184}	1
+Texture:				90117		{527x171}	1
+Texture:				81567		{513x159}	1
+Texture:				80227		{511x157}	1
+Texture:				79515		{513x155}	1
+Texture:				104750		{838x125}	1
+Texture:				102828		{836x123}	1
+Texture:				101398		{838x121}	1
+Texture:				77044		{412x187}	1
+Texture:				94050		{550x171}	1
+Texture:				98941		{607x163}	1
+Texture:				97405		{605x161}	1
+Texture:				96513		{607x159}	1
+Texture:				110500		{884x125}	1
+Texture:				108486		{882x123}	1
+Texture:				106964		{884x121}	1
+Texture:				81780		{435x188}	1
+Texture:				108398		{653x166}	1
+Texture:				105462		{651x162}	1
+Texture:				105786		{653x162}	1
+Texture:				87590		{461x190}	1
+Texture:				98154		{574x171}	1
+Texture:				118440		{705x168}	1
+Texture:				116698		{703x166}	1
+Texture:				115620		{705x164}	1
+Texture:				116500		{932x125}	1
+Texture:				114390		{930x123}	1
+Texture:				112772		{932x121}	1
+Texture:				90343		{473x191}	1
+Texture:				99351		{581x171}	1
+Texture:				123201		{729x169}	1
+Texture:				119955		{727x165}	1
+Texture:				118827		{729x163}	1
+Texture:				118250		{946x125}	1
+Texture:				116112		{944x123}	1
+Texture:				114466		{946x121}	1
+Texture:				91871		{481x191}	1
+Texture:				100035		{585x171}	1
+Texture:				125328		{746x168}	1
+Texture:				123504		{744x166}	1
+Texture:				122344		{746x164}	1
+Texture:				119250		{954x125}	1
+Texture:				117096		{952x123}	1
+Texture:				115434		{954x121}	1
+Texture:				94080		{490x192}	1
+Texture:				100719		{589x171}	2
+Texture:				128947		{763x169}	1
+Texture:				127087		{761x167}	1
+Texture:				125895		{763x165}	1
+Texture:				120250		{962x125}	2
+Texture:				118080		{960x123}	2
+Texture:				116402		{962x121}	2
+Texture:				95040		{495x192}	2
+Texture:				101232		{592x171}	3
+Texture:				95424		{497x192}	1
+Texture:				101403		{593x171}	2
+Texture:				132260		{778x170}	1
+Texture:				130368		{776x168}	1
+Texture:				129148		{778x166}	1
+Texture:				121250		{970x125}	2
+Texture:				119064		{968x123}	2
+Texture:				117370		{970x121}	6
+Texture:				131095		{785x167}	2
+Texture:				133172		{788x169}	2
+Texture:				96886		{502x193}	2
+Texture:				129195		{783x165}	4
+Texture:				129855		{787x165}	2
+Texture:				119556		{972x123}	2
+Texture:				122850		{975x126}	2
+Texture:				405790		{1190x341}	2
+Texture:				117854		{974x121}	2
+StencilAttachment:				131072		{256x128}	1
+Texture:				80712		{472x171}	1
+Texture:				91000		{728x125}	1
+Texture:				89298		{726x123}	1
+Texture:				88088		{728x121}	1
+Texture:				78660		{460x171}	1
+Texture:				88000		{704x125}	1
+Texture:				86346		{702x123}	1
+Texture:				85184		{704x121}	1
+Texture:				76608		{448x171}	1
+Texture:				85000		{680x125}	1
+Texture:				83394		{678x123}	1
+Texture:				82280		{680x121}	1
+Texture:				75411		{441x171}	1
+Texture:				83250		{666x125}	1
+Texture:				81672		{664x123}	1
+Texture:				80586		{666x121}	1
+Texture:				74727		{437x171}	1
+Texture:				82250		{658x125}	1
+Texture:				80688		{656x123}	1
+Texture:				79618		{658x121}	1
+Texture:				74385		{435x171}	1
+Texture:				81750		{654x125}	1
+Texture:				80196		{652x123}	1
+Texture:				79134		{654x121}	1
+Texture:				74043		{433x171}	2
+Texture:				81250		{650x125}	2
+Texture:				79704		{648x123}	2
+Texture:				78650		{650x121}	2
+Texture:				73872		{432x171}	1
+Texture:				81000		{648x125}	1
+Texture:				79458		{646x123}	1
+Texture:				78408		{648x121}	1
+Texture:				78966		{642x123}	1
+Texture:				81270		{645x126}	1
+Texture:				293260		{860x341}	1
+Texture:				77440		{640x121}	2
+Texture:				77924		{644x121}	1
+Texture:				77463		{453x171}	1
+Texture:				86250		{690x125}	1
+Texture:				84624		{688x123}	1
+Texture:				83490		{690x121}	1
+Texture:				84303		{493x171}	1
+Texture:				96250		{770x125}	1
+Texture:				94464		{768x123}	1
+Texture:				93170		{770x121}	1
+Texture:				74958		{403x186}	1
+Texture:				93366		{546x171}	1
+Texture:				95418		{589x162}	1
+Texture:				93920		{587x160}	1
+Texture:				93062		{589x158}	1
+Texture:				109500		{876x125}	1
+Texture:				107502		{874x123}	1
+Texture:				105996		{876x121}	1
+Texture:				80840		{430x188}	1
+Texture:				95589		{559x171}	1
+Texture:				106095		{643x165}	1
+Texture:				104483		{641x163}	1
+Texture:				103523		{643x161}	1
+Texture:				112750		{902x125}	1
+Texture:				110700		{900x123}	1
+Texture:				109142		{902x121}	1
+Texture:				85050		{450x189}	1
+Texture:				97299		{569x171}	1
+Texture:				113544		{684x166}	1
+Texture:				111848		{682x164}	1
+Texture:				110808		{684x162}	1
+Texture:				115250		{922x125}	1
+Texture:				113160		{920x123}	1
+Texture:				111562		{922x121}	1
+Texture:				88540		{466x190}	1
+Texture:				98667		{577x171}	1
+Texture:				120120		{715x168}	1
+Texture:				118358		{713x166}	1
+Texture:				117260		{715x164}	1
+Texture:				117250		{938x125}	1
+Texture:				115128		{936x123}	1
+Texture:				113498		{938x121}	1
+Texture:				90916		{476x191}	1
+Texture:				99522		{582x171}	1
+Texture:				123648		{736x168}	1
+Texture:				121844		{734x166}	1
+Texture:				120704		{736x164}	1
+Texture:				118500		{948x125}	1
+Texture:				116358		{946x123}	1
+Texture:				114708		{948x121}	1
+Texture:				92928		{484x192}	1
+Texture:				100206		{586x171}	1
+Texture:				127088		{752x169}	1
+Texture:				125250		{750x167}	1
+Texture:				124080		{752x165}	1
+Texture:				119500		{956x125}	1
+Texture:				117342		{954x123}	1
+Texture:				115676		{956x121}	1
+Texture:				93888		{489x192}	1
+Texture:				128778		{762x169}	1
+Texture:				126920		{760x167}	1
+Texture:				125730		{762x165}	1
+Texture:				94656		{493x192}	1
+Texture:				101061		{591x171}	1
+Texture:				130900		{770x170}	1
+Texture:				129024		{768x168}	1
+Texture:				127820		{770x166}	1
+Texture:				120750		{966x125}	1
+Texture:				118572		{964x123}	1
+Texture:				116886		{966x121}	1
+Texture:				95232		{496x192}	1
+Texture:				131920		{776x170}	1
+Texture:				130032		{774x168}	1
+Texture:				128816		{776x166}	1
+Texture:				95616		{498x192}	1
+Texture:				132430		{779x170}	1
+Texture:				130536		{777x168}	1
+Texture:				129314		{779x166}	1
+Buffer Object:				180		{0x0}	1
+Buffer Object:				1920		{0x0}	1
+Texture:				64		{8x8}	1
+Buffer Object:				192		{0x0}	1
+Buffer Object:				272		{0x0}	1
+Buffer Object:				186		{0x0}	1
+Buffer Object:				264		{0x0}	1
+StencilAttachment:				65536		{128x128}	1
+StencilAttachment:				4194304		{1024x1024}	1
+StencilAttachment:				1048576		{512x512}	1
+StencilAttachment:				2097152		{512x1024}	1
+StencilAttachment:				262144		{512x128}	1
+StencilAttachment:				524288		{512x256}	1
+
+GraphicBufferAllocator buffers:
+            Handle |         Size |     W (Stride) x H | Layers |   Format |      Usage | Requestor
+0xb4000077ae4e6e70 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae4fac40 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae4fc620 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae4fd3a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae4ff320 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae502da0 |  4657.50 KiB | 1440 (1472) x  810 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae505c50 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50af00 |  4657.50 KiB | 1440 (1472) x  810 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50bda0 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50c610 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50d390 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50dc90 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50e8f0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50fa60 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50faf0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50fdc0 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae50fee0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae510360 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae510480 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae513720 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae514b60 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae515bb0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae516660 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae517470 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae51ab90 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae51b400 |  3600.00 KiB | 1280 (1280) x  720 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae51b9a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae51bd90 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae51f270 |    94.50 KiB |  168 ( 192) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae521ca0 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae522c60 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae523560 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae523d40 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae525ba0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae526800 |   126.00 KiB |  224 ( 256) x  126 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae539d60 |  4657.50 KiB | 1440 (1472) x  810 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae54cdb0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae54fcf0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae555810 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae557670 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae557940 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae559560 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae55aa30 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae55c380 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae560ca0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae562710 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae5632e0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae5654a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae565f50 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae56a3f0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae56a990 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae56b200 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae56c0a0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae56d7b0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae570c90 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae570ed0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae573360 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae575be0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae576570 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae57a6b0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae582ff0 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+0xb4000077ae584d30 |   250.00 KiB |  320 ( 320) x  200 |      1 |        1 | 0x     100 | AHardwareBuffer pid [18643]
+Total allocated by GraphicBufferAllocator (estimate): 30305.00 KB
+Imported gralloc buffers:
++ name:AHardwareBuffer pid [18643], id:66792, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66791, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66790, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66793, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66789, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66784, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66783, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66782, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66781, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66780, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66779, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66778, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66777, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66776, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66775, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66774, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66770, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66620, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66769, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66766, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66638, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66765, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66761, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66763, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66646, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66773, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66772, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66644, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66619, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66643, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66642, size:4660.00KiB, w/h:1440x810, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1440x810, stride:5888 bytes, size:4771840
++ name:AHardwareBuffer pid [18643], id:66633, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66767, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66655, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66641, size:96.00KiB, w/h:168x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:168x126, stride:768 bytes, size:98304
++ name:AHardwareBuffer pid [18643], id:66639, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66637, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66636, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66771, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66787, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66786, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66634, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66788, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66631, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66632, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66625, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66630, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66762, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66627, size:4660.00KiB, w/h:1440x810, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1440x810, stride:5888 bytes, size:4771840
++ name:AHardwareBuffer pid [18643], id:66768, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66629, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66626, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66785, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66622, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66623, size:4660.00KiB, w/h:1440x810, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1440x810, stride:5888 bytes, size:4771840
++ name:AHardwareBuffer pid [18643], id:66621, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66624, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66645, size:3600.00KiB, w/h:1280x720, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:1280x720, stride:5120 bytes, size:3686400
++ name:AHardwareBuffer pid [18643], id:66635, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66764, size:252.00KiB, w/h:320x200, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:320x200, stride:1280 bytes, size:258048
++ name:AHardwareBuffer pid [18643], id:66654, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
++ name:AHardwareBuffer pid [18643], id:66628, size:128.00KiB, w/h:224x126, usage: 0x100, req fmt:1, fourcc/mod:875708993/0, dataspace: 0x0, compressed: false
+	planes: R/G/B/A:	 w/h:224x126, stride:1024 bytes, size:131072
+Total imported by gralloc: 30428.00KiB
+
+Profile data in ms:
+
+	com.neoruaa.meilox/com.ljyh.mei.MainActivity/android.view.ViewRootImpl@91d4b12 (visibility=8)
+	Draw	Prepare	Process	Execute
+
+Window: com.neoruaa.meilox/com.ljyh.mei.MainActivity
+Stats since: 88780788741027ns
+Total frames rendered: 0
+Janky frames: 0 (0.00%)
+Janky frames (legacy): 0 (0.00%)
+50th percentile: 4950ms
+90th percentile: 4950ms
+95th percentile: 4950ms
+99th percentile: 4950ms
+Number Missed Vsync: 0
+Number High input latency: 0
+Number Slow UI thread: 0
+Number Slow bitmap uploads: 0
+Number Slow issue draw commands: 0
+Number Frame deadline missed: 0
+Number Frame deadline missed (legacy): 0
+HISTOGRAM: 5ms=0 6ms=0 7ms=0 8ms=0 9ms=0 10ms=0 11ms=0 12ms=0 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 26ms=0 27ms=0 28ms=0 29ms=0 30ms=0 31ms=0 32ms=0 34ms=0 36ms=0 38ms=0 40ms=0 42ms=0 44ms=0 46ms=0 48ms=0 53ms=0 57ms=0 61ms=0 65ms=0 69ms=0 73ms=0 77ms=0 81ms=0 85ms=0 89ms=0 93ms=0 97ms=0 101ms=0 105ms=0 109ms=0 113ms=0 117ms=0 121ms=0 125ms=0 129ms=0 133ms=0 150ms=0 200ms=0 250ms=0 300ms=0 350ms=0 400ms=0 450ms=0 500ms=0 550ms=0 600ms=0 650ms=0 700ms=0 750ms=0 800ms=0 850ms=0 900ms=0 950ms=0 1000ms=0 1050ms=0 1100ms=0 1150ms=0 1200ms=0 1250ms=0 1300ms=0 1350ms=0 1400ms=0 1450ms=0 1500ms=0 1550ms=0 1600ms=0 1650ms=0 1700ms=0 1750ms=0 1800ms=0 1850ms=0 1900ms=0 1950ms=0 2000ms=0 2050ms=0 2100ms=0 2150ms=0 2200ms=0 2250ms=0 2300ms=0 2350ms=0 2400ms=0 2450ms=0 2500ms=0 2550ms=0 2600ms=0 2650ms=0 2700ms=0 2750ms=0 2800ms=0 2850ms=0 2900ms=0 2950ms=0 3000ms=0 3050ms=0 3100ms=0 3150ms=0 3200ms=0 3250ms=0 3300ms=0 3350ms=0 3400ms=0 3450ms=0 3500ms=0 3550ms=0 3600ms=0 3650ms=0 3700ms=0 3750ms=0 3800ms=0 3850ms=0 3900ms=0 3950ms=0 4000ms=0 4050ms=0 4100ms=0 4150ms=0 4200ms=0 4250ms=0 4300ms=0 4350ms=0 4400ms=0 4450ms=0 4500ms=0 4550ms=0 4600ms=0 4650ms=0 4700ms=0 4750ms=0 4800ms=0 4850ms=0 4900ms=0 4950ms=0
+50th gpu percentile: 4950ms
+90th gpu percentile: 4950ms
+95th gpu percentile: 4950ms
+99th gpu percentile: 4950ms
+GPU HISTOGRAM: 1ms=0 2ms=0 3ms=0 4ms=0 5ms=0 6ms=0 7ms=0 8ms=0 9ms=0 10ms=0 11ms=0 12ms=0 13ms=0 14ms=0 15ms=0 16ms=0 17ms=0 18ms=0 19ms=0 20ms=0 21ms=0 22ms=0 23ms=0 24ms=0 25ms=0 4950ms=0
+
+
+RenderLite trim renderNode error: 0
+
+---PROFILEDATA---
+Flags,FrameTimelineVsyncId,IntendedVsync,Vsync,InputEventId,HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,FrameDeadline,FrameStartTime,FrameInterval,WorkloadTarget,AnimationTime,SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,DequeueBufferDuration,QueueBufferDuration,GpuCompleted,SwapBuffersCompleted,DisplayPresentTime,CommandSubmissionCompleted,
+---PROFILEDATA---
+
+
+backgroundBlur used(0)
+
+View hierarchy:
+
+  com.neoruaa.meilox/com.ljyh.mei.MainActivity/android.view.ViewRootImpl@91d4b12
+  10 views, 17.44 kB of render nodes
+
+
+  Dynamic VRI BBQ Log.  render_draw: false  hdr_dimmer: false  blur_blend: false  hwui_window_decor: false  sync_barrier: false
+
+Total ViewRootImpl   : 1
+Total attached Views : 10
+Total RenderNode     : 17.44 kB (used) / 17.44 kB (capacity)
+

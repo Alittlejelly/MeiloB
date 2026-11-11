@@ -27,10 +27,10 @@ import com.ljyh.mei.data.model.bili.toMediaItem
 import com.ljyh.mei.data.network.Resource
 import com.ljyh.mei.data.repository.BiliRepository
 import com.ljyh.mei.playback.queue.ListQueue
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosListRow
-import com.ljyh.mei.ui.glass.IosPinnedListPage
-import com.ljyh.mei.ui.glass.LocalGlassColors
+import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
+import io.github.neoruaa.glasmio.core.LocalGlassColors
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.local.LocalPlayerAwareWindowInsets
 import com.ljyh.mei.ui.local.LocalPlayerConnection
@@ -133,6 +133,7 @@ fun BiliUploaderGroupScreen(
 
     val uiState by viewModel.state.collectAsState()
     val videos = (uiState.videos as? Resource.Success)?.data.orEmpty()
+    val biliGridColumns = rememberBiliGridColumns()
 
     fun playAll(startIndex: Int) {
         val connection = playerConnection ?: return
@@ -150,7 +151,7 @@ fun BiliUploaderGroupScreen(
         }
     }
 
-    IosPinnedListPage(
+    MeiloXPinnedListPage(
         title = groupName.ifBlank { "分组" },
         onNavigateBack = navController::navigateUp,
         bottomPadding = insets.calculateBottomPadding(),
@@ -172,8 +173,8 @@ fun BiliUploaderGroupScreen(
             is Resource.Success -> {
                 if (videos.isNotEmpty()) {
                     item(key = "play-all") {
-                        IosGroupedList {
-                            IosListRow(
+                        GlasmioGroupedList {
+                            GlasmioListRow(
                                 title = "播放全部",
                                 systemName = "play.fill",
                                 showTopSeparator = false,
@@ -182,12 +183,11 @@ fun BiliUploaderGroupScreen(
                         }
                     }
                 }
-                itemsIndexed(videos, key = { _, v -> v.aid }, contentType = { _, _ -> "group-row" }) { index, video ->
-                    BiliTrackRow(video = video, onClick = { playAll(index) })
-                    if (index == videos.lastIndex) {
-                        LaunchedEffect(video.aid) { viewModel.loadMore() }
-                    }
-                }
+                biliVideoGridItems(
+                    videos = videos,
+                    columns = biliGridColumns,
+                    onReachEnd = { viewModel.loadMore() },
+                ) { index, _ -> playAll(index) }
                 if (uiState.loadingMore) {
                     item(key = "group-loading") {
                         Text(

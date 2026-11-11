@@ -42,7 +42,7 @@ import com.ljyh.mei.constants.PlayerStyleKey
 import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicPlayPauseIcon
 import com.ljyh.mei.ui.component.player.component.applemusic.AppleMusicSkipIcon
 import com.ljyh.mei.playback.PlayerConnection
-import com.ljyh.mei.ui.glass.SfIcon
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.utils.rememberEnumPreference
 import kotlinx.coroutines.delay
 
@@ -55,6 +55,7 @@ fun PlayerControls(
     canSkipNext: Boolean,
     isPlaying: Boolean,
     playbackState: Int,
+    showSideSpacers: Boolean = true,
 ){
     val playerStyle by rememberEnumPreference(PlayerStyleKey, PlayerStyle.AppleMusic)
     val appleMusicStyle = playerStyle == PlayerStyle.AppleMusic
@@ -68,9 +69,9 @@ fun PlayerControls(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .then(if (appleMusicStyle) Modifier.height(84.dp) else Modifier)
+                .then(if (appleMusicStyle) Modifier.height(playTargetSize) else Modifier)
         ) {
-            if (appleMusicStyle) Spacer(Modifier.weight(0.4f))
+            if (appleMusicStyle && showSideSpacers) Spacer(Modifier.weight(0.4f))
 
             //previous
             Box(modifier = Modifier.weight(1f)) {
@@ -144,7 +145,7 @@ fun PlayerControls(
                 }
             }
 
-            if (appleMusicStyle) Spacer(Modifier.weight(0.4f))
+            if (appleMusicStyle && showSideSpacers) Spacer(Modifier.weight(0.4f))
         }
     }
 

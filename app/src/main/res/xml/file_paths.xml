@@ -2,4 +2,6 @@
 <paths>
     <!-- 对应 context.filesDir -->
     <files-path name="my_logs" path="." />
+    <!-- 对应 context.cacheDir：应用内更新下载的 APK 放这里，安装时经 FileProvider 授权读取 -->
+    <cache-path name="updates" path="updates/" />
 </paths>

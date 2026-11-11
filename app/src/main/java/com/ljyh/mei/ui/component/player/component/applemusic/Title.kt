@@ -5,11 +5,15 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,18 +26,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.ljyh.mei.R
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import com.ljyh.mei.ui.component.player.LocalPlayerRoamingModeLabel
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
 
 @Composable
 fun Title(
@@ -55,16 +62,21 @@ fun Title(
     onTextSizeChanged: (IntSize) -> Unit = {},
     onTextPositioned: (LayoutCoordinates) -> Unit = {},
     onRowPositioned: (LayoutCoordinates) -> Unit = {},
+    /** 副标题（UP 主 / 歌手）自身的坐标：弹窗要从这一行展开，而不是整个标题块。 */
+    onSubTitlePositioned: (LayoutCoordinates) -> Unit = {},
     onActionsSizeChanged: (IntSize) -> Unit = {},
     marqueeEdgeWidth: Dp = AppleMusicDimensions.albumMarqueeEdgeWidth,
     marqueeEnabled: Boolean = true,
     showLikeButton: Boolean = true,
+    modeLabel: String? = LocalPlayerRoamingModeLabel.current,
 ) {
     val shadowStyle = if (needShadow) Shadow(
         color = Color.Black.copy(alpha = 0.3f),
         offset = Offset(2f, 2f),
         blurRadius = 12f
     ) else null
+    val artistStyle = subTitleStyle.copy(shadow = shadowStyle)
+    val artistColor = Color.White.copy(alpha = 0.4f)
 
     Row(
         modifier = modifier.onGloballyPositioned(onRowPositioned),
@@ -85,24 +97,26 @@ fun Title(
                 ),
             horizontalAlignment = Alignment.Start
         ) {
-            AppleMusicMarqueeText(
-                text = title,
-                style = titleStyle.copy(
-                    shadow = shadowStyle,
-                    fontWeight = titleStyle.fontWeight ?: FontWeight.Medium,
-                ),
-                color = Color.White,
-                edgeWidth = marqueeEdgeWidth,
-                enabled = marqueeEnabled,
-            )
+            PlayerTitleWithMode(modeLabel, artistStyle, artistColor) { titleModifier ->
+                AppleMusicMarqueeText(
+                    text = title,
+                    style = titleStyle.copy(
+                        shadow = shadowStyle,
+                        fontWeight = titleStyle.fontWeight ?: FontWeight.Medium,
+                    ),
+                    color = Color.White,
+                    edgeWidth = marqueeEdgeWidth,
+                    enabled = marqueeEnabled,
+                    modifier = titleModifier,
+                )
+            }
             AppleMusicMarqueeText(
                 text = subTitle,
-                style = subTitleStyle.copy(
-                    shadow = shadowStyle,
-                ),
-                color = Color.White.copy(alpha = 0.4f),
+                style = artistStyle,
+                color = artistColor,
                 edgeWidth = marqueeEdgeWidth,
                 enabled = marqueeEnabled,
+                modifier = Modifier.onGloballyPositioned(onSubTitlePositioned),
             )
         }
 
@@ -174,15 +188,67 @@ fun Title(
     }
 }
 
+@Composable
+internal fun PlayerTitleWithMode(
+    modeLabel: String?,
+    modeStyle: TextStyle,
+    modeColor: Color,
+    title: @Composable (Modifier) -> Unit,
+) {
+    if (modeLabel.isNullOrBlank()) {
+        title(Modifier)
+        return
+    }
+    Row {
+        title(Modifier.weight(1f, fill = false).width(IntrinsicSize.Max).alignByBaseline())
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = modeLabel,
+            style = modeStyle,
+            color = modeColor,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.alignByBaseline().layout { measurable, constraints ->
+                // Keep a readable title viewport even for long scene names and large text.
+                val maxModeWidth = if (constraints.hasBoundedWidth) {
+                    (constraints.maxWidth * 0.45f).toInt()
+                } else constraints.maxWidth
+                val placeable = measurable.measure(
+                    constraints.copy(
+                        minWidth = constraints.minWidth.coerceAtMost(maxModeWidth),
+                        maxWidth = maxModeWidth,
+                    ),
+                )
+                layout(placeable.width, placeable.height) {
+                    placeable.placeRelative(0, 0)
+                }
+            },
+        )
+    }
+}
+
+/**
+ * 弹窗展开锚点。
+ *
+ * [startInsetPx] 用来抵消跑马灯的内缩：`AppleMusicMarqueeText` 为了让文字进出
+ * 渐隐边时不被裁切，把文本整体向左平移了 `edgeWidth`，所以文字的视觉左边缘比
+ * 组件的布局左边缘还要靠左 `edgeWidth`。不补这个差值，弹窗会整体偏右。
+ */
 internal fun playerMetadataAnchorBounds(
     textCoordinates: LayoutCoordinates?,
     rowCoordinates: LayoutCoordinates?,
+    startInsetPx: Float = 0f,
 ): Rect? {
     val textBounds = textCoordinates?.takeIf { it.isAttached }?.boundsInWindow()
     val rowBounds = rowCoordinates?.takeIf { it.isAttached }?.boundsInWindow()
-    return when {
+    val rect = when {
         textBounds == null -> rowBounds
         rowBounds == null -> textBounds
         else -> Rect(rowBounds.left, textBounds.top, rowBounds.right, textBounds.bottom)
-    }
+    } ?: return null
+    if (startInsetPx <= 0f) return rect
+    // 左边缘左移但不能反向外扩（避免整行锚点时溢出屏幕左边界）。
+    val left = (rect.left - startInsetPx).coerceAtLeast(0f)
+    return Rect(left, rect.top, rect.right, rect.bottom)
 }

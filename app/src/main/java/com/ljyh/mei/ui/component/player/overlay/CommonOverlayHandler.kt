@@ -1,10 +1,12 @@
 package com.ljyh.mei.ui.component.player.overlay
 
+import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -16,26 +18,29 @@ import com.ljyh.mei.ui.component.player.OverlayState
 import com.ljyh.mei.ui.component.player.PlayerViewModel
 import com.ljyh.mei.ui.component.player.component.localPlaybackQualityTitle
 import com.ljyh.mei.ui.component.player.component.PlayerNavigationMenu
+import com.ljyh.mei.ui.component.player.component.PrivateFmSceneSheet
 import com.ljyh.mei.ui.component.player.component.sheet.AlbumArtistBottomSheet
 import com.ljyh.mei.ui.component.player.component.sheet.MoreActionsSheet
 import com.ljyh.mei.ui.component.player.component.sheet.PlayerActionSettingsSheet
 import com.ljyh.mei.ui.component.player.component.sheet.PlaylistBottomSheet
+import com.ljyh.mei.ui.component.player.component.sheet.QQMusicSelectSheet
 import com.ljyh.mei.ui.component.player.component.sheet.SleepTimerSheet
 import com.ljyh.mei.ui.component.player.component.sheet.SongInfoSheet
 import com.ljyh.mei.ui.component.player.state.PlayerStateContainer
 import com.ljyh.mei.ui.component.playlist.AddToPlaylistSheet
 import com.ljyh.mei.ui.component.playlist.CreatePlaylistSheet
 import com.ljyh.mei.ui.component.playlist.TrackActionMenu
-import com.ljyh.mei.ui.component.sheet.BottomSheetState
+import io.github.neoruaa.glasmio.scaffold.GlasmioBottomSheetState
 import com.ljyh.mei.ui.local.LocalNavController
 import com.ljyh.mei.ui.model.MoreAction
+import com.ljyh.mei.ui.model.LyricSource
 import com.ljyh.mei.ui.screen.Screen
 import com.ljyh.mei.R
-import com.ljyh.mei.ui.glass.IosAlertDialog
-import com.ljyh.mei.ui.glass.IosGroupedList
-import com.ljyh.mei.ui.glass.IosListRow
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
+import io.github.neoruaa.glasmio.ui.GlasmioAlertDialog
+import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
+import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
 import com.ljyh.mei.ui.local.LocalPlayerConnection
 import com.ljyh.mei.ui.component.TrackShareSheet
 import com.ljyh.mei.utils.setClipboard
@@ -50,12 +55,25 @@ import timber.log.Timber
 fun CommonOverlayHandler(
     overlayHandler: PlayerOverlayHandler,
     stateContainer: PlayerStateContainer,
-    sheetState: BottomSheetState? = null,
+    sheetState: GlasmioBottomSheetState? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
     val playerViewModel = stateContainer.playerViewModel
+    val currentMetadata = stateContainer.mediaMetadata.value
+    val privateFmError by stateContainer.playerConnection.service.queueManager.privateFmError.collectAsStateWithLifecycle()
+    val isPrivateFm = stateContainer.isFMMode.value &&
+        stateContainer.playerConnection.service.queueManager.similarFmSourceIds == null
+
+    LaunchedEffect(privateFmError, isPrivateFm) {
+        if (isPrivateFm) privateFmError?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+    }
+    LaunchedEffect(isPrivateFm, overlayHandler.currentOverlayValue) {
+        if (!isPrivateFm && overlayHandler.currentOverlayValue == OverlayState.PrivateFmScenes) {
+            overlayHandler.dismiss()
+        }
+    }
 
     when (val overlay = overlayHandler.currentOverlayValue) {
         OverlayState.None -> {}
@@ -67,16 +85,25 @@ fun CommonOverlayHandler(
         }
 
         is OverlayState.AlbumArtist -> {
+            // B 站音源的 artist id 就是 UP 主 mid，必须进 UP 主空间页；
+            // 走网易云那套 Artist 路由在本分叉里没有数据源，只会得到空页面。
+            val isBiliTrack = currentMetadata?.isBili == true
+            val onArtistClick: (Long) -> Unit = { id ->
+                if (isBiliTrack) {
+                    Screen.BiliUploader.navigate(navController) { addPath(id.toString()) }
+                } else {
+                    Screen.Artist.navigate(navController) { addPath(id.toString()) }
+                }
+                sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
+            }
             val anchor = overlay.anchorBounds
             if (anchor != null) {
                 PlayerNavigationMenu(
                     artists = overlay.artists,
                     playlistTitle = overlay.playlistTitle,
                     anchorBounds = anchor,
-                    onArtistClick = { mid ->
-                        Screen.BiliUploader.navigate(navController) { addPath(mid.toString()) }
-                        sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
-                    },
+                    viewportBounds = overlay.viewportBounds,
+                    onArtistClick = onArtistClick,
                     onPlaylistClick = {
                         val playlistId = overlay.playlistId
                         if (playlistId != null && playlistId > 0) {
@@ -90,20 +117,34 @@ fun CommonOverlayHandler(
                 )
             } else {
                 AlbumArtistBottomSheet(
+                    coverUrl = overlay.cover,
+                    albumInfo = overlay.album,
                     artistList = overlay.artists,
-                    onArtistClick = { mid ->
-                        Screen.BiliUploader.navigate(navController) { addPath(mid.toString()) }
-                        sheetState?.collapse(spring(stiffness = Spring.StiffnessVeryLow))
-                    },
+                    onAlbumClick = {},
+                    onArtistClick = onArtistClick,
                     onDismissRequest = overlayHandler::dismiss,
+                    showAlbum = !isBiliTrack,
+                    artistSectionTitle = if (isBiliTrack) "UP主" else "歌手",
                 )
             }
         }
 
         is OverlayState.SongInfo -> {
+            val qqSongId by produceState<String?>(null, overlay.metadata.id) {
+                value = stateContainer.playerViewModel.getQQSongId(overlay.metadata.id)
+            }
             SongInfoSheet(
                 metadata = overlay.metadata,
+                qqSongId = qqSongId,
                 onDismissRequest = { overlayHandler.dismiss() }
+            )
+        }
+
+        is OverlayState.QQMusicSelection -> {
+            QQMusicSelectSheet(
+                viewmodel = playerViewModel,
+                mediaMetadata = overlay.mediaMetadata,
+                onDismiss = { overlayHandler.dismiss() }
             )
         }
 
@@ -141,14 +182,37 @@ fun CommonOverlayHandler(
         }
 
         OverlayState.MoreAction -> {
+            // MoreActionsSheet queues this callback until its dismissal finishes. Capture
+            // the displayed track now so an automatic advance cannot retarget that action.
+            val actionMetadata = currentMetadata
             MoreActionsSheet(
+                onChoosePrivateFmScene = if (isPrivateFm) overlayHandler::showPrivateFmScenes else null,
                 onDismissRequest = {
                     overlayHandler.dismiss()
                 },
                 onActionClick = { action ->
-                    overlayHandler.handleMoreAction(action)
+                    overlayHandler.handleMoreAction(action, actionMetadata)
                 },
                 viewModel = playerViewModel,
+                onFindLyrics = if (actionMetadata != null) {
+                    {
+                        playerViewModel.searchQQSong(actionMetadata.title)
+                        overlayHandler.showQQMusicSelection(actionMetadata)
+                    }
+                } else null,
+                onFindLyricsLongClick = if (stateContainer.lyricLine.source == LyricSource.QQMusic && actionMetadata != null) {
+                    {
+                        playerViewModel.deleteSongById(actionMetadata.id.toString())
+                        android.widget.Toast.makeText(context, "已删除QQ音乐歌词", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                } else null,
+            )
+        }
+
+        OverlayState.PrivateFmScenes -> {
+            if (isPrivateFm) PrivateFmSceneSheet(
+                connection = stateContainer.playerConnection,
+                onDismissRequest = overlayHandler::dismiss,
             )
         }
 
@@ -159,78 +223,7 @@ fun CommonOverlayHandler(
             )
         }
 
-        is OverlayState.MusicQualitySelection -> {
-            val playerConnection = LocalPlayerConnection.current
-            val currentQuality = playerConnection?.currentMusicQuality?.collectAsStateWithLifecycle()?.value
-            val availableQualities = playerConnection?.availableMusicQualities?.collectAsStateWithLifecycle()?.value.orEmpty()
-            val isLoadingQualities = playerConnection?.isLoadingMusicQualities?.collectAsStateWithLifecycle()?.value ?: false
-            val localPlaybackInfo = playerConnection?.localPlaybackInfo?.collectAsStateWithLifecycle()?.value
-            val isPlayingLocalSource = playerConnection?.isPlayingLocalSource?.collectAsStateWithLifecycle()?.value ?: false
-            val mediaMetadata = playerConnection?.mediaMetadata?.collectAsStateWithLifecycle()?.value
-            LaunchedEffect(playerConnection, mediaMetadata?.id) {
-                playerConnection?.refreshAvailableMusicQualities()
-            }
-            IosAlertDialog(
-                onDismissRequest = overlayHandler::dismiss,
-                title = stringResource(R.string.music_quality),
-            ) {
-                IosGroupedList {
-                    localPlaybackInfo?.let { info ->
-                        IosListRow(
-                            title = localPlaybackQualityTitle(info, includeSource = true),
-                            showTopSeparator = false,
-                            onClick = {
-                                playerConnection?.useLocalSource()
-                                overlayHandler.dismiss()
-                            },
-                            trailing = if (isPlayingLocalSource) {
-                                {
-                                    SfIcon(
-                                        "checkmark",
-                                        contentDescription = null,
-                                        size = 17.dp,
-                                        tint = LocalGlassColors.current.content,
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                        )
-                    }
-                    availableQualities.forEachIndexed { index, quality ->
-                        IosListRow(
-                            title = stringResource(quality.labelRes),
-                            showTopSeparator = index != 0 || localPlaybackInfo != null,
-                            onClick = {
-                                playerConnection?.changeQuality(quality)
-                                overlayHandler.dismiss()
-                            },
-                            trailing = if (!isPlayingLocalSource && quality == currentQuality) {
-                                {
-                                    SfIcon(
-                                        "checkmark",
-                                        contentDescription = null,
-                                        size = 17.dp,
-                                        tint = LocalGlassColors.current.content,
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                        )
-                    }
-                    if (isLoadingQualities || (availableQualities.isEmpty() && localPlaybackInfo == null)) {
-                        IosListRow(
-                            title = stringResource(
-                                if (isLoadingQualities) R.string.track_quality_loading
-                                else R.string.track_quality_unavailable,
-                            ),
-                            showTopSeparator = availableQualities.isNotEmpty() || localPlaybackInfo != null,
-                        )
-                    }
-                }
-            }
-        }
+        is OverlayState.MusicQualitySelection -> Unit
 
         is OverlayState.TrackActionMenu -> {
             TrackActionMenu(
@@ -245,4 +238,81 @@ fun CommonOverlayHandler(
             )
         }
     }
+    val qualityDialogVisible = overlayHandler.currentOverlayValue is OverlayState.MusicQualitySelection
+    GlasmioAlertDialog(
+        visible = qualityDialogVisible,
+        onDismissRequest = overlayHandler::dismiss,
+        title = stringResource(R.string.music_quality),
+    ) {
+        val playerConnection = LocalPlayerConnection.current
+        val currentQuality = playerConnection?.currentMusicQuality?.collectAsStateWithLifecycle()?.value
+        val availableQualities = playerConnection?.availableMusicQualities?.collectAsStateWithLifecycle()?.value.orEmpty()
+        val isLoadingQualities = playerConnection?.isLoadingMusicQualities?.collectAsStateWithLifecycle()?.value ?: false
+        val localPlaybackInfo = playerConnection?.localPlaybackInfo?.collectAsStateWithLifecycle()?.value
+        val isPlayingLocalSource = playerConnection?.isPlayingLocalSource?.collectAsStateWithLifecycle()?.value ?: false
+        val mediaMetadata = playerConnection?.mediaMetadata?.collectAsStateWithLifecycle()?.value
+        LaunchedEffect(qualityDialogVisible, playerConnection, mediaMetadata?.id) {
+            if (qualityDialogVisible) playerConnection?.refreshAvailableMusicQualities()
+        }
+        GlasmioGroupedList {
+            localPlaybackInfo?.let { info ->
+                GlasmioListRow(
+                    title = localPlaybackQualityTitle(info, includeSource = true),
+                    showTopSeparator = false,
+                    onClick = {
+                        if (qualityDialogVisible) {
+                            playerConnection?.useLocalSource()
+                            overlayHandler.dismiss()
+                        }
+                    },
+                    trailing = if (isPlayingLocalSource) {
+                        {
+                            SfIcon(
+                                "checkmark",
+                                contentDescription = null,
+                                size = 17.dp,
+                                tint = LocalGlassColors.current.content,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+            }
+            availableQualities.forEachIndexed { index, quality ->
+                GlasmioListRow(
+                    title = stringResource(quality.labelRes),
+                    showTopSeparator = index != 0 || localPlaybackInfo != null,
+                    onClick = {
+                        if (qualityDialogVisible) {
+                            playerConnection?.changeQuality(quality)
+                            overlayHandler.dismiss()
+                        }
+                    },
+                    trailing = if (!isPlayingLocalSource && quality == currentQuality) {
+                        {
+                            SfIcon(
+                                "checkmark",
+                                contentDescription = null,
+                                size = 17.dp,
+                                tint = LocalGlassColors.current.content,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+            }
+            if (isLoadingQualities || (availableQualities.isEmpty() && localPlaybackInfo == null)) {
+                GlasmioListRow(
+                    title = stringResource(
+                        if (isLoadingQualities) R.string.track_quality_loading
+                        else R.string.track_quality_unavailable,
+                    ),
+                    showTopSeparator = availableQualities.isNotEmpty() || localPlaybackInfo != null,
+                )
+            }
+        }
+    }
+
 }

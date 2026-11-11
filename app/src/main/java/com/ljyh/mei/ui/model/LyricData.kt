@@ -2,6 +2,7 @@ package com.ljyh.mei.ui.model
 
 import com.ljyh.mei.data.model.Lyric
 import com.ljyh.mei.data.model.qq.u.LyricResult
+import com.ljyh.mei.data.model.qq.u.SearchResult
 import com.mocharealm.accompanist.lyrics.core.model.SyncedLyrics
 
 
@@ -12,6 +13,21 @@ data class LyricData(
     val lyricLine: SyncedLyrics
 )
 
+
+/** A selectable lyric source or QQ search match for the current song. */
+data class LyricCandidate(
+    val key: String,
+    val source: LyricSource,
+    val title: String,
+    val artist: String,
+    val album: String,
+    val coverUrl: String,
+    val durationMs: Long,
+    val qqSong: SearchResult.Request.Data.Body.ItemSong? = null,
+    val variant: LyricVariant? = null,
+    val preview: String = "",
+    val isSelected: Boolean = false,
+)
 
 /** Stable per-song choices; a null variant retains the legacy source-only preference. */
 enum class LyricVariant(val source: LyricSource) {
@@ -31,12 +47,16 @@ sealed class LyricSourceData(val source: LyricSource, val priority: Int) {
     ) : LyricSourceData(LyricSource.QQMusic, 1)
 
     data class AM(val lyric: String) : LyricSourceData(LyricSource.AM, 3)
+
+    /** 酷狗 LRC 歌词（BBPlayer 式搜索匹配源，仅 B 站曲目使用）。 */
+    data class Kugou(val lyric: String) : LyricSourceData(LyricSource.Kugou, 0)
 }
 
 enum class LyricSource {
     Empty,
     NetEaseCloudMusic,
     QQMusic,
+    Kugou,
     AM,
     Loading
 }

@@ -1,5 +1,10 @@
 package com.ljyh.mei.ui.screen.playlist.component
 
+import com.ljyh.mei.ui.component.playlist.songListDividerColor
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.layout.height
+import com.ljyh.mei.ui.component.item.PortraitMediaRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,20 +47,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
 import com.kyant.capsule.ContinuousRoundedRectangle
 import com.ljyh.mei.R
 import com.ljyh.mei.constants.DetailPageHorizontalPadding
-import com.ljyh.mei.constants.CommonImageRadius
+import com.ljyh.mei.constants.songListCoverCornerRadius
+import com.ljyh.mei.constants.songListCoverSize
 import com.ljyh.mei.data.model.MediaMetadata
 import com.ljyh.mei.ui.component.playlist.PlayingImageView
 import com.ljyh.mei.ui.component.playlist.AnimatedSoundWave
 import com.ljyh.mei.ui.component.playlist.FavoriteTrackStar
-import com.ljyh.mei.ui.glass.LocalGlassColors
-import com.ljyh.mei.ui.glass.SfIcon
-import com.ljyh.mei.ui.glass.SfSymbol
+import io.github.neoruaa.glasmio.core.LocalGlassColors
+import io.github.neoruaa.glasmio.icons.SfIcon
+import io.github.neoruaa.glasmio.icons.SfSymbol
+import com.ljyh.mei.utils.TimeUtils.formatDuration
 import com.ljyh.mei.utils.smallImage
 
-private val DetailTrackArtworkSize = 48.dp
 private val DetailTrackMoreButtonSize = 44.dp
 private val DetailTrackMoreIconSize = 16.dp
 private val DetailTrackIndicatorWidth = 18.dp
@@ -72,11 +79,28 @@ internal fun DetailTrackRow(
     onClick: () -> Unit,
     selected: Boolean?,
     onMoreClick: ((Rect) -> Unit)?,
+    showDuration: Boolean = false,
 ) {
     val colors = LocalGlassColors.current
+    val compactRows = rememberDeviceInfo().isLandscape
+    val artworkSize = songListCoverSize(compactRows)
+    if (!compactRows && showArtwork && selected == null) {
+        PortraitMediaRow(
+            image = track.coverUrl.smallImage(), title = track.title,
+            artist = track.artists.joinToString(" / ") { it.name },
+            detail = if (showDuration) formatDuration(track.duration) else "",
+            onClick = onClick, modifier = Modifier, album = null, suffix = null,
+            suffixColor = null, favorite = isFavorite, showDivider = false,
+            onMore = onMoreClick, navigationArrow = false, footer = null,
+        )
+        return
+    }
+
     val numberWidth = if (showArtwork) 0.dp else albumTrackNumberWidth()
     val numberColumnWidth = maxOf(numberWidth, DetailTrackIndicatorWidth)
-    val favoriteOffset = -(DetailPageHorizontalPadding + DetailTrackFavoriteSize) / 2
+    val favoriteOffset = -(DetailPageHorizontalPadding + DetailTrackFavoriteSize) / 2 +
+        if (compactRows) 0.dp else 2.dp
+    val moreButtonOffset = if (compactRows) -8.dp else 8.dp
     var menuAnchor by remember { mutableStateOf(Rect.Zero) }
     Box(Modifier.fillMaxWidth()) {
         if (isFavorite) {
@@ -88,12 +112,12 @@ internal fun DetailTrackRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = if (showArtwork) 64.dp else 52.dp)
+                .heightIn(min = if (showArtwork) { 56.dp } else 52.dp)
                 .then(
                     if (selected == null) Modifier.clickable(onClick = onClick)
                     else Modifier.selectable(selected = selected, role = Role.Checkbox, onClick = onClick)
                 )
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (selected != null) {
@@ -111,8 +135,8 @@ internal fun DetailTrackRow(
                     imageUrl = track.coverUrl.smallImage(),
                     isPlaying = false,
                     modifier = Modifier
-                        .size(DetailTrackArtworkSize)
-                        .clip(ContinuousRoundedRectangle(CommonImageRadius)),
+                        .size(artworkSize)
+                        .clip(ContinuousRoundedRectangle(songListCoverCornerRadius(compactRows))),
                 )
             } else {
                 Box(
@@ -162,8 +186,8 @@ internal fun DetailTrackRow(
                     text = track.title,
                     color = colors.content,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 17.sp,
-                        lineHeight = 22.sp,
+                        fontSize = if (compactRows) 16.sp else 15.sp,
+                        lineHeight = if (compactRows) 22.sp else 20.sp,
                         fontWeight = FontWeight.Normal,
                     ),
                     maxLines = if (showArtwork) 1 else 2,
@@ -173,14 +197,23 @@ internal fun DetailTrackRow(
                     Text(
                         text = track.artists.joinToString(" / ") { it.name },
                         color = colors.secondaryContent,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 18.sp),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = if (compactRows) 13.sp else 12.sp, lineHeight = if (compactRows) 18.sp else 17.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
+            if (showDuration) {
+                Text(
+                    text = formatDuration(track.duration),
+                    modifier = Modifier.padding(start = 16.dp).detailInkBlend(),
+                    color = colors.secondaryContent,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = if (compactRows) 16.sp else 17.sp),
+                    maxLines = 1, softWrap = false,
+                )
+            }
             onMoreClick?.let { onMore ->
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(if (compactRows && !showArtwork && showDuration) 12.dp else 8.dp))
                 Box(
                     modifier = Modifier.width(DetailTrackMoreButtonSize),
                     contentAlignment = Alignment.Center,
@@ -188,7 +221,7 @@ internal fun DetailTrackRow(
                     Box(
                         modifier = Modifier
                             .size(DetailTrackMoreButtonSize)
-                            .offset(x = (DetailTrackMoreButtonSize - DetailTrackMoreIconSize) / 2)
+                            .offset(x = moreButtonOffset)
                             .onGloballyPositioned { menuAnchor = it.boundsInWindow() }
                             .clip(CircleShape)
                             .clickable(
@@ -203,7 +236,7 @@ internal fun DetailTrackRow(
                             symbol = SfSymbol.Ellipsis,
                             contentDescription = stringResource(R.string.more_actions_title),
                             tint = colors.secondaryContent,
-                            size = DetailTrackMoreIconSize,
+                            size = if (compactRows && !showArtwork) 18.dp else DetailTrackMoreIconSize,
                         )
                     }
                 }
@@ -218,16 +251,24 @@ internal fun DetailTrackDivider(
     selectionMode: Boolean = false,
     fullWidth: Boolean = false,
 ) {
-    val colors = LocalGlassColors.current
+    val dividerColor = songListDividerColor()
+    val compactRows = rememberDeviceInfo().isLandscape
+    val artworkSize = songListCoverSize(compactRows)
     val leadingInset = if (fullWidth) 0.dp else {
-        (if (showArtwork) DetailTrackArtworkSize else maxOf(albumTrackNumberWidth(), DetailTrackIndicatorWidth)) +
+        (if (showArtwork) artworkSize else maxOf(albumTrackNumberWidth(), DetailTrackIndicatorWidth)) +
             12.dp +
             (if (selectionMode) 36.dp else 0.dp)
     }
+    if (!compactRows && !fullWidth) {
+        Box(Modifier.fillMaxWidth().padding(start = leadingInset).height(0.dp).drawBehind {
+            drawLine(dividerColor, Offset.Zero, Offset(size.width, 0f), strokeWidth = 0.5.dp.toPx())
+        })
+        return
+    }
     HorizontalDivider(
-        modifier = Modifier.padding(start = leadingInset).detailInkBlend(),
+        modifier = Modifier.padding(start = leadingInset),
         thickness = 0.5.dp,
-        color = colors.content.copy(alpha = 0.16f),
+        color = dividerColor,
     )
 }
 
