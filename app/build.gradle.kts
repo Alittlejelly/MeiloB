@@ -66,10 +66,16 @@ val buildCommitSha = sourceBuildMetadata[1].ifBlank {
     providers.gradleProperty("mei.buildCommitSha").orElse("").get().trim()
 }.takeIf { it.matches(Regex("[0-9a-fA-F]{40}|[0-9a-fA-F]{64}")) }.orEmpty().lowercase()
 val buildSourceDirty = sourceBuildMetadata[2].toBoolean()
-val isCanonicalCi = providers.environmentVariable("GITHUB_REPOSITORY").orElse("").get()
-    .equals("NEORUAA/MeiloX", ignoreCase = true) &&
-    providers.environmentVariable("GITHUB_WORKFLOW_REF").orElse("").get().substringBefore('@')
-        .equals("NEORUAA/MeiloX/.github/workflows/main.yml", ignoreCase = true)
+// 之前硬编码成上游 NEORUAA/MeiloX：fork 上 GITHUB_REPOSITORY 永远对不上，
+// 于是 workflow 传进来的 -Pmei.ciRunNumber / -Pmei.ciRunAttempt 全被忽略，
+// 构建标识恒为 ci=0.0，关于页里看不出是哪次 CI 打的包。
+// 改成“工作流所属仓库 == 当前构建仓库”，fork 和上游同时成立；
+// 只要不是在本仓库自己的 main.yml 里跑（本地构建、别人的 workflow 调用）就仍然为 0。
+val githubRepository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("")
+val githubWorkflowRef = providers.environmentVariable("GITHUB_WORKFLOW_REF").getOrElse("")
+val isCanonicalCi = githubRepository.isNotEmpty() &&
+    githubRepository.equals(githubWorkflowRef.substringBefore("/.github/"), ignoreCase = true) &&
+    githubWorkflowRef.substringBefore('@').endsWith("/.github/workflows/main.yml", ignoreCase = true)
 val ciRunNumber = if (isCanonicalCi) providers.gradleProperty("mei.ciRunNumber")
     .orElse(providers.environmentVariable("GITHUB_RUN_NUMBER"))
     .orElse("0")
