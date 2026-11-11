@@ -1011,7 +1011,6 @@ class MainActivity : ComponentActivity() {
                         // 默认 320dp 在平板上偏宽，内容区被挤掉一大截；缩到 250dp。
                         sidebarWidth = 250.dp,
                         // 平板：返回键先退页面（还能回退时不收侧栏）。
-                        canNavigateBack = { backStack.size > 1 },
                         sidebar = {
                             Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()
                                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
@@ -1394,7 +1393,6 @@ class MainActivity : ComponentActivity() {
                                     // 打开 B 站全站搜索结果，而不是退出搜索。
                                     onCancel = { onSearch(query.text) },
                                     cancelLabel = stringResource(R.string.app_tab_search),
-                                    cancelIcon = "magnifyingglass",
                                     placeholder = stringResource(R.string.search_bar_search),
                                     focusRequester = searchBarFocusRequester,
                                     autoFocus = focusSearchOnEntry,
