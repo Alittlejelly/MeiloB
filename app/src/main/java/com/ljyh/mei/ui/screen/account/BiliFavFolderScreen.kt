@@ -24,7 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -49,6 +52,7 @@ import com.ljyh.mei.data.repository.biliFavPlaylistId
 import com.ljyh.mei.playback.queue.ListQueue
 import com.ljyh.mei.ui.component.BiliCover
 import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
+import io.github.neoruaa.glasmio.icons.SfIcon
 import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
 import io.github.neoruaa.glasmio.ui.GlasmioListRow
 import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
@@ -134,9 +138,15 @@ fun BiliFavFolderScreen(
     val uiState by viewModel.state.collectAsState()
     val gridColumns = rememberBiliGridColumns()
 
+    // 倒序：本地反转当前已加载的列表（收藏夹详情与收藏合集详情共用本页）。
+    // 注意接口只取了第一页（ps=50），超过 50 个内容时倒序只作用于已加载部分。
+    var reversedOrder by rememberSaveable { mutableStateOf(false) }
+    val loadedVideos = (uiState.videos as? Resource.Success)?.data
+    val displayVideos = if (reversedOrder) loadedVideos?.asReversed() else loadedVideos
+
     fun playAll(startIndex: Int) {
         val connection = playerConnection ?: return
-        val list = (uiState.videos as? Resource.Success)?.data ?: return
+        val list = displayVideos ?: return
         scope.launch {
             val items = list.map { it.toMediaItem() }
             connection.playQueue(
@@ -156,6 +166,7 @@ fun BiliFavFolderScreen(
         bottomPadding = insets.calculateBottomPadding(),
     ) {
         item(key = "folder-header") {
+            val colors = LocalGlassColors.current
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -167,14 +178,33 @@ fun BiliFavFolderScreen(
                 Text(
                     "共 $count 个内容" + if (uiState.synced) " · 已同步" else "",
                     fontSize = 14.sp,
-                    color = LocalGlassColors.current.content.copy(alpha = 0.6f),
+                    color = colors.content.copy(alpha = 0.6f),
                 )
+                // 倒序开关：反转列表显示顺序，「播放全部」和单曲点击同样按倒序入队。
+                val active = reversedOrder
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(ContinuousRoundedRectangle(10.dp))
+                        .background(colors.content.copy(alpha = if (active) 0.14f else 0.07f))
+                        .clickable { reversedOrder = !reversedOrder }
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                ) {
+                    SfIcon("arrow.up.arrow.down", null, size = 13.dp, tint = colors.content)
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        "倒序",
+                        fontSize = 13.sp,
+                        color = colors.content.copy(alpha = if (active) 1f else 0.6f),
+                    )
+                }
             }
         }
 
         when (val result = uiState.videos) {
             is Resource.Success -> {
-                if (result.data.isNotEmpty()) {
+                val shown = displayVideos ?: result.data
+                if (shown.isNotEmpty()) {
                     item(key = "play-all") {
                         GlasmioGroupedList {
                             GlasmioListRow(
@@ -187,7 +217,7 @@ fun BiliFavFolderScreen(
                     }
                 }
                 biliVideoGridItems(
-                    videos = result.data,
+                    videos = shown,
                     columns = gridColumns,
                     key = { video -> "${video.aid}_${video.cid}" },
                 ) { index, _ -> playAll(index) }
