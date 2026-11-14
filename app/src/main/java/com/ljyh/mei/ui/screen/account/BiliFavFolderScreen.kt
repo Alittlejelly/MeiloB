@@ -52,9 +52,11 @@ import com.ljyh.mei.data.repository.biliFavPlaylistId
 import com.ljyh.mei.playback.queue.ListQueue
 import com.ljyh.mei.ui.component.BiliCover
 import com.ljyh.mei.ui.component.utils.rememberDeviceInfo
+import io.github.neoruaa.glasmio.core.IosTypography
 import io.github.neoruaa.glasmio.icons.SfIcon
 import io.github.neoruaa.glasmio.ui.GlasmioGroupedList
 import io.github.neoruaa.glasmio.ui.GlasmioListRow
+import io.github.neoruaa.glasmio.ui.glasmioGroupedListBackground
 import com.ljyh.mei.ui.navigation.MeiloXPinnedListPage
 import io.github.neoruaa.glasmio.core.LocalGlassColors
 import com.ljyh.mei.ui.local.LocalNavController
@@ -180,23 +182,25 @@ fun BiliFavFolderScreen(
                     fontSize = 14.sp,
                     color = colors.content.copy(alpha = 0.6f),
                 )
-                // 倒序开关：反转列表显示顺序，「播放全部」和单曲点击同样按倒序入队。
+                // 倒序开关：与「播放全部」同一套玻璃卡片材质（同背板、同 accent 图标、同字号），
+                // 只是按内容自适应宽度、右对齐，不占满整行。激活时图标换成实心圆形变体。
                 val active = reversedOrder
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(ContinuousRoundedRectangle(10.dp))
-                        .background(colors.content.copy(alpha = if (active) 0.14f else 0.07f))
+                        .height(36.dp)
+                        .glasmioGroupedListBackground(shape = ContinuousRoundedRectangle(18.dp))
                         .clickable { reversedOrder = !reversedOrder }
-                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                        .padding(horizontal = 14.dp),
                 ) {
-                    SfIcon("arrow.up.arrow.down", null, size = 13.dp, tint = colors.content)
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "倒序",
-                        fontSize = 13.sp,
-                        color = colors.content.copy(alpha = if (active) 1f else 0.6f),
+                    SfIcon(
+                        if (active) "arrow.up.arrow.down.circle.fill" else "arrow.up.arrow.down",
+                        null,
+                        size = 16.dp,
+                        tint = colors.accent,
                     )
+                    Spacer(Modifier.width(8.dp))
+                    Text("倒序", style = IosTypography.body, color = colors.content)
                 }
             }
         }
